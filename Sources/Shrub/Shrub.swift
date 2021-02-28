@@ -6,7 +6,7 @@ public struct Shrub<Key: Hashable, Value> {
 }
 
 extension Shrub {
-    public init(_ shrub: Self) { self.any = shrub.any }
+    public init(_ shrub: Self) { self = shrub }
     public init(_ values: Value...) { self.any = values.isEmpty ? nil : values }
 }
 
