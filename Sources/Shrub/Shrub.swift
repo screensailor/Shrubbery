@@ -3,8 +3,39 @@ import Peek
 public struct Shrub<Key: Hashable, Value> {
     
     public private(set) var any: Any?
+}
+
+extension Shrub {
+    public init(_ shrub: Self) { self.any = shrub.any }
+    public init(_ values: Value...) { self.any = values.isEmpty ? nil : values }
+}
+
+extension Shrub {
     
-    public init(_ any: Any = Value?.none as Any) { self.any = any }
+    public init<Values>(_ values: Values) where
+        Values: Collection,
+        Values.Element == Value
+    {
+        any = values.isEmpty ? nil : values
+    }
+    
+    public init<Shrubbery>(_ values: Shrubbery) where
+        Shrubbery: Collection,
+        Shrubbery.Element == Self
+    {
+        any = values.isEmpty ? nil : values.map(\.any)
+    }
+}
+
+extension Shrub {
+    
+    public init(_ dictionary: [Key: Value]) {
+        any = dictionary.isEmpty ? nil : dictionary
+    }
+    
+    public init(_ dictionary: [Key: Self]) {
+        any = dictionary.isEmpty ? nil : dictionary.mapValues(\.any)
+    }
 }
 
 extension Shrub {
