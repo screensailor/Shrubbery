@@ -2,21 +2,19 @@ class Optional™: Hopes {
     
     func test_isNil() throws {
         
-        hope.true(isNil(Optional<Any>.some(Int?.none as Any)))
+        hope(isNilAfterFlattening(Optional<Any>.some(Int?.none as Any))) == true
         
         let a: Int???? = nil
         let any = a as Any
-        
-        assert(any != nil)
 
-        hope.true(isNil(any))
+        hope(isNilAfterFlattening(any)) == true
         
         let array = [Int?.none as Any, 1, 2, Any?.none as Any, 4, Any?.none as Any]
         for (i, e) in array.enumerated() {
             switch i {
-            case 0: hope.true(isNil(e))
-            case 1: hope.false(isNil(e))
-            case 5: hope.true(isNil(e))
+            case 0: hope(isNilAfterFlattening(e)) == true
+            case 1: hope(isNilAfterFlattening(e)) == false
+            case 5: hope(isNilAfterFlattening(e)) == true
             default: break
             }
         }
@@ -26,18 +24,18 @@ class Optional™: Hopes {
         
         let a: Int???? = 4
         let b = a!
-        let aƒ = flattenOptionality(of: a)!
+        let aƒ = try flattenOptionality(of: a).hopefully()
         
         assert(type(of: b) == Int???.self)
         
         hope.true(type(of: aƒ) == Int.self)
         
         let any = a as Any
-        let anyƒ = flattenOptionality(of: any)!
+        let anyƒ = try flattenOptionality(of: any).hopefully()
         hope.true(type(of: anyƒ) == Int.self)
 
         let ºany = a as Any?
-        let ºanyƒ = flattenOptionality(of: ºany)!
+        let ºanyƒ = try flattenOptionality(of: ºany).hopefully()
         hope.true(type(of: ºanyƒ) == Int.self)
     }
     

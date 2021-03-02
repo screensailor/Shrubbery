@@ -244,7 +244,7 @@ extension Shrub where Value == Any {
             try Self.set(value, at: path.dropFirst(), in: &o)
             array[int] = o as Any
             for e in array.reversed() {
-                guard isNil(e) else { break }
+                guard isNilAfterFlattening(e) else { break }
                 array.removeLast()
             }
             this = array.isEmpty ? none : array
@@ -259,7 +259,7 @@ extension Shrub where Value == Any {
     }
 }
 
-// MARK: expresible as...
+// MARK: expresible
 
 extension Shrub: ExpressibleByNilLiteral {
     public init(nilLiteral: ()) {

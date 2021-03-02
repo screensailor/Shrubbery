@@ -5,7 +5,7 @@ public func flattenOptionality<A>(of any: A) -> Any? {
     return o.safelyUnwrapped
 }
 
-public func isNil<A>(_ any: A) -> Bool {
+public func isNilAfterFlattening<A>(_ any: A) -> Bool {
     switch flattenOptionality(of: any) {
     case .none: return true
     case .some: return false

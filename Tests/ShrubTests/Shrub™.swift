@@ -3,14 +3,17 @@
 @_exported import Peek
 
 class Shrub™: Hopes {
-
-}
-
-extension Shrub™ {
     
     func test_subscript() throws { 
         
-        var o: JSON = nil
+        var o: JSON
+            
+        o = nil
+        o = []
+        o = [:]
+        
+        o[] = "👋"
+        hope(o[]) == "👋"
         
         o["one"] = 1
         hope(o["one"]) == 1
@@ -22,10 +25,10 @@ extension Shrub™ {
         hope(o["one"]) == [nil, nil, 2] // did not append
         
         o["one", 2] = nil
-        hope.true(isNil(o["one"])) // none left
+        hope.true(isNilAfterFlattening(o["one"])) // none left
         
         o["one", "two"] = nil
-        hope.true(isNil(o["one", "two"]))
+        hope.true(isNilAfterFlattening(o["one", "two"]))
     }
     
     func test_expressible() throws {
@@ -80,13 +83,4 @@ extension Shrub™ {
         try Shrub.set("😃", at: 2, "three", 4, "five", in: &any)
         try hope(Shrub.get(2, "three", 4, "five", in: any) as? String) == "😃"
     }
-}
-
-extension Shrub™ {
-    
-    static var allTests = [
-        ("test_subscript", test_subscript),
-        ("test_Shub_get", test_Shub_get),
-        ("test_Shrub_set", test_Shrub_set),
-    ]
 }
