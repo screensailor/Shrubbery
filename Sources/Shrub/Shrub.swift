@@ -12,14 +12,16 @@ extension Shrub {
 
 extension Shrub {
     
-    public init<Values>(_ values: Values) where
+    public init<Values>(_ values: Values)
+    where
         Values: Collection,
         Values.Element == Value
     {
         any = values.isEmpty ? nil : values
     }
     
-    public init<Shrubbery>(_ values: Shrubbery) where
+    public init<Shrubbery>(_ values: Shrubbery)
+    where
         Shrubbery: Collection,
         Shrubbery.Element == Self
     {
@@ -56,7 +58,8 @@ extension Shrub {
         }
     }
 
-    public subscript<A, Path>(_ path: Path, as _: A.Type = A.self) -> A? where
+    public subscript<A, Path>(_ path: Path, as _: A.Type = A.self) -> A?
+    where
         Path: Collection,
         Path.Element == Index
     {
@@ -80,7 +83,8 @@ extension Shrub {
         }
     }
 
-    public subscript<Path>(_ path: Path) -> Any? where
+    public subscript<Path>(_ path: Path) -> Any?
+    where
         Path: Collection,
         Path.Element == Index
     {
@@ -99,7 +103,8 @@ extension Shrub {
         try get(path, as: A.self)
     }
     
-    public func get<A, Path>(_ path: Path, as: A.Type = A.self) throws -> A where
+    public func get<A, Path>(_ path: Path, as: A.Type = A.self) throws -> A
+    where
         Path: Collection,
         Path.Element == Index
     {
@@ -117,7 +122,8 @@ extension Shrub {
         try set(value, at: path)
     }
     
-    public mutating func set<Path, A>(_ value: A, at path: Path) throws where
+    public mutating func set<Path, A>(_ value: A, at path: Path) throws
+    where
         Path: Collection,
         Path.Element == Index
     {
@@ -132,7 +138,8 @@ extension Shrub {
         try set(value, at: path)
     }
     
-    public mutating func set<Path>(_ value: Self, at path: Path) throws where
+    public mutating func set<Path>(_ value: Self, at path: Path) throws
+    where
         Path: Collection,
         Path.Element == Index
     {
@@ -144,13 +151,14 @@ extension Shrub {
 
 extension Shrub where Value == Any {
     
-    public static func get(_ path: Index..., in any: Any) throws -> Any where
-        Key: Hashable
+    public static func get(_ path: Index..., in any: Any) throws -> Any
+    where Key: Hashable
     {
         try get(path, in: any)
     }
     
-    public static func get<Path>(_ path: Path, in any: Any) throws -> Any where
+    public static func get<Path>(_ path: Path, in any: Any) throws -> Any
+    where
         Path: Collection,
         Path.Element == Index
     {
@@ -182,13 +190,14 @@ extension Shrub where Value == Any {
 
 extension Shrub where Value == Any {
     
-    public static func get(_ path: Index..., in any: Any?) throws -> Any where
-        Key: Hashable
+    public static func get(_ path: Index..., in any: Any?) throws -> Any
+    where Key: Hashable
     {
         try get(path, in: any as Any)
     }
     
-    public static func get<Path>(_ path: Path, in any: Any?) throws -> Any where
+    public static func get<Path>(_ path: Path, in any: Any?) throws -> Any
+    where
         Path: Collection,
         Path.Element == Index
     {
@@ -203,7 +212,8 @@ extension Shrub where Value == Any {
     }
 
 
-    public static func set<Path>(_ value: Any?, at path: Path, in any: inout Any) throws where
+    public static func set<Path>(_ value: Any?, at path: Path, in any: inout Any) throws
+    where
         Path: Collection,
         Path.Element == Index
     {
@@ -221,7 +231,8 @@ extension Shrub where Value == Any {
         try set(value, at: path, in: &this)
     }
 
-    public static func set<Path>(_ value: Any?, at path: Path, in this: inout Any?) throws where
+    public static func set<Path>(_ value: Any?, at path: Path, in this: inout Any?) throws
+    where
         Path: Collection,
         Path.Element == Index
     {

@@ -19,8 +19,8 @@ extension EitherType {
 }
 
 extension EitherType {
-    @inlinable public var a: A? { if case let .a(o) = value { return o} else { return nil } }
-    @inlinable public var b: B? { if case let .b(o) = value { return o} else { return nil } }
+    @inlinable public var a: A? { if case let .a(o) = value { return o } else { return nil } }
+    @inlinable public var b: B? { if case let .b(o) = value { return o } else { return nil } }
 }
 
 extension EitherType {
@@ -34,8 +34,18 @@ extension EitherType {
 extension EitherType.Value: Equatable where A: Equatable, B: Equatable {}
 
 extension EitherType: Equatable where A: Equatable, B: Equatable {
+    
     @inlinable public static func == (lhs: Self, rhs: Self) -> Bool {
         lhs.value == rhs.value
+    }
+    
+    @inlinable public static func == (lhs: Self, rhs: EitherType<B, A>) -> Bool {
+        switch (lhs.value, rhs.value)
+        {
+        case let (.a(l), .b(r)): return l == r
+        case let (.b(l), .a(r)): return l == r
+        default: return false
+        }
     }
 }
 
