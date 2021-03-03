@@ -1,11 +1,11 @@
-public typealias IntOrString = EitherType<Int, String>
+public typealias CodingIndex = EitherType<Int, String>
 
-extension IntOrString {
+extension CodingIndex {
     @inlinable public var int: Int? { a }
     @inlinable public var string: String? { b }
 }
 
-extension IntOrString: Decodable {
+extension CodingIndex: Decodable {
     public init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
         do {
@@ -16,7 +16,7 @@ extension IntOrString: Decodable {
     }
 }
 
-extension IntOrString: Encodable {
+extension CodingIndex: Encodable {
     public func encode(to encoder: Encoder) throws {
         var container = encoder.singleValueContainer()
         switch value {
@@ -26,7 +26,7 @@ extension IntOrString: Encodable {
     }
 }
 
-extension IntOrString {
+extension CodingIndex {
     public var debugDescription: String {
         switch value {
         case let .a(o): return String(describing: o)
@@ -35,11 +35,11 @@ extension IntOrString {
     }
 }
 
-extension IntOrString: CustomStringConvertible {
+extension CodingIndex: CustomStringConvertible {
     @inlinable public var description: String { debugDescription }
 }
 
-extension IntOrString: CodingKey {
+extension CodingIndex: CodingKey {
     
     @inlinable public var stringValue: String { debugDescription }
     @inlinable public init?(stringValue: String) { self.init(stringValue) }
@@ -48,23 +48,23 @@ extension IntOrString: CodingKey {
     @inlinable public init?(intValue: Int) { self.init(intValue) }
 }
 
-extension IntOrString: ExpressibleByIntegerLiteral {
+extension CodingIndex: ExpressibleByIntegerLiteral {
     @inlinable public init(integerLiteral value: IntegerLiteralType) { self.init(value) }
 }
 
-extension IntOrString: ExpressibleByStringLiteral {
+extension CodingIndex: ExpressibleByStringLiteral {
     @inlinable public init(stringLiteral value: String) { self.init(value) }
 }
 
-extension IntOrString: ExpressibleByUnicodeScalarLiteral {
+extension CodingIndex: ExpressibleByUnicodeScalarLiteral {
     @inlinable public init(unicodeScalarLiteral value: String) { self.init(value) }
 }
 
-extension IntOrString: ExpressibleByExtendedGraphemeClusterLiteral {
+extension CodingIndex: ExpressibleByExtendedGraphemeClusterLiteral {
     @inlinable public init(extendedGraphemeClusterLiteral value: String) { self.init(value) }
 }
 
-extension Collection where Element == IntOrString {
+extension Collection where Element == CodingIndex {
     
     @inlinable public func joined(separator: String = ".") -> String {
         lazy.map(\.debugDescription).joined(separator: separator)
