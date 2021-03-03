@@ -16,16 +16,20 @@ extension Spring {
         Future { $0(.success(of)) }
     }
     
-    public func stream<A, Path>(of: Path, as: A.Type = A.self) -> Stream<A>
-    where
-        Path: Sequence,
-        Path.Element == Index
-    {
-        self.stream(of: Array(of), as: A.self)
-    }
-    
     public func stream<A>(of: Index..., as: A.Type = A.self) -> Stream<A> {
         self.stream(of: of, as: A.self)
+    }
+}
+
+extension Published.Publisher: Spring
+where Value: Shrubbery
+{
+    public typealias Index = Value.Index
+    
+    public func stream<A>(of: [Index], as: A.Type) -> Stream<A> {
+        self
+            .map{ o in Result{ try o.get(of, as: A.self) } }
+            .eraseToAnyPublisher()
     }
 }
 
