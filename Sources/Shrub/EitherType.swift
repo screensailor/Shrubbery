@@ -2,8 +2,18 @@ prefix operator ^ /// lift operator
 
 public prefix func ^ <A, B>(a: A) -> EitherType<A, B> { .init(a) }
 public prefix func ^ <A, B>(b: B) -> EitherType<A, B> { .init(b) }
-public prefix func ^ <A, B, Path>(path: Path) -> [EitherType<A, B>] where Path: Collection, Path.Element == A { path.map(EitherType.init) }
-public prefix func ^ <A, B, Path>(path: Path) -> [EitherType<A, B>] where Path: Collection, Path.Element == B { path.map(EitherType.init) }
+
+public prefix func ^ <A, B, Path>(path: Path) -> [EitherType<A, B>]
+where
+    Path: Collection,
+    Path.Element == A
+{ path.map(EitherType.init) }
+
+public prefix func ^ <A, B, Path>(path: Path) -> [EitherType<A, B>]
+where
+    Path: Collection,
+    Path.Element == B
+{ path.map(EitherType.init) }
 
 public struct EitherType<A, B> {
     public private(set) var value: Value
@@ -64,7 +74,51 @@ extension EitherType: Hashable where A: Hashable, B: Hashable {
     }
 }
 
-extension EitherType: CustomDebugStringConvertible {
+extension EitherType: CustomStringConvertible {
+    public var description: String {
+        switch value {
+        case let .a(o): return String(describing: o)
+        case let .b(o): return String(describing: o)
+        }
+    }
+}
+
+public struct EitherTypeDecodingError: Error {
+    let error: (a: Error, b: Error)
+}
+
+extension EitherType: Decodable
+where
+    A: Decodable,
+    B: Decodable
+{
+    public init(from decoder: Decoder) throws {
+        do {
+            try self.init(A(from: decoder))
+        } catch let a {
+            do {
+                try self.init(B(from: decoder))
+            } catch let b {
+                throw EitherTypeDecodingError(error: (a, b))
+            }
+        }
+    }
+}
+
+extension EitherType: Encodable
+where
+    A: Encodable,
+    B: Encodable
+{
+    public func encode(to encoder: Encoder) throws {
+        switch value {
+        case let .a(o): try o.encode(to: encoder)
+        case let .b(o): try o.encode(to: encoder)
+        }
+    }
+}
+
+extension EitherType {
     public var debugDescription: String {
         switch value {
         case let .a(o): return String(describing: o)
