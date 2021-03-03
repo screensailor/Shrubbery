@@ -15,6 +15,18 @@ extension Spring {
     public func source(of: [Index]) -> Future<[Index], Error> {
         Future { $0(.success(of)) }
     }
+    
+    public func stream<A, Path>(of: Path, as: A.Type = A.self) -> Stream<A>
+    where
+        Path: Sequence,
+        Path.Element == Index
+    {
+        self.stream(of: Array(of), as: A.self)
+    }
+    
+    public func stream<A>(of: Index..., as: A.Type = A.self) -> Stream<A> {
+        self.stream(of: of, as: A.self)
+    }
 }
 
 public typealias CurrentShrubSubject<A: Shrubbery> = CurrentValueSubject<JSON, Never>
