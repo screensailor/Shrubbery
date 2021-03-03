@@ -8,7 +8,7 @@ class Pond™: XCTestCase {
         
         var result: Result<Int, Error> = .failure("😱".error())
         
-        a.stream(of: "one", 2, "three", as: Int.self)
+        a.stream(of: "one", 2, "three")
             .sink{ result = $0 }
             .store(in: &bag)
         
