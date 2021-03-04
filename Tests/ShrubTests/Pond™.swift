@@ -8,9 +8,7 @@ class Pond™: Hopes {
         
         var result: Result<Int, Error> = .failure("😱")
 
-        $a.stream(of: "one", 2, "three")
-            .sink{ result = $0 }
-            .store(in: &bag)
+        $a["one", 2, "three"].sink{ result = $0 }.store(in: &bag)
 
         a["one", 2, "three"] = 4
 
@@ -19,16 +17,14 @@ class Pond™: Hopes {
     
     func test_CurrentShrubSubject() throws {
 
-        let a = CurrentValueSubject<JSON, Never>(nil)
+        let a: CurrentValueSubject<JSON, Never> = nil
         
         var result: Result<Int, Error> = .failure("😱")
         
-        a.stream(of: "one", 2, "three")
-            .sink{ result = $0 }
-            .store(in: &bag)
+        a["one", 2, "three"].sink{ result = $0 }.store(in: &bag)
         
         a.value["one", 2, "three"] = 4
         
-        hope(result) == 4 // TODO:❗️ hope(result) == 4
+        hope(result) == 4
     }
 }
