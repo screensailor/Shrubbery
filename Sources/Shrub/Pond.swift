@@ -1,14 +1,12 @@
-public struct Pond<A, Value>: Spring
-where A: Spring
+public struct Pond<S, Value>: Spring
+where S: Spring
 {
-    public typealias Index = A.Index
+    public let spring: S
     
-    public let spring: A
+    public private(set) var data: Shrub<S.Key, Value> = nil
+    public private(set) var sources: [S.Key: Int] = [:]
     
-    public private(set) var data: Shrub<Index, Value> = nil
-    public private(set) var sources: [[Index]: Int] = [:]
-    
-    public func stream<A>(of: [Index], as: A.Type) -> Stream<A> {
+    public func stream<A>(of: S.Key, as: A.Type) -> Stream<A> {
         fatalError()
     }
 }
