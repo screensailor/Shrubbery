@@ -1,4 +1,4 @@
-public struct Pond<G, Value>: Spring
+public class Pond<G, Value>: Spring
 where
     G: Geyser,
     G.Key: RangeReplaceableCollection,
@@ -12,14 +12,28 @@ where
     
     public private(set) var data: Shrub<Index, Value> = nil
     
+    private var bag: Set<AnyCancellable> = []
+    
+    public init(geyser: G) {
+        self.geyser = geyser
+    }
+    
     public func stream<A>(of key: Key, as: A.Type) -> Stream<A> {
-        
-        let x = geyser
+        geyser
             .source(of: key)
-            
-        
-            
-        let y = x.map{ $0 }
+            .flatMap{ [weak self] (result: Result<Key, Error>) -> Stream<A> in
+                guard let self = self else {
+                    return Just(.failure("\(Self.self) is no more".error())).eraseToAnyPublisher()
+                }
+                switch result {
+                case let .success(key): return self.geyser.stream(of: key, as: A.self)
+                case let .failure(error): return Just(.failure(error)).eraseToAnyPublisher()
+                }
+            }
+            .sink{ result in
+                
+            }
+            .store(in: &bag)
         
         fatalError()
     }
