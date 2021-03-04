@@ -1,4 +1,4 @@
-class Pond™: XCTestCase {
+class Pond™: Hopes {
     
     private var bag: Set<AnyCancellable> = []
     
@@ -6,7 +6,7 @@ class Pond™: XCTestCase {
     
     func test_Published() throws {
         
-        var result: Result<Int, Error> = .failure("😱".error())
+        var result: Result<Int, Error> = .failure("😱")
 
         $a.stream(of: "one", 2, "three")
             .sink{ result = $0 }
@@ -14,14 +14,14 @@ class Pond™: XCTestCase {
 
         a["one", 2, "three"] = 4
 
-        try hope(result.get()) == 4
+        hope(result) == 4
     }
     
     func test_CurrentShrubSubject() throws {
 
-        let a = CurrentShrubSubject<JSON>(nil)
+        let a = CurrentValueSubject<JSON, Never>(nil)
         
-        var result: Result<Int, Error> = .failure("😱".error())
+        var result: Result<Int, Error> = .failure("😱")
         
         a.stream(of: "one", 2, "three")
             .sink{ result = $0 }
@@ -29,6 +29,6 @@ class Pond™: XCTestCase {
         
         a.value["one", 2, "three"] = 4
         
-        try hope(result.get()) == 4
+        hope(result) == 4 // TODO:❗️ hope(result) == 4
     }
 }

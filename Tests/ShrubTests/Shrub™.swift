@@ -3,6 +3,8 @@
 @_exported import Shrub
 @_exported import Combine
 
+extension String: Error {}
+
 class Shrub™: Hopes {
     
     func test_subscript() throws { 
