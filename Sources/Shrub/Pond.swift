@@ -1,12 +1,12 @@
-public struct Pond<S, Value>: Spring
-where S: Spring
+public struct Pond<G, Value>: Spring
+where G: Geyser
 {
-    public let spring: S
+    public let geyser: G
     
-    public private(set) var data: Shrub<S.Key, Value> = nil
-    public private(set) var sources: [S.Key: Int] = [:]
+    public private(set) var data: Shrub<G.Key, Value> = nil
+    public private(set) var sources: [G.Key: Int] = [:]
     
-    public func stream<A>(of: S.Key, as: A.Type) -> Stream<A> {
+    public func stream<A>(of: G.Key, as: A.Type) -> Stream<A> {
         fatalError()
     }
 }
