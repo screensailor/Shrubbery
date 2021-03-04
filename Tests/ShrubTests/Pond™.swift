@@ -15,7 +15,7 @@ class Pond™: Hopes {
         hope(result) == 4
     }
     
-    func test_CurrentShrubSubject() throws {
+    func test_CurrentValueSubject() throws {
 
         let a: CurrentValueSubject<JSON, Never> = nil
         
