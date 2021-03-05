@@ -19,15 +19,15 @@ extension Publisher {
     }
 }
 
-extension Publisher where Output: ResultProtocol {
+extension Publisher where Output: Signal {
     
-    public func get() -> AnyPublisher<Output.Success, Error> {
+    public func get() -> AnyPublisher<Output.Value, Error> {
         self
             .tryMap{ try $0.get() }
             .eraseToAnyPublisher()
     }
     
-    public func map<A>(_ ƒ: @escaping (Output.Success) throws -> A) -> AnyPublisher<Result<A, Error>, Failure> {
+    public func map<A>(_ ƒ: @escaping (Output.Value) throws -> A) -> AnyPublisher<Result<A, Error>, Failure> {
         self
             .map{ (o: Output) -> Result<A, Error> in
                 do {
