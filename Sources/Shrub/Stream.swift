@@ -6,13 +6,6 @@ extension Publisher {
     
     public func stream() -> Stream<Output> {
         self
-            .result()
-            .map{ $0.mapError{ $0 } }
-            .eraseToAnyPublisher()
-    }
-    
-    public func result() -> AnyPublisher<Result<Output, Failure>, Never> {
-        self
             .map{ .success($0) }
             .catch { Just(.failure($0)) }
             .eraseToAnyPublisher()

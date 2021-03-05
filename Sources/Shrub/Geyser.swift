@@ -1,8 +1,4 @@
-public protocol Geyser: Spring {
+public protocol Geyser: Spring where Key: RangeReplaceableCollection {
     
-    typealias Path = [Index]
-    associatedtype Index: Hashable
-    
-    func path(for: Key) -> Path
     func sources(of: Key) -> Stream<Shrub<Key, ()>>
 }
