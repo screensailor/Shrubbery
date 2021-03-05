@@ -12,7 +12,7 @@ extension Publisher {
     }
 }
 
-extension Publisher where Output: Signal {
+extension Publisher where Output: Wave {
     
     public func get() -> AnyPublisher<Output.Value, Error> {
         self
