@@ -1,4 +1,3 @@
-public protocol Geyser: Spring where Key: RangeReplaceableCollection {
-    
-    func sources(of: Key) -> Stream<Shrub<Key, ()>>
+public protocol Geyser: Spring {
+    func sources(of: Key) -> Stream<Shrub<Key, Key>>
 }
