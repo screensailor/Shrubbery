@@ -17,11 +17,32 @@ public protocol Shrubbery {
     
     typealias Index = EitherType<Int, Key>
     
-    func get<A, Path>(_ path: Path, as: A.Type) throws -> A
+    func `as`<A>(_: A.Type) throws -> A
+    
+    func get<Path>(_ path: Path) throws -> Self
+    where
+        Path: Collection,
+        Path.Element == Index
+    
+    mutating
+    func set<Path>(_ value: Self, at path: Path) throws
     where
         Path: Collection,
         Path.Element == Index
 }
 
 // TODO: implement most of Shrub here
-
+extension Shrubbery {
+    
+    public func get<A>(_ path: Index..., as: A.Type = A.self) throws -> A {
+        try get(path, as: A.self)
+    }
+    
+    public func get<A, Path>(_ path: Path, as: A.Type = A.self) throws -> A
+    where
+        Path: Collection,
+        Path.Element == Index
+    {
+        try get(path).as(A.self)
+    }
+}

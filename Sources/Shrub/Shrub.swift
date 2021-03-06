@@ -49,6 +49,16 @@ extension Shrub {
 
 extension Shrub {
     
+    public func `as`<A>(_: A.Type) throws -> A {
+        guard let a = any as? A else {
+            throw "Expected \(A.self) but got \(type(of: any))".error()
+        }
+        return a
+    }
+}
+
+extension Shrub {
+    
     public subscript<A>(_ path: Index..., as _: A.Type = A.self) -> A? {
         get {
             self[path, as: A.self]
@@ -98,21 +108,14 @@ extension Shrub {
 }
 
 extension Shrub {
-    
-    public func get<A>(_ path: Index..., as: A.Type = A.self) throws -> A {
-        try get(path, as: A.self)
-    }
-    
-    public func get<A, Path>(_ path: Path, as: A.Type = A.self) throws -> A
+        
+    public func get<Path>(_ path: Path) throws -> Self
     where
         Path: Collection,
         Path.Element == Index
     {
         let any = try Shrub<Key, Any>.get(path, in: self.any)
-        guard let a = any as? A else {
-            throw "Expected \(A.self) but got \(type(of: any))".error()
-        }
-        return a
+        return Shrub(any: any)
     }
 }
 
