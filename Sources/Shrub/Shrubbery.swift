@@ -1,3 +1,14 @@
+/*
+ * - decoder & encoder of Shrubbery
+ * - subscribing vs observing
+ * - flat collections (path components) vs deep documents (values)
+ */
+
+// TODO: implement most of Shrub here
+
+public typealias Code = Shrub
+public typealias Encoded = Shrubbery
+
 extension Shrub: Shrubbery {}
 
 public protocol Shrubbery {

@@ -12,8 +12,12 @@ extension Publisher {
     }
 }
 
-extension Publisher where Output: Wave, Failure == Never {
-
+extension Publisher
+where
+    Output: Wave,
+    Failure == Never
+{
+    
     public func get() -> AnyPublisher<Output.Value, Error> {
         self
             .tryMap{ try $0.get() }
