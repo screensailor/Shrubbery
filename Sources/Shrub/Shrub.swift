@@ -33,7 +33,7 @@ extension ShrubAny {
         Path.Element == Index
     {
         let any = flattenOptionality(
-            of: (any as? SomeShrubbery)?.unwrapped ?? any
+            of: (any as? AnyWrapper)?.unwrapped ?? any
         )
         guard let index = path.first else {
             return any
@@ -75,7 +75,7 @@ extension ShrubAny {
         Path.Element == Index
     {
         let value = flattenOptionality(
-            of: (value as? SomeShrubbery)?.unwrapped ?? value
+            of: (value as? AnyWrapper)?.unwrapped ?? value
         )
         guard let index = path.first else {
             any = value

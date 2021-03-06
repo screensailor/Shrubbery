@@ -10,18 +10,11 @@ import Peek
 public typealias Code = Shrub<String, Codable>
 public protocol Encoded: Shrubbery where Key == String, Value: Codable {}
 
-public protocol SomeShrubbery: ExpressibleByNilLiteral {
-    var unwrapped: Any? { get }
-    init(_ unwrapped: Any?)
-}
-
 public protocol Shrubbery:
-    SomeShrubbery,
+    AnyWrapper,
     ExpressibleByArrayLiteral,
     ExpressibleByDictionaryLiteral where Key: Hashable
 {
-    associatedtype Value
-    
     typealias Index = EitherType<Int, Key>
 
     func get(_ path: [Index]) throws -> Self
@@ -131,13 +124,6 @@ extension Shrubbery {
 }
 
 // MARK: expresible
-
-extension SomeShrubbery {
-    
-    public init(nilLiteral: ()) {
-        self.init(nil)
-    }
-}
 
 extension Shrubbery {
 
