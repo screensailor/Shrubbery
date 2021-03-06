@@ -1,11 +1,9 @@
-/*
- * - decoder & encoder of Shrubbery
+/**
+ * - events vs? streams - i.e. events as streams of () or of Event value?
  * - subscribing vs observing
+ * - decoder & encoder of Shrubbery
  * - flat collections (path components) vs deep documents (values)
  */
-
-// TODO: implement most of Shrub here
-
 public typealias Code = Shrub
 public typealias Encoded = Shrubbery
 
@@ -21,3 +19,6 @@ public protocol Shrubbery {
         Path: Collection,
         Path.Element == Index
 }
+
+// TODO: implement most of Shrub here
+
