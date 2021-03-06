@@ -2,12 +2,12 @@ import Peek
 
 public struct Shrub<Key: Hashable, Value> {
     
-    public private(set) var any: Any?
+    public private(set) var unwrapped: Any?
 }
 
 extension Shrub {
     public init(_ shrub: Self) { self = shrub }
-    public init(_ values: Value...) { self.any = values.isEmpty ? nil : values }
+    public init(_ values: Value...) { self.unwrapped = values.isEmpty ? nil : values }
 }
 
 extension Shrub {
@@ -17,7 +17,7 @@ extension Shrub {
         Values: Collection,
         Values.Element == Value
     {
-        any = values.isEmpty ? nil : values
+        unwrapped = values.isEmpty ? nil : values
     }
     
     public init<Shrubbery>(_ values: Shrubbery)
@@ -25,18 +25,18 @@ extension Shrub {
         Shrubbery: Collection,
         Shrubbery.Element == Self
     {
-        any = values.isEmpty ? nil : values.map(\.any)
+        unwrapped = values.isEmpty ? nil : values.map(\.unwrapped)
     }
 }
 
 extension Shrub {
     
     public init(_ dictionary: [Key: Value]) {
-        any = dictionary.isEmpty ? nil : dictionary
+        unwrapped = dictionary.isEmpty ? nil : dictionary
     }
     
     public init(_ dictionary: [Key: Self]) {
-        any = dictionary.isEmpty ? nil : dictionary.mapValues(\.any)
+        unwrapped = dictionary.isEmpty ? nil : dictionary.mapValues(\.unwrapped)
     }
 }
 
@@ -45,16 +45,6 @@ extension Shrub {
     public typealias Index = EitherType<Int, Key>
     
     public static var empty: Self { .init() }
-}
-
-extension Shrub {
-    
-    public func `as`<A>(_: A.Type) throws -> A {
-        guard let a = any as? A else {
-            throw "Expected \(A.self) but got \(type(of: any))".error()
-        }
-        return a
-    }
 }
 
 extension Shrub {
@@ -114,8 +104,7 @@ extension Shrub {
         Path: Collection,
         Path.Element == Index
     {
-        let any = try Shrub<Key, Any>.get(path, in: self.any)
-        return Shrub(any: any)
+        try Shrub(unwrapped: Shrub<Key, Any>.get(path, in: self.unwrapped))
     }
 }
 
@@ -130,8 +119,8 @@ extension Shrub {
         Path: Collection,
         Path.Element == Index
     {
-        let value = (value as? Self)?.any ?? value
-        try Shrub<Key, Any>.set(value, at: path, in: &any)
+        let value = (value as? Self)?.unwrapped ?? value
+        try Shrub<Key, Any>.set(value, at: path, in: &unwrapped)
     }
 }
 
@@ -146,7 +135,7 @@ extension Shrub {
         Path: Collection,
         Path.Element == Index
     {
-        try Shrub<Key, Any>.set(value.any, at: path, in: &any)
+        try Shrub<Key, Any>.set(value.unwrapped, at: path, in: &unwrapped)
     }
 }
 
@@ -240,7 +229,7 @@ extension Shrub where Value == Any {
         Path.Element == Index
     {
         let value = flattenOptionality(
-            of: (value as? Self)?.any ?? value
+            of: (value as? Self)?.unwrapped ?? value
         )
         guard let index = path.first else {
             this = value
@@ -277,20 +266,20 @@ extension Shrub where Value == Any {
 
 extension Shrub: ExpressibleByNilLiteral {
     public init(nilLiteral: ()) {
-        any = nil
+        unwrapped = nil
     }
 }
 
 extension Shrub: ExpressibleByArrayLiteral {
     public init(arrayLiteral elements: Self...) {
-        any = elements.map(\.any)
+        unwrapped = elements.map(\.unwrapped)
     }
 }
 
 extension Shrub: ExpressibleByDictionaryLiteral {
     public init(dictionaryLiteral elements: (Key, Self)...) {
-        let pairs = elements.map{ ($0, $1.any) }
-        any = Dictionary(pairs){ _, last in last }
+        let pairs = elements.map{ ($0, $1.unwrapped) }
+        unwrapped = Dictionary(pairs){ _, last in last }
     }
 }
 

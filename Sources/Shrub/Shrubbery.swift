@@ -17,7 +17,7 @@ public protocol Shrubbery {
     
     typealias Index = EitherType<Int, Key>
     
-    func `as`<A>(_: A.Type) throws -> A
+    var unwrapped: Any? { get }
     
     func get<Path>(_ path: Path) throws -> Self
     where
@@ -32,10 +32,21 @@ public protocol Shrubbery {
 }
 
 // TODO: implement most of Shrub here
+
+extension Shrubbery {
+    
+    public func `as`<A>(_: A.Type) throws -> A {
+        guard let a = unwrapped as? A else {
+            throw "Expected \(A.self) but got \(type(of: unwrapped))".error()
+        }
+        return a
+    }
+}
+
 extension Shrubbery {
     
     public func get<A>(_ path: Index..., as: A.Type = A.self) throws -> A {
-        try get(path, as: A.self)
+        try get(path).as(A.self)
     }
     
     public func get<A, Path>(_ path: Path, as: A.Type = A.self) throws -> A
