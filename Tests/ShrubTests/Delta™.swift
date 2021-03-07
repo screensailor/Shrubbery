@@ -53,7 +53,7 @@ extension Delta™ {
         
         func flow<A>(of route: JSONRoute, as: A.Type) -> Flow<A> {
             var source = route
-            return db.source(of: source)
+            return db.source(of: route)
             .print("✅ 1").flowFlatMap{ [weak self] o -> Flow<JSON> in
                 guard let self = self else { throw "🗑" }
                 source = o
@@ -84,10 +84,6 @@ extension Delta™ {
                 return Just(.failure("Can flow only at depth 1")).eraseToAnyPublisher()
             }
             return Just(.success([index])).eraseToAnyPublisher()
-        }
-        
-        func route(to route: JSONRoute) -> Flow<JSONRoute> {
-            Just(.success(route)).eraseToAnyPublisher()
         }
     }
 }
