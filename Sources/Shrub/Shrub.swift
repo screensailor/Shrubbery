@@ -32,17 +32,20 @@ extension ShrubAny {
         Path: Collection,
         Path.Element == Index
     {
-        let any = flattenOptionality(
+        let ºany = flattenOptionality(
             of: (any as? AnyWrapper)?.unwrapped ?? any
         )
         guard let index = path.first else {
-            return any
+            return ºany
+        }
+        guard let any = ºany else {
+            throw "Expected \(path) but found nil".error()
         }
         switch index.value
         {
         case .a(let int):
             guard let array = any as? [Any] else {
-                throw "Expected [Any] but found \(type(of: any)) at \(index) in \(path)".error()
+                throw "Expected [Any] but found \(type(of: any)) at '\(index)' in \(path)".error()
             }
             guard array.indices.contains(int) else {
                 throw "Index \(int) in \(path) is out of bounds - found only \(array.count) elements".error()
@@ -51,7 +54,7 @@ extension ShrubAny {
             
         case .b(let key):
             guard let dictionary = any as? [Key: Any] else {
-                throw "Expected [Any] but found \(type(of: any)) at \(key) in \(path)".error()
+                throw "Expected [Any] but found \(type(of: any)) at '\(key)' in \(path)".error()
             }
             guard let any = dictionary[key] else {
                 throw "No value found at \(key) in \(path)".error()

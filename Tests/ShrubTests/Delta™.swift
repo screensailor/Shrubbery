@@ -39,10 +39,14 @@ extension Delta™ {
         
         pond["one", "two", "three"].sink{ result = $0 }.store(in: &bag)
         pond["one", "two", "three"].sink{ result = $0 }.store(in: &bag)
-
+        
         pond.db.store["one", "two", "three"] = 4
         
         hope(result) == 4
+        
+        pond.db.store["one", "two", "three"] = 5
+        
+        hope(result) == 5
     }
     
     class Pond: Delta {
