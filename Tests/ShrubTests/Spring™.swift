@@ -1,4 +1,4 @@
-class Pond™: Hopes {
+class Spring™: Hopes {
     
     private var bag: Set<AnyCancellable> = []
     

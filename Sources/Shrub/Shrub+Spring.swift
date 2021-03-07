@@ -1,4 +1,4 @@
-extension Published.Publisher: Spring
+extension Published.Publisher: Delta
 where Value: Shrubbery
 {
     public func stream<A>(of: [Value.Index], as: A.Type) -> Stream<A> {
@@ -8,7 +8,7 @@ where Value: Shrubbery
     }
 }
 
-extension CurrentValueSubject: Spring
+extension CurrentValueSubject: Delta
 where
     Output: Shrubbery,
     Failure == Never
