@@ -30,9 +30,9 @@ extension Shrubbery {
     public func cast<A>(to: A.Type = A.self) throws -> A {
         try self.as(A.self)
     }
-    
+        
     public func `as`<A>(_: A.Type) throws -> A {
-        guard let a = unwrapped as? A else {
+        guard let a = unwrapped as? A ?? self as? A else {
             throw "Expected \(A.self) but got \(type(of: unwrapped))".error()
         }
         return a

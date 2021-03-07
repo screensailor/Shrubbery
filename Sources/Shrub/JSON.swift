@@ -1,6 +1,7 @@
 import Foundation
 
 public typealias JSON = Shrub<String, JSONFragment>
+public typealias JSONRoute = Route<JSON.Key>
 
 public protocol JSONFragment {}
 

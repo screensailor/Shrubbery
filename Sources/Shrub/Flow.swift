@@ -4,7 +4,7 @@ public typealias Flow<A> = AnyPublisher<Result<A, Error>, Never>
 
 extension Publisher {
     
-    public func stream() -> Flow<Output> {
+    public func flow() -> Flow<Output> {
         self
             .map{ .success($0) }
             .catch { Just(.failure($0)) }
