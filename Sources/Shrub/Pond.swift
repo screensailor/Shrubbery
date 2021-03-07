@@ -3,7 +3,7 @@ public typealias Route<Key> = [Fork<Key>] where Key: Hashable
 
 public protocol Delta {
     associatedtype Key: Hashable
-    func stream<A>(of: Key, as: A.Type) -> Stream<A>
+    func stream<A>(of: Key, as: A.Type) -> Flow<A>
 }
 
 public protocol Tributary: Delta {

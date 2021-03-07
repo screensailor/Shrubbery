@@ -1,10 +1,10 @@
 @_exported import Combine
 
-public typealias Stream<A> = AnyPublisher<Result<A, Error>, Never>
+public typealias Flow<A> = AnyPublisher<Result<A, Error>, Never>
 
 extension Publisher {
     
-    public func stream() -> Stream<Output> {
+    public func stream() -> Flow<Output> {
         self
             .map{ .success($0) }
             .catch { Just(.failure($0)) }
@@ -24,7 +24,7 @@ where
             .eraseToAnyPublisher()
     }
     
-    public func map<A>(_ ƒ: @escaping (Output.Value) throws -> A) -> Stream<A> {
+    public func map<A>(_ ƒ: @escaping (Output.Value) throws -> A) -> Flow<A> {
         self
             .map{ x in Result{ try ƒ(x.get()) } }
             .eraseToAnyPublisher()
