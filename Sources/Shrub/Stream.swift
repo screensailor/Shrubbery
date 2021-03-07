@@ -14,7 +14,7 @@ extension Publisher {
 
 extension Publisher
 where
-    Output: Wave,
+    Output: Drop,
     Failure == Never
 {
     

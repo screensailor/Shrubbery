@@ -1,4 +1,4 @@
-public protocol Wave {
+public protocol Drop {
     
     associatedtype Value
     
@@ -10,7 +10,7 @@ public protocol Wave {
     func get() throws -> Value
 }
 
-extension Result: Wave where Failure == Error {
+extension Result: Drop where Failure == Error {
     
     public static func value(_ value: Success) -> Self { .success(value) }
     public static func error<E: Error>(_ error: E) -> Self { .failure(error) }
