@@ -38,7 +38,8 @@ extension Delta™ {
         let pond = Pond()
         
         pond["one", "two", "three"].sink{ result = $0 }.store(in: &bag)
-        
+        pond["one", "two", "three"].sink{ result = $0 }.store(in: &bag)
+
         pond.db.store["one", "two", "three"] = 4
         
         hope(result) == 4
@@ -50,25 +51,20 @@ extension Delta™ {
         
         @Published var store: JSON = nil
         
-        func flow<A>(of route: Route<JSON.Key>, as: A.Type) -> Flow<A> {
+        func flow<A>(of route: JSONRoute, as: A.Type) -> Flow<A> {
             var source = route
-            return db.source(of: source).print("✅ 1").flatMap{ [weak self] o -> Flow<JSON> in
-                guard let self = self else { return Just(.failure("😱")).eraseToAnyPublisher() }
-                do {
-                    source = try o.get()
-                    return self.db.flow(of: source, as: JSON.self)
-                } catch {
-                    return Just(.failure("\(error)")).eraseToAnyPublisher()
-                }
-            }.print("✅ 2").flatMap{ [weak self] o -> Flow<A> in
-                guard let self = self else { return Just(.failure("😱")).eraseToAnyPublisher() }
-                do {
-                    try self.store.set(o.get(), at: source)
-                    return self.$store.flow(of: route, as: A.self)
-                } catch {
-                    return Just(.failure("\(error)")).eraseToAnyPublisher()
-                }
-            }.eraseToAnyPublisher()
+            return db.source(of: source)
+            .print("✅ 1").flowFlatMap{ [weak self] o -> Flow<JSON> in
+                guard let self = self else { throw "😱" }
+                source = o
+                return self.db.flow(of: source, as: JSON.self)
+            }
+            .print("✅ 2").flowFlatMap{ [weak self] o -> Flow<A> in
+                guard let self = self else { throw "😱" }
+                try self.store.set(o, at: source)
+                return self.$store.flow(of: route, as: A.self)
+            }
+            .print("✅ 3").eraseToAnyPublisher()
         }
     }
 

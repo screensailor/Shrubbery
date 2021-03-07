@@ -18,15 +18,27 @@ where
     Failure == Never
 {
     
-    public func get() -> AnyPublisher<Output.Value, Error> {
+    public func unflow() -> AnyPublisher<Output.Value, Error> {
         self
             .tryMap{ try $0.get() }
             .eraseToAnyPublisher()
     }
     
-    public func map<A>(_ ƒ: @escaping (Output.Value) throws -> A) -> Flow<A> {
+    public func flowMap<A>(_ ƒ: @escaping (Output.Value) throws -> A) -> Flow<A> {
         self
             .map{ x in Result{ try ƒ(x.get()) } }
+            .eraseToAnyPublisher()
+    }
+    
+    public func flowFlatMap<A>(_ ƒ: @escaping (Output.Value) throws -> Flow<A>) -> Flow<A> {
+        self
+            .flatMap{ x -> Flow<A> in
+                do {
+                    return try ƒ(x.get())
+                } catch {
+                    return Fail(error: error).flow()
+                }
+            }
             .eraseToAnyPublisher()
     }
 }
