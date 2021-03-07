@@ -1,3 +1,6 @@
+public typealias Fork<Key> = EitherType<Int, Key> where Key: Hashable
+public typealias Route<Key> = [Fork<Key>] where Key: Hashable
+
 public protocol Delta {
     associatedtype Key: Hashable
     func stream<A>(of: Key, as: A.Type) -> Stream<A>
@@ -5,9 +8,8 @@ public protocol Delta {
 
 public protocol Tributary: Delta {
     associatedtype RouteKey: Hashable
-    typealias Route = [EitherType<Int, RouteKey>]
-    func route(to: Key) -> AnyPublisher<Route, Error>
     func source(of: Key) -> AnyPublisher<Key, Error>
+    func route(to: Key) -> AnyPublisher<Route<RouteKey>, Error>
 }
 
 public protocol Pond: Delta {

@@ -15,7 +15,7 @@ public protocol Shrubbery:
     ExpressibleByArrayLiteral,
     ExpressibleByDictionaryLiteral where Key: Hashable
 {
-    typealias Index = EitherType<Int, Key>
+    typealias Index = Fork<Key>
 
     func get(_ path: [Index]) throws -> Self
     
