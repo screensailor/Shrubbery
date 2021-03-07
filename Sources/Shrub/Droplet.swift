@@ -1,4 +1,4 @@
-public protocol Drop {
+public protocol Droplet {
     
     associatedtype Value
     
@@ -10,7 +10,7 @@ public protocol Drop {
     func get() throws -> Value
 }
 
-extension Result: Drop where Failure == Error {
+extension Result: Droplet where Failure == Error {
     
     public static func value(_ value: Success) -> Self { .success(value) }
     public static func error<E: Error>(_ error: E) -> Self { .failure(error) }

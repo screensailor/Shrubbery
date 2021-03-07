@@ -55,12 +55,12 @@ extension Delta™ {
             var source = route
             return db.source(of: source)
             .print("✅ 1").flowFlatMap{ [weak self] o -> Flow<JSON> in
-                guard let self = self else { throw "😱" }
+                guard let self = self else { throw "🗑" }
                 source = o
                 return self.db.flow(of: source, as: JSON.self)
             }
             .print("✅ 2").flowFlatMap{ [weak self] o -> Flow<A> in
-                guard let self = self else { throw "😱" }
+                guard let self = self else { throw "🗑" }
                 try self.store.set(o, at: source)
                 return self.$store.flow(of: route, as: A.self)
             }
