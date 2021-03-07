@@ -1,4 +1,4 @@
-public protocol Droplet {
+public protocol Droplet: CustomStringConvertible {
     
     associatedtype Value
     
@@ -10,17 +10,36 @@ public protocol Droplet {
     func get() throws -> Value
 }
 
+extension Droplet {
+    
+    public var description: String {
+        do { return try "\(get())" }
+        catch { return "⚠️ \(error)" }
+    }
+}
+
+// MARK: Result
+
 extension Result: Droplet, CustomStringConvertible where Failure == Error {
     
     public static func value(_ value: Success) -> Self { .success(value) }
     public static func error<E: Error>(_ error: E) -> Self { .failure(error) }
     
     public var isError: Bool { if case .failure = self { return true } else { return false } }
-    
-    public var description: String {
-        switch self {
-        case let .success(o): return "\(o)"
-        case let .failure(o): return "⚠️ \(o)"
-        }
+}
+
+// MARK: think...
+
+@dynamicMemberLookup
+public struct Drop<A, Key> {
+    public let key: Key
+    public let result: Result<A, Error>
+}
+
+extension Drop {
+    public subscript<T>(dynamicMember keyPath: KeyPath<Result<A, Error>, T>) -> T {
+        result[keyPath: keyPath]
     }
 }
+
+

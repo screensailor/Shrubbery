@@ -37,16 +37,20 @@ extension Delta™ {
         
         let pond = Pond()
         
-        pond["one", "two", "three"].sink{ result = $0 }.store(in: &bag)
-        pond["one", "two", "three"].sink{ result = $0 }.store(in: &bag)
+        let route: JSONRoute = ["one", "two", "three"]
         
-        pond.db.store["one", "two", "three"] = 4
+        pond[route].sink{ result = $0 }.store(in: &bag)
+        pond[route].sink{ result = $0 }.store(in: &bag)
+        
+        pond.db.store[route] = 4
         
         hope(result) == 4
         
-        pond.db.store["one", "two", "three"] = 5
+        pond.db.store[route] = 5
         
         hope(result) == 5
+        
+        bag.removeAll()
     }
     
     class Pond: Delta {
@@ -58,17 +62,35 @@ extension Delta™ {
         func flow<A>(of route: JSONRoute, as: A.Type) -> Flow<A> {
             var source = route
             return db.source(of: route)
-            .print("✅ 1").flowFlatMap{ [weak self] o -> Flow<JSON> in
-                guard let self = self else { throw "🗑" }
-                source = o
-                return self.db.flow(of: source, as: JSON.self)
-            }
-            .print("✅ 2").flowFlatMap{ [weak self] o -> Flow<A> in
-                guard let self = self else { throw "🗑" }
-                try self.store.set(o, at: source)
-                return self.$store.flow(of: route, as: A.self)
-            }
-            .print("✅ 3").eraseToAnyPublisher()
+                .print("✅ 1").flowFlatMap{ [weak self] o -> Flow<JSON> in
+                    guard let self = self else { throw "🗑".error() }
+                    source = o
+                    return self.db.flow(of: source, as: JSON.self)
+                }
+                .print("✅ 2").flowFlatMap{ [weak self] o -> Flow<A> in
+                    guard let self = self else { throw "🗑".error() }
+                    try self.store.set(o, at: source)
+                    return self.$store.flow(of: route, as: A.self)
+                        .handleEvents(
+                            receiveSubscription: { o in
+                                print("✅❓receiveSubscription", route, o)
+                            },
+                            receiveOutput: { o in
+                                print("✅❓receiveOutput", route, o)
+                            },
+                            receiveCompletion: { o in
+                                print("✅❓receiveCompletion", route, o)
+                            },
+                            receiveCancel: {
+                                print("✅❓receiveCancel", route)
+                            },
+                            receiveRequest: { o in
+                                print("✅❓receiveRequest", route, o)
+                            }
+                        )
+                        .eraseToAnyPublisher()
+                }
+                .print("✅ 3").eraseToAnyPublisher()
         }
     }
 
@@ -78,16 +100,16 @@ extension Delta™ {
         
         func flow<A>(of route: JSONRoute, as: A.Type) -> Flow<A> {
             guard route.count == 1 else {
-                return Just(.failure("Can flow only at depth 1")).eraseToAnyPublisher()
+                return Fail(error: "Can flow only at depth 1").flow()
             }
             return $store.flow(of: route)
         }
         
         func source(of route: JSONRoute) -> Flow<JSONRoute> {
             guard let index = route.first else {
-                return Just(.failure("Can flow only at depth 1")).eraseToAnyPublisher()
+                return Fail(error: "Can flow only at depth 1").flow()
             }
-            return Just(.success([index])).eraseToAnyPublisher()
+            return Just([index]).flow()
         }
     }
 }

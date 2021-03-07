@@ -1,17 +1,5 @@
 @_exported import Combine
 
-@dynamicMemberLookup
-public struct Drop<A, Key> {
-    public let key: Key
-    public let result: Result<A, Error>
-}
-
-extension Drop {
-    public subscript<T>(dynamicMember keyPath: KeyPath<Result<A, Error>, T>) -> T {
-        result[keyPath: keyPath]
-    }
-}
-
 public typealias Flow<A> = AnyPublisher<Result<A, Error>, Never>
 
 extension Publisher {
