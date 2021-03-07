@@ -39,9 +39,10 @@ extension Delta™ {
         
         let route: JSONRoute = ["one", "two", "three"]
         
-        pond[route].sink{ result = $0 }.store(in: &bag)
-        pond[route].sink{ result = $0 }.store(in: &bag)
-        
+        pond[route].sink{ result = $0.peek("✅❓💛 1") }.store(in: &bag)
+        pond[route].sink{ result = $0.peek("✅❓💛 2") }.store(in: &bag)
+        pond[route].sink{ result = $0.peek("✅❓💛 3") }.store(in: &bag)
+
         pond.db.store[route] = 4
         
         hope(result) == 4
@@ -50,6 +51,14 @@ extension Delta™ {
         
         hope(result) == 5
         
+        pond.db.store[route] = 6
+        
+        hope(result) == 6
+        
+        pond.db.store[route] = 7
+        
+        hope(result) == 7
+
         bag.removeAll()
     }
     
@@ -59,38 +68,41 @@ extension Delta™ {
         
         @Published var store: JSON = nil
         
+        var sources: [JSONRoute: AnyCancellable] = [:]
+        
         func flow<A>(of route: JSONRoute, as: A.Type) -> Flow<A> {
-            var source = route
             return db.source(of: route)
-                .print("✅ 1").flowFlatMap{ [weak self] o -> Flow<JSON> in
+                .print("✅ 0").flowFlatMap{ [weak self] source -> Flow<A> in
                     guard let self = self else { throw "🗑".error() }
-                    source = o
-                    return self.db.flow(of: source, as: JSON.self)
+                    guard !self.sources.keys.contains(source) else {
+                        return self.$store.flow(of: route, as: A.self)
+                    }
+                    let s = self.db.flow(of: source, as: JSON.self).share()
+                    self.sources[source] = s.print("✅ 2").sink{ o in
+                        self.store[source] = try? o.get()
+                    }
+                    return s.first().flowFlatMap{ _ in
+                        self.$store.flow(of: route, as: A.self)
+                    }
                 }
-                .print("✅ 2").flowFlatMap{ [weak self] o -> Flow<A> in
-                    guard let self = self else { throw "🗑".error() }
-                    try self.store.set(o, at: source)
-                    return self.$store.flow(of: route, as: A.self)
-                        .handleEvents(
-                            receiveSubscription: { o in
-                                print("✅❓receiveSubscription", route, o)
-                            },
-                            receiveOutput: { o in
-                                print("✅❓receiveOutput", route, o)
-                            },
-                            receiveCompletion: { o in
-                                print("✅❓receiveCompletion", route, o)
-                            },
-                            receiveCancel: {
-                                print("✅❓receiveCancel", route)
-                            },
-                            receiveRequest: { o in
-                                print("✅❓receiveRequest", route, o)
-                            }
-                        )
-                        .eraseToAnyPublisher()
-                }
-                .print("✅ 3").eraseToAnyPublisher()
+                .handleEvents(
+                    receiveSubscription: { o in
+                        print("✅❓receiveSubscription", route, o)
+                    },
+//                    receiveOutput: { o in
+//                        print("✅❓receiveOutput", route, o)
+//                    },
+                    receiveCompletion: { o in
+                        print("✅❓receiveCompletion", route, o)
+                    },
+                    receiveCancel: {
+                        print("✅❓receiveCancel", route)
+                    },
+                    receiveRequest: { o in
+                        print("✅❓receiveRequest", route, o)
+                    }
+                )
+                .eraseToAnyPublisher()
         }
     }
 
