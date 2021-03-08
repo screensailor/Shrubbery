@@ -32,13 +32,14 @@ where
     
     public func flowFlatMap<A>(_ ƒ: @escaping (Output.Value) throws -> Flow<A>) -> Flow<A> {
         self
-            .flatMap{ x -> Flow<A> in
+            .map{ x -> Flow<A> in
                 do {
                     return try ƒ(x.get())
                 } catch {
                     return Fail(error: error).flow()
                 }
             }
+            .switchToLatest()
             .eraseToAnyPublisher()
     }
 }
