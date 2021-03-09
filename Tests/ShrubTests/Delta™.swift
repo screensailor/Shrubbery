@@ -108,30 +108,12 @@ extension Delta™ {
             db.source(of: route).flowFlatMap{ [weak self] prefixCount -> Flow<A> in
                 guard let self = self else { throw "🗑".error() }
                 let source = Array(route.prefix(prefixCount))
-                guard !self.sources.keys.contains(source) else {
-                    return self.$store.flow(of: route, as: A.self)
+                if !self.sources.keys.contains(source) {
+                    self.sources[source] = self.db.flow(of: source, as: JSON.self).sink{ json in
+                        self.store[source] = try? json.get()
+                    }
                 }
-                let json = self.db.flow(of: source, as: JSON.self)
-//                    .handleEvents(
-//                        receiveSubscription: { o in
-//                            print("✅❓receiveSubscription", source, o)
-//                        },
-//                        receiveCompletion: { o in
-//                            print("✅❓receiveCompletion", source, o)
-//                        },
-//                        receiveCancel: {
-//                            print("✅❓receiveCancel", source)
-//                        }
-//                    )
-                    .share()
-                self.sources[source] = json.sink{ json in
-                    self.store[source] = try? json.get()
-                }
-                return json.first().map{ _ in
-                    self.$store.flow(of: route, as: A.self)
-                }
-                .switchToLatest()
-                .eraseToAnyPublisher()
+                return self.$store.flow(of: route, as: A.self)
             }
         }
     }
