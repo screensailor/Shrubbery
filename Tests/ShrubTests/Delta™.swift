@@ -27,6 +27,23 @@ class Delta™: Hopes {
         
         hope(result) == 4
     }
+    
+    func test_flowFlatMap() throws {
+        
+        let json = CurrentValueSubject<JSONResult, Never>(^0)
+        
+        var result: JSONResult = .failure("😱")
+
+        json.flowFlatMap{ o in Just(o).flow() }.sink{ result = $0 }.store(in: &bag)
+
+        json.value = ^4.0
+        hope(try result.get().cast()) == 4.0
+
+        json.value = .failure("😱")
+
+        json.value = ^5.0
+        hope(try result.get().cast()) == 5.0
+    }
 }
 
 extension Delta™ {
@@ -41,9 +58,9 @@ extension Delta™ {
         
         pond.db.store[route] = 4
         
-        pond[route].sink{ result = $0.peek("✅❓💛 1") }.store(in: &bag)
-        pond[route].sink{ result = $0.peek("✅❓💛 2") }.store(in: &bag)
-        pond[route].sink{ result = $0.peek("✅❓💛 3") }.store(in: &bag)
+        pond[route].sink{ result = $0 ¶ "✅💛 1" }.store(in: &bag)
+        pond[route].sink{ result = $0 ¶ "✅💛 2" }.store(in: &bag)
+        pond[route].sink{ result = $0 ¶ "✅💛 3" }.store(in: &bag)
         
         hope(result) == 4
         
@@ -88,30 +105,33 @@ extension Delta™ {
         var sources: [JSONRoute: AnyCancellable] = [:]
         
         func flow<A>(of route: JSONRoute, as: A.Type) -> Flow<A> {
-            db.source(of: route).flowFlatMap{ [weak self] source -> Flow<A> in
+            db.source(of: route).flowFlatMap{ [weak self] prefixCount -> Flow<A> in
                 guard let self = self else { throw "🗑".error() }
+                let source = Array(route.prefix(prefixCount))
                 guard !self.sources.keys.contains(source) else {
                     return self.$store.flow(of: route, as: A.self)
                 }
                 let json = self.db.flow(of: source, as: JSON.self)
-                    .handleEvents(
-                        receiveSubscription: { o in
-                            print("✅❓receiveSubscription", source, o)
-                        },
-                        receiveCompletion: { o in
-                            print("✅❓receiveCompletion", source, o)
-                        },
-                        receiveCancel: {
-                            print("✅❓receiveCancel", source)
-                        }
-                    )
+//                    .handleEvents(
+//                        receiveSubscription: { o in
+//                            print("✅❓receiveSubscription", source, o)
+//                        },
+//                        receiveCompletion: { o in
+//                            print("✅❓receiveCompletion", source, o)
+//                        },
+//                        receiveCancel: {
+//                            print("✅❓receiveCancel", source)
+//                        }
+//                    )
                     .share()
                 self.sources[source] = json.sink{ json in
                     self.store[source] = try? json.get()
                 }
-                return json.flowFlatMap{ _ in
+                return json.first().map{ _ in
                     self.$store.flow(of: route, as: A.self)
                 }
+                .switchToLatest()
+                .eraseToAnyPublisher()
             }
         }
     }
@@ -128,13 +148,13 @@ extension Delta™ {
             return $store.flow(of: route)
         }
         
-        func source(of route: JSONRoute) -> Flow<JSONRoute> {
+        func source(of route: JSONRoute) -> Flow<PrefixCount> {
             $depth.tryMap{ depth in
                 let source = Array(route.prefix(depth))
                 guard source.count == depth else {
                     throw "Can flow only at depth \(depth)".error()
                 }
-                return source
+                return depth
             }
             .flow()
         }

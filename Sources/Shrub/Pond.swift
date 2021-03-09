@@ -6,8 +6,9 @@ public protocol Delta {
     func flow<A>(of: Key, as: A.Type) -> Flow<A>
 }
 
-public protocol Tributary: Delta {
-    func source(of: Key) -> Flow<Key>
+public protocol Tributary: Delta where Key: Collection {
+    typealias PrefixCount = Int
+    func source(of: Key) -> Flow<PrefixCount>
 }
 
 public protocol Pond: Delta {

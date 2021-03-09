@@ -1,5 +1,9 @@
 import Peek
 
+prefix operator ^ /// lift operator
+
+public prefix func ^ <Key, Value>(a: Value) -> Shrub<Key, Value> { .init(a) }
+
 public struct Shrub<Key, Value>: Shrubbery
 where Key: Hashable
 {    

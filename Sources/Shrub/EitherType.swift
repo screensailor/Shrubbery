@@ -1,5 +1,3 @@
-prefix operator ^ /// lift operator
-
 public prefix func ^ <A, B>(a: A) -> EitherType<A, B> { .init(a) }
 public prefix func ^ <A, B>(b: B) -> EitherType<A, B> { .init(b) }
 

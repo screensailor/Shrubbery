@@ -20,6 +20,11 @@ extension Droplet {
 
 // MARK: Result
 
+public prefix func ^ <Value>(v: Value) -> Result<Value, Error> { .success(v) }
+public prefix func ^ <Key, Value>(v: Value) -> Result<Shrub<Key, Value>, Error> { .success(.init(v)) }
+
+public typealias JSONResult = Result<JSON, Error>
+
 extension Result: Droplet, CustomStringConvertible where Failure == Error {
     
     public static func value(_ value: Success) -> Self { .success(value) }

@@ -1,4 +1,3 @@
-
 extension Delta {
     
     public subscript<A>(of: Key, as _: A.Type = A.self) -> Flow<A> {
