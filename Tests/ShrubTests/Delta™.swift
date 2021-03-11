@@ -104,8 +104,17 @@ extension Delta™ {
         
         var sources: [JSONRoute: AnyCancellable] = [:]
         
+        var flows: [JSONRoute: Flow<JSON>] = [:]
+        
+        var source: [JSONRoute: Flow<Int>] = [:]
+
         func flow<A>(of route: JSONRoute, as: A.Type) -> Flow<A> {
-            db.source(of: route).flowFlatMap{ [weak self] prefixCount -> Flow<A> in
+            
+            _ = source[route, default: self.db.source(of: route)]
+                
+            
+            
+            return db.source(of: route).flowFlatMap{ [weak self] prefixCount -> Flow<A> in
                 guard let self = self else { throw "🗑".error() }
                 let source = Array(route.prefix(prefixCount))
                 if !self.sources.keys.contains(source) {

@@ -1,3 +1,5 @@
+public typealias Flow<A> = AnyPublisher<Result<A, Error>, Never>
+
 public typealias Fork<Key> = EitherType<Int, Key> where Key: Hashable
 public typealias Route<Key> = [Fork<Key>] where Key: Hashable
 
@@ -12,5 +14,5 @@ public protocol Tributary: Delta where Key: Collection {
 }
 
 public protocol Pond: Delta {
-    
+
 }
