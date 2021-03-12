@@ -22,6 +22,9 @@ where
 
 // MARK: DeltaShrub
 
+import Dispatch
+import CombineSchedulers
+
 public typealias DeltaJSON = DeltaShrub<String, JSONFragment>
 
 public class DeltaShrub<Key, Value>: Delta where Key: Hashable {
@@ -34,8 +37,17 @@ public class DeltaShrub<Key, Value>: Delta where Key: Hashable {
     
     private lazy var routes = DefaultInsertingDictionary<Route, Flow<Drop>>(default: shared)
     
-    public init(_ drop: Drop = nil) {
+    private let scheduler: AnyDispatchScheduler
+
+    public init(
+        drop: Drop = nil,
+        on scheduler: AnyDispatchScheduler = DispatchQueue(
+            label: "\(DeltaShrub<Key, Value>.self).q",
+            qos: .userInteractive
+        ).any
+    ) {
         self.drop = drop
+        self.scheduler = scheduler
     }
     
     private func shared(_ route: Route) -> Flow<Drop> {
@@ -50,6 +62,7 @@ public class DeltaShrub<Key, Value>: Delta where Key: Hashable {
         routes[route]
             .map{ o in Result{ try o.get().as(A.self) } }
             .merge(with: Just(Result{ try drop.get(route, as: A.self) } ))
+            .subscribe(on: scheduler)
             .eraseToAnyPublisher()
     }
 }
