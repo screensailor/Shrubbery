@@ -46,7 +46,7 @@ public class DeltaShrub<Key, Value>: Delta where Key: Hashable {
     private func shared(_ route: Route) -> Flow<Store> {
         $store.map{ o in Result{ try o.get(route, as: Store.self) } }
             .print("✅")
-            .multicast{ CurrentValueSubject(.failure("∅".error())) }
+            .multicast(subject: CurrentValueSubject(Result{ try self.store.get(route, as: Store.self) }))
             .autoconnect()
             .eraseToAnyPublisher()
     }

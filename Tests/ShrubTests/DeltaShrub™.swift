@@ -11,7 +11,7 @@ class DeltaShrub™: Hopes {
         let route: JSONRoute = ["one", "two", "three"]
         
         loch.store[route] = 4
-        
+
         loch.flow(of: route).sink{ result = $0 ¶ "✅ 1" }.store(in: &bag)
         loch.flow(of: route).sink{ result = $0 ¶ "✅ 2" }.store(in: &bag)
         loch.flow(of: route).sink{ result = $0 ¶ "✅ 3" }.store(in: &bag)
