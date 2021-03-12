@@ -8,7 +8,7 @@ class DeltaShrub™: Hopes {
         
         let loch = DeltaJSON()
 
-        let route: JSONRoute = ["one", "two", "three"]
+        let route: JSONRoute = [1, "two", 3]
         
         loch.store[route] = 4
 

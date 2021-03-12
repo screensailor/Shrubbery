@@ -49,8 +49,9 @@ public class DeltaShrub<Key, Value>: Delta where Key: Hashable {
                 result = Result{ try o.get(route, as: Store.self) }
                 return result
             }
+            .dropFirst()
             .print("✅")
-            .multicast(subject: CurrentValueSubject(result))
+            .multicast{ CurrentValueSubject(result) }
             .autoconnect()
             .eraseToAnyPublisher()
     }
