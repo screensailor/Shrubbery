@@ -26,31 +26,22 @@ public typealias DeltaJSON = DeltaShrub<String, JSONFragment>
 
 public class DeltaShrub<Key, Value>: Delta where Key: Hashable {
     
-    public typealias Store = Shrub<Key, Value>
-    public typealias Fork = Store.Index
+    public typealias Drop = Shrub<Key, Value>
+    public typealias Fork = Drop.Index
     public typealias Route = [Fork]
     
-    @Published
-    public var store: Shrub<Key, Value> = nil
+    @Published public var store: Shrub<Key, Value> = nil
     
-    private lazy var routes = DefaultInsertingDictionary<Route, Flow<Store>>(default: shared)
+    private lazy var routes = DefaultInsertingDictionary<Route, Flow<Drop>>(default: shared)
     
     public init(_ store: Shrub<Key, Value> = nil) {
         self.store = store
     }
     
-    deinit {
-        print("✅ 🗑", self)
-    }
-    
-    private func shared(_ route: Route) -> Flow<Store> {
-        var result = Result{ try store.get(route, as: Store.self) }
-        return $store.map{ o in
-                result = Result{ try o.get(route, as: Store.self) }
-                return result
-            }
+    private func shared(_ route: Route) -> Flow<Drop> {
+        $store.map{ o in Result{ try o.get(route, as: Drop.self) } }
             .dropFirst()
-            .multicast{ CurrentValueSubject(result) }
+            .multicast(subject: PassthroughSubject())
             .autoconnect()
             .eraseToAnyPublisher()
     }
@@ -58,6 +49,7 @@ public class DeltaShrub<Key, Value>: Delta where Key: Hashable {
     public func flow<A>(of route: Route, as: A.Type = A.self) -> Flow<A> {
         routes[route]
             .map{ o in Result{ try o.get().as(A.self) } }
+            .merge(with: Just(Result{ try store.get(route, as: A.self) } ))
             .eraseToAnyPublisher()
     }
 }
