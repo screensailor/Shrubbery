@@ -50,7 +50,6 @@ public class DeltaShrub<Key, Value>: Delta where Key: Hashable {
                 return result
             }
             .dropFirst()
-            .print("✅")
             .multicast{ CurrentValueSubject(result) }
             .autoconnect()
             .eraseToAnyPublisher()
