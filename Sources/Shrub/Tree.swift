@@ -60,3 +60,19 @@ extension Tree {
         }
     }
 }
+
+extension Tree {
+    
+    // TODO:❗️breadth vs. depth first
+    /// Depth first traversal
+    public func traverse(yield: ((route: [Key], value: Value?)) -> ()) {
+        Self.traverse(route: [], tree: self, yield: yield)
+    }
+    
+    private static func traverse(route: [Key], tree: Tree, yield: ((route: [Key], value: Value?)) -> ()) {
+        yield((route, tree.value))
+        for (key, tree) in tree.branches {
+            traverse(route: route + [key], tree: tree, yield: yield)
+        }
+    }
+}
