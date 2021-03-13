@@ -1,4 +1,3 @@
-import Peek
 import Dispatch
 
 public typealias DeltaJSON = DeltaShrub<String, JSONFragment>
@@ -11,7 +10,7 @@ public class DeltaShrub<Key, Value>: Delta where Key: Hashable, Key: Collection 
     public typealias Subject = PassthroughSubject<Result<Drop, Error>, Never>
     
     private var drop: Drop
-    private let queue: DispatchQueue
+    private let queue: DispatchQueue // TODO: a more generic Scheduler
     private var subjects: Tree<Fork, Subject>
 
     public init(

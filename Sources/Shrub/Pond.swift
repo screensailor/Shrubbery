@@ -5,8 +5,8 @@
  * - flat collections (path components) vs deep documents (values)
  * - decoder & encoder of ``Shrubbery`` (`as _: A.Type` tries a cast then decode where `A: Decodable`)
  */
-public typealias Coded = Shrub<String, Codable>
 public protocol Encoded: Shrubbery where Key == String, Value: Codable {}
+public typealias Coded = Shrub<String, Codable>
 
 public typealias Flow<A> = AnyPublisher<Result<A, Error>, Never>
 
@@ -27,8 +27,9 @@ public protocol Pond: Delta {
 
 }
 
-public struct Signal<Key, Value> where Key: Hashable {
-    public let date: Double
+// TODO: instead of Result ↓
+public struct Datum<Key, Value, Context> where Key: Hashable {
     public let route: Route<Key>
     public let result: Result<Shrub<Key, Value>, Error>
+    public let context: Context
 }
