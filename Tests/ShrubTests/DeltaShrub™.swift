@@ -10,7 +10,7 @@ class DeltaShrub™: Hopes {
 
         let route: JSONRoute = [1, "two", 3]
         
-        delta.drop[route] = 4
+        delta.sync{ $0[route] = 4 }
 
         delta.flow(of: route).sink{ result = $0 ¶ "✅ 1" }.store(in: &bag)
         delta.flow(of: route).sink{ result = $0 ¶ "✅ 2" }.store(in: &bag)
@@ -20,11 +20,11 @@ class DeltaShrub™: Hopes {
 
         hope(result) == 4
         
-        delta.drop[route] = 5
+        delta.sync{ $0[route] = 5 }
         
         hope(result) == 5
         
-        delta.drop[route] = 6
+        delta.sync{ $0[route] = 6 }
         
         hope(result) == 6
         
