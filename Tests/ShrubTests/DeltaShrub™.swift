@@ -15,6 +15,8 @@ class DeltaShrub™: Hopes {
         for i in result.indices {
             delta.flow(of: 1, "two", 3).sink{ result[i] = $0 }.store(in: &bag)
         }
+        
+        hope.for(0.01)
 
         hope(try result.map{ try $0.get() }) == Array(repeating: 4, count: result.count)
 
@@ -43,6 +45,8 @@ class DeltaShrub™: Hopes {
 
         delta.flow(of: 1, "two", 3, "a").sink{ a = $0 }.store(in: &bag)
         delta.flow(of: 1, "two", 3, "b").sink{ b = $0 }.store(in: &bag)
+        
+        hope.for(0.01)
 
         hope(a) == 4
         hope(b) == 4

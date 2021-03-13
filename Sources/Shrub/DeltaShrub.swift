@@ -31,9 +31,13 @@ public class DeltaShrub<Key, Value>: Delta where Key: Hashable, Key: Collection 
 extension DeltaShrub {
     
     public func flow<A>(of route: Route, as: A.Type = A.self) -> Flow<A> {
-        Just(Result{ try drop.get(route) }).merge(
-            with: subjects[value: route, inserting: Subject()].map{ o in Result{ try o.get().as(A.self) } }
-        ).eraseToAnyPublisher()
+        Just(Result{ try get(route) }).merge(
+            with: subjects[value: route, inserting: Subject()].map{ o in
+                Result{ try o.get().as(A.self) }
+            }
+        )
+        .subscribe(on: queue)
+        .eraseToAnyPublisher()
     }
 }
 
@@ -48,7 +52,7 @@ extension DeltaShrub {
         Route: Collection,
         Route.Element == Fork
     {
-        try drop.get(route, as: A.self)
+        try queue.sync{ try drop.get(route) }
     }
 }
 
@@ -63,9 +67,11 @@ extension DeltaShrub {
         Route: Collection,
         Route.Element == Fork
     {
-        try drop.set(value, at: route)
-        subjects[route]?.traverse { subroute, subject in
-            subject?.send(Result{ try drop.get(route + subroute) })
+        try queue.sync{
+            try drop.set(value, at: route)
+            subjects[route]?.traverse { subroute, subject in
+                subject?.send(Result{ try drop.get(route + subroute) })
+            }
         }
     }
 }
