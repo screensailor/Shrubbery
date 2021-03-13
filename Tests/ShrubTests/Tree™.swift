@@ -30,25 +30,23 @@ class Tree™: Hopes {
         
         var tree = Tree<Int, Int>()
         
-        var traversal: [(route: [Int], value: Int)] = []
+        var traversal: [[Int]: Int] = [:]
         
         for x in 1...5 {
             for y in 1...5 {
                 for z in 1...5 {
                     tree[value: x, y, z] = x * y * z
-                    traversal.append(([x, y, z], x * y * z))
+                    traversal[[x, y, z]] = x * y * z
                 }
             }
         }
         
         tree.traverse { route, value in
-            guard let value = value else { return }
-            print(
-                "✅",
-                route.map(\.description).joined(separator: " * "),
-                "=",
-                value
-            )
+            if traversal[route] == value {
+                traversal.removeValue(forKey: route)
+            }
         }
+        
+        hope(traversal.count) == 0
     }
 }

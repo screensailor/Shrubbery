@@ -8,23 +8,25 @@ class DeltaShrub™: Hopes {
         
         var delta = DeltaJSON()
         
-//        delta.sync{ $0[1, "two", 3] = 4 }
-//
-//        for i in result.indices {
-//            delta.flow(of: 1, "two", 3).sink{ result[i] = $0 }.store(in: &bag)
-//        }
-//
+        try delta.set(1, "two", 3, to: 4)
+        
+        hope(try delta.get(1, "two", 3)) == 4
+
+        for i in result.indices {
+            delta.flow(of: 1, "two", 3).sink{ result[i] = $0 ¶ "✅ \(i)" }.store(in: &bag)
+        }
+
 //        hope.for(0.01)
-//
-//        hope(try result.map{ try $0.get() }) == Array(repeating: 4, count: result.count)
-//
-//        delta.sync{ $0[1, "two", 3] = 5 }
-//
-//        hope(try result.map{ try $0.get() }) == Array(repeating: 5, count: result.count)
-//
-//        delta.sync{ $0[1, "two", 3] = 6 }
-//
-//        hope(try result.map{ try $0.get() }) == Array(repeating: 6, count: result.count)
+
+        hope(try result.map{ try $0.get() }) == Array(repeating: 4, count: result.count)
+
+        try delta.set(1, "two", 3, to: 5)
+
+        hope(try result.map{ try $0.get() }) == Array(repeating: 5, count: result.count)
+
+        try delta.set(1, "two", 3, to: 6)
+
+        hope(try result.map{ try $0.get() }) == Array(repeating: 6, count: result.count)
 
         hope.true(Thread.isMainThread)
         delta = DeltaJSON()
