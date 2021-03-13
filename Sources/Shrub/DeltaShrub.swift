@@ -2,7 +2,7 @@ import Dispatch
 
 public typealias DeltaJSON = DeltaShrub<String, JSONFragment>
 
-public class DeltaShrub<Key, Value>: Delta where Key: Hashable, Key: Collection {
+public class x_DeltaShrub<Key, Value>: Delta where Key: Hashable, Key: Collection {
     
     public typealias Drop = Shrub<Key, Value>
     public typealias Fork = Drop.Index
@@ -49,22 +49,23 @@ public class DeltaShrub<Key, Value>: Delta where Key: Hashable, Key: Collection 
     }
 }
 
-public class DeltaShrub2<Key, Value>: Delta where Key: Hashable, Key: Collection {
+public class DeltaShrub<Key, Value>: Delta where Key: Hashable, Key: Collection {
     
     public typealias Drop = Shrub<Key, Value>
     public typealias Fork = Drop.Index
     public typealias Route = [Fork]
+    public typealias Result = Swift.Result<Drop, Error>
+    public typealias Subscriptions = PassthroughSubject<Result, Never>
     
-    @Published private var drop: Drop
-    
-    private lazy var routes = DefaultInsertingDictionary<Route, Flow<Drop>>(default: shared)
-    
+    private var drop: Drop
     private let scheduler: DispatchQueue
+    private var subscriptions: Tree<Key, Subscriptions> = .init()
+    
 
     public init(
         drop: Drop = nil,
         on scheduler: DispatchQueue = .init(
-            label: "\(DeltaShrub2<Key, Value>.self).q",
+            label: "\(DeltaShrub<Key, Value>.self).q",
             qos: .userInteractive
         )
     ) {
@@ -73,21 +74,8 @@ public class DeltaShrub2<Key, Value>: Delta where Key: Hashable, Key: Collection
     }
 
     public func flow<A>(of route: Route, as: A.Type = A.self) -> Flow<A> {
-        scheduler.sync {
-            routes[route]
-                .map{ o in Result{ try o.get().as(A.self) } }
-                .merge(with: Just(Result{ try drop.get(route) } ))
-                .subscribe(on: scheduler)
-                .eraseToAnyPublisher()
-        }
-    }
-
-    private func shared(_ route: Route) -> Flow<Drop> {
-        $drop.map{ o in Result{ try self.drop.get(route) } } // TODO:❗️filter
-            .dropFirst()
-            .multicast(subject: PassthroughSubject())
-            .autoconnect()
-            .eraseToAnyPublisher()
+        
+        fatalError()
     }
 }
 
