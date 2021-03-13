@@ -1,10 +1,10 @@
 @dynamicMemberLookup
 public struct Tree<Key, Value> where Key: Hashable {
     
-    public let value: Value
-    public let branches: [Key: Tree]
+    public var value: Value?
+    public var branches: [Key: Tree]
     
-    public init(value: Value, branches: [Key: Tree] = [:]) {
+    public init(value: Value? = nil, branches: [Key: Tree] = [:]) {
         self.value = value
         self.branches = branches
     }
@@ -12,8 +12,8 @@ public struct Tree<Key, Value> where Key: Hashable {
 
 extension Tree {
     
-    public subscript<A>(dynamicMember keyPath: KeyPath<Value, A>) -> A {
-        value[keyPath: keyPath]
+    public subscript<A>(dynamicMember keyPath: KeyPath<Value, A>) -> A? {
+        value?[keyPath: keyPath]
     }
 }
 
@@ -24,15 +24,24 @@ extension Tree {
         set { self[route] = newValue }
     }
 
-    public subscript(route: [Key]) -> Tree? {
+    public subscript<Keys>(route: Keys) -> Tree?
+    where
+        Keys: Collection,
+        Keys.Element == Key
+    {
         get {
             guard let key = route.first else {
                 return Tree(value: value)
             }
-            fatalError()
+            return branches[key]?[route.dropFirst()]
         }
         set {
-            
+            guard let key = route.first else {
+                value = newValue?.value
+                branches = newValue?.branches ?? [:]
+                return
+            }
+            branches[key, default: Tree()][route.dropFirst()] = newValue
         }
     }
 }
