@@ -14,7 +14,7 @@ public class KeySubject<Key, Value>: Hashable where Key: Hashable {
         hasher.combine(key)
     }
     
-    public static func == (lhs: Self, rhs: Self) -> Bool {
-        lhs.key == rhs.key && lhs.subject === rhs.subject
+    public static func == (lhs: KeySubject<Key, Value>, rhs: KeySubject<Key, Value>) -> Bool {
+        lhs.key == rhs.key
     }
 }
