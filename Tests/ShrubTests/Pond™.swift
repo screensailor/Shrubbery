@@ -8,39 +8,13 @@ class Pond™: Hopes {
 }
 
 extension Pond™ {
-    
-    class Pond: Delta {
-        
-        var store: DeltaJSON = .init()
-        
-        let a = Database()
-        let b = Database()
-        let c = Database()
-        
-        private var bag: Set<AnyCancellable> = []
 
-        func flow<A>(of route: JSONRoute, as: A.Type) -> Flow<A> {
-            
-            let a = self.a.source(of: route)
-                .tryMap{ o in Array(route.prefix(o)) }
-                .flatMap{ o in self.a.flow(of: o, as: JSON.self) }
-                .catch{ o in Just(.failure(o)) }
-
-            a.sink{ result in
-                
-            }.store(in: &bag)
-            
-            
-            return store.flow(of: route)
-        }
-    }
-
-    class Database: Tributary {
+    class Database: Geyser {
 
         @Published var store: JSON = nil
         @Published var depth = 1
         
-        func flow<A>(of route: JSONRoute, as: A.Type) -> Flow<A> {
+        func gush(of route: JSONRoute) -> Flow<JSON> {
             $depth.map{ [weak self] depth in
                 Result{
                     guard let self = self else {

@@ -25,11 +25,34 @@ public protocol Delta {
     func flow<A>(of: Key, as: A.Type) -> Flow<A>
 }
 
-public protocol Tributary: Delta where Key: Collection {
+public protocol Geyser {
+    
+    associatedtype Key: Hashable, Collection
+    associatedtype Value
+    
     typealias PrefixCount = Int
+    
+    func gush(of: Key) -> Flow<Value>
     func source(of: Key) -> AnyPublisher<PrefixCount, Error>
 }
 
-public protocol Pond: Delta {
+public class Pond<Source, Value>: Delta where Source: Geyser {
+    
+    public typealias Key = Source.Key
+    public typealias Store = DeltaShrub<Key, Value>
+    
+    public let source: Source
+    private var store: Store
+    
+    public init(
+        source: Source,
+        store: Store = .init()
+    ) {
+        self.source = source
+        self.store = store
+    }
 
+    public func flow<A>(of: Key, as: A.Type) -> Flow<A> {
+        fatalError()
+    }
 }
