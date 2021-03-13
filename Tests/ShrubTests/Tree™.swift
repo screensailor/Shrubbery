@@ -3,15 +3,26 @@ class Tree™: Hopes {
     func test() throws {
         
         var t = Tree<CodingIndex, Int>()
-        hope(t[]?.value) == nil
+        hope(t[]) == nil
 
-        t[] = Tree(value: 0)
-        hope(t[1]?.value) == nil
+        t[] = 0
+        hope(t[]) == 0
         
-        t[1] = Tree(value: 1)
-        hope(t[1]?.value) == 1
+        t[value: 1] = 1
+        hope(t[value: 1]) == 1
         
-        t[1, 2, 3] = Tree(value: 3)
-        hope(t[1, 2, 3]?.value) == 3
+        t[value: 1, 2, 3] = 3
+        hope(t[value: 1, 2, 3]) == 3
+        
+        t[value: 1, "2", 3] = 3
+        hope(t[value: 1, "2", 3]) == 3
+        
+        t[value: 1] = nil
+        hope(t[value: 1, 2, 3]) == 3
+        hope(t[value: 1, "2", 3]) == 3
+        
+        t[1] = nil
+        hope(t[value: 1, 2, 3]) == nil
+        hope(t[value: 1, "2", 3]) == nil
     }
 }
