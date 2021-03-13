@@ -20,11 +20,4 @@ class EitherType™: Hopes {
         
         hope.true(x == y)
     }
-    
-    func test_tree() throws {
-        let t = Tree<Int, Int>(
-            value: 1,
-            branches: [:]
-        )
-    }
 }
