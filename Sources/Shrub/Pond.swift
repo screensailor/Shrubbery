@@ -27,7 +27,7 @@ public protocol Delta {
 
 public protocol Tributary: Delta where Key: Collection {
     typealias PrefixCount = Int
-    func source(of: Key) -> Flow<PrefixCount>
+    func source(of: Key) -> AnyPublisher<PrefixCount, Error>
 }
 
 public protocol Pond: Delta {
