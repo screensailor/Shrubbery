@@ -8,8 +8,7 @@ public class DeltaShrub<Key, Value>: Delta where Key: Hashable, Key: Collection 
     public typealias Drop = Shrub<Key, Value>
     public typealias Fork = Drop.Index
     public typealias Route = [Fork]
-    public typealias Result = Swift.Result<Drop, Error>
-    public typealias Subject = PassthroughSubject<Result, Never>
+    public typealias Subject = PassthroughSubject<Result<Drop, Error>, Never>
     
     private var drop: Drop
     private let queue: DispatchQueue
@@ -32,14 +31,9 @@ public class DeltaShrub<Key, Value>: Delta where Key: Hashable, Key: Collection 
 extension DeltaShrub {
     
     public func flow<A>(of route: Route, as: A.Type = A.self) -> Flow<A> {
-        let subject = subjects[value: route] ?? {
-            let o = Subject()
-            subjects[value: route] = o
-            return o
-        }()
-        return Just(Swift.Result{ try drop.get(route) })
-            .merge(with: subject.map{ o in Swift.Result{ try o.get().as(A.self) } })
-            .eraseToAnyPublisher()
+        Just(Result{ try drop.get(route) }).merge(
+            with: subjects[value: route, inserting: Subject()].map{ o in Result{ try o.get().as(A.self) } }
+        ).eraseToAnyPublisher()
     }
 }
 

@@ -11,6 +11,47 @@ public struct Tree<Key, Value> where Key: Hashable {
 
 extension Tree {
     
+    public subscript(route: Key..., inserting defaultTree: Tree) -> Tree {
+        mutating get {
+            self[route, inserting: defaultTree]
+        }
+    }
+    
+    public subscript<Keys>(route: Keys, inserting defaultTree: Tree) -> Tree
+    where
+        Keys: Collection,
+        Keys.Element == Key
+    {
+        mutating get {
+            self[route] ?? {
+                self[route] = defaultTree
+                return defaultTree
+            }()
+        }
+    }
+    
+    public subscript(value route: Key..., inserting defaultValue: Value) -> Value {
+        mutating get {
+            self[value: route, inserting: defaultValue]
+        }
+    }
+    
+    public subscript<Keys>(value route: Keys, inserting defaultValue: Value) -> Value
+    where
+        Keys: Collection,
+        Keys.Element == Key
+    {
+        mutating get {
+            self[value: route] ?? {
+                self[value: route] = defaultValue
+                return defaultValue
+            }()
+        }
+    }
+}
+
+extension Tree {
+    
     public subscript(route: Key...) -> Tree? {
         get { self[route] }
         set { self[route] = newValue }
