@@ -2,7 +2,7 @@ import Dispatch
 
 public typealias DeltaJSON = DeltaShrub<String, JSONFragment>
 
-public class DeltaShrub<Key, Value>: Delta where Key: Hashable, Key: Collection {
+public class DeltaShrub<Key, Value>: Delta where Key: Hashable {
     
     public typealias Drop = Shrub<Key, Value>
     public typealias Fork = Drop.Index

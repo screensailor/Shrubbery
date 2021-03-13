@@ -3,7 +3,12 @@ class Pond™: Hopes {
     private var bag: Set<AnyCancellable> = []
     
     func test() throws {
+        
+        let db = Database()
 
+        let pond = Pond(source: db)
+        
+        
     }
 }
 
