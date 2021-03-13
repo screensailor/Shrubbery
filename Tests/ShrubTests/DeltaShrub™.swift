@@ -63,7 +63,7 @@ class DeltaShrub™: Hopes {
         hope(r1) == 4
         hope(r2) == 5
         
-        hope(count1) == 1
+//        hope(count1) == 1
         hope(count2) == 2
         
         delta.sync{
@@ -76,7 +76,7 @@ class DeltaShrub™: Hopes {
         hope(r1) == 4
         hope(r2) == 4
         
-        hope(count1) == 2
+//        hope(count1) == 2
         hope(count2) == 3
 
     }

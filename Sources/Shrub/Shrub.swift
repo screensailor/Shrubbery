@@ -11,7 +11,7 @@ where Key: Hashable
     
     public init(_ unwrapped: Any? = nil) { try! set(unwrapped, at: []) }
 
-    public func get(_ path: [Index]) throws -> Shrub {
+    public func get(_ path: [Index]) throws -> Self {
         try Self(ShrubAny.get(path, in: self.unwrapped))
     }
     
