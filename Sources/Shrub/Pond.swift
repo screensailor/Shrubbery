@@ -29,7 +29,7 @@ public protocol Pond: Delta {
 
 // TODO: instead of Result ↓
 public struct Datum<Key, Value, Context> where Key: Hashable {
-    public let route: Route<Key>
+    public let source: Route<Key>
     public let result: Result<Shrub<Key, Value>, Error>
     public let context: Context
 }
