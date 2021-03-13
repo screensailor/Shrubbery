@@ -33,7 +33,7 @@ public class DeltaShrub<Key, Value>: Delta where Key: Hashable {
     public typealias Fork = Drop.Index
     public typealias Route = [Fork]
     
-    @Published private var drop: Drop = nil
+    @Published private var drop: Drop
     
     private lazy var routes = DefaultInsertingDictionary<Route, Flow<Drop>>(default: shared)
     
@@ -56,11 +56,13 @@ public class DeltaShrub<Key, Value>: Delta where Key: Hashable {
     }
 
     public func flow<A>(of route: Route, as: A.Type = A.self) -> Flow<A> {
-        routes[route]
-            .map{ o in Result{ try o.get().as(A.self) } }
-            .merge(with: Just(Result{ try drop.get(route, as: A.self) } ))
-            .subscribe(on: scheduler)
-            .eraseToAnyPublisher()
+        scheduler.sync {
+            routes[route]
+                .map{ o in Result{ try o.get().as(A.self) } }
+                .merge(with: Just(Result{ try drop.get(route, as: A.self) } ))
+                .subscribe(on: scheduler)
+                .eraseToAnyPublisher()
+        }
     }
 
     private func shared(_ route: Route) -> Flow<Drop> {
