@@ -18,3 +18,10 @@ public class KeySubject<Key, Value>: Hashable where Key: Hashable {
         lhs.key == rhs.key
     }
 }
+
+extension Hashable {
+    
+    public func keySubject<Value>(for: Value.Type = Value.self) -> KeySubject<Self, Value> {
+        .init(key: self)
+    }
+}

@@ -11,7 +11,7 @@ class DeltaShrub™: Hopes {
         delta.sync{ $0[1, "two", 3] = 4 }
 
         for i in result.indices {
-            delta.flow(of: 1, "two", 3).sink{ result[i] = $0 ¶ "✅ \(i)" }.store(in: &bag)
+            delta.flow(of: 1, "two", 3).sink{ result[i] = $0 }.store(in: &bag)
         }
         
         hope.for(0.01)
@@ -47,8 +47,8 @@ class DeltaShrub™: Hopes {
             ]
         }
 
-        delta.flow(of: 1, "two", 3, "1").sink{ r1 = $0 ¶ "✅ 1" }.store(in: &bag)
-        delta.flow(of: 1, "two", 3, "2").sink{ r2 = $0 ¶ "✅ 2" }.store(in: &bag)
+        delta.flow(of: 1, "two", 3, "1").sink{ r1 = $0 }.store(in: &bag)
+        delta.flow(of: 1, "two", 3, "2").sink{ r2 = $0 }.store(in: &bag)
         
         hope.for(0.01)
 
@@ -65,6 +65,20 @@ class DeltaShrub™: Hopes {
         
         hope(count1) == 1
         hope(count2) == 2
+        
+        delta.sync{
+            $0[1, "two", 3] = [
+                "1": 4,
+                "2": 4
+            ]
+        }
+
+        hope(r1) == 4
+        hope(r2) == 4
+        
+        hope(count1) == 2
+        hope(count2) == 3
+
     }
 }
 
