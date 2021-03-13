@@ -30,3 +30,7 @@ extension Hashable {
         .init(key: self)
     }
 }
+
+//extension Collection where Index == KeySubject {
+//    
+//}

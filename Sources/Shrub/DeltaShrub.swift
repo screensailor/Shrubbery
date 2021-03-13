@@ -2,7 +2,7 @@ import Dispatch
 
 public typealias DeltaJSON = DeltaShrub<String, JSONFragment>
 
-public class DeltaShrub<Key, Value>: Delta where Key: Hashable {
+public class DeltaShrub<Key, Value>: Delta where Key: Hashable, Key: Collection {
     
     public typealias Drop = Shrub<Key, Value>
     public typealias Fork = Drop.Index
@@ -41,7 +41,49 @@ public class DeltaShrub<Key, Value>: Delta where Key: Hashable {
     }
 
     private func shared(_ route: Route) -> Flow<Drop> {
-        $drop.map{ o in Result{ try o.get(route) } }
+        $drop.map{ o in Result{ try o.get(route) } }// TODO:❗️filter
+            .dropFirst()
+            .multicast(subject: PassthroughSubject())
+            .autoconnect()
+            .eraseToAnyPublisher()
+    }
+}
+
+public class DeltaShrub2<Key, Value>: Delta where Key: Hashable, Key: Collection {
+    
+    public typealias Drop = Shrub<Key, Value>
+    public typealias Fork = Drop.Index
+    public typealias Route = [Fork]
+    
+    @Published private var drop: Drop
+    
+    private lazy var routes = DefaultInsertingDictionary<Route, Flow<Drop>>(default: shared)
+    
+    private let scheduler: DispatchQueue
+
+    public init(
+        drop: Drop = nil,
+        on scheduler: DispatchQueue = .init(
+            label: "\(DeltaShrub2<Key, Value>.self).q",
+            qos: .userInteractive
+        )
+    ) {
+        self.drop = drop
+        self.scheduler = scheduler
+    }
+
+    public func flow<A>(of route: Route, as: A.Type = A.self) -> Flow<A> {
+        scheduler.sync {
+            routes[route]
+                .map{ o in Result{ try o.get().as(A.self) } }
+                .merge(with: Just(Result{ try drop.get(route) } ))
+                .subscribe(on: scheduler)
+                .eraseToAnyPublisher()
+        }
+    }
+
+    private func shared(_ route: Route) -> Flow<Drop> {
+        $drop.map{ o in Result{ try self.drop.get(route) } } // TODO:❗️filter
             .dropFirst()
             .multicast(subject: PassthroughSubject())
             .autoconnect()
