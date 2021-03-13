@@ -13,10 +13,8 @@ class DeltaShrub™: Hopes {
         hope(try delta.get(1, "two", 3)) == 4
 
         for i in result.indices {
-            delta.flow(of: 1, "two", 3).sink{ result[i] = $0 ¶ "✅ \(i)" }.store(in: &bag)
+            delta.flow(of: 1, "two", 3).sink{ result[i] = $0 }.store(in: &bag)
         }
-
-//        hope.for(0.01)
 
         hope(try result.map{ try $0.get() }) == Array(repeating: 4, count: result.count)
 
@@ -32,54 +30,41 @@ class DeltaShrub™: Hopes {
         delta = DeltaJSON()
     }
 
-    func test_selectiveness() throws {
+    func test_counts() throws {
         
-        var count1 = 0
-        var count2 = 0
+        var count = (a: 0, b: 0)
         
-        var r1: Result<Int, Error> = .failure("😱") { didSet { count1 += 1 } }
-        var r2: Result<Int, Error> = .failure("😱") { didSet { count2 += 1 } }
+        var a: Result<Int, Error> = .failure("😱") { didSet { count.a += 1 } }
+        var b: Result<Int, Error> = .failure("😱") { didSet { count.b += 1 } }
 
         let delta = DeltaJSON()
         
-//        delta.sync{
-//            $0[1, "two", 3] = [
-//                "1": 4,
-//                "2": 4
-//            ]
-//        }
-//
-//        delta.flow(of: 1, "two", 3, "1").sink{ r1 = $0 }.store(in: &bag)
-//        delta.flow(of: 1, "two", 3, "2").sink{ r2 = $0 }.store(in: &bag)
-//        
-//        hope.for(0.01)
-//
-//        hope(r1) == 4
-//        hope(r2) == 4
-//        
-//        hope(count1) == 1
-//        hope(count2) == 1
-//
-//        delta.sync{ $0[1, "two", 3, "2"] = 5 }
-//        
-//        hope(r1) == 4
-//        hope(r2) == 5
-//        
-//        hope(count1) == 1
-//        hope(count2) == 2
-//        
-//        delta.sync{
-//            $0[1, "two", 3] = [
-//                "1": 4,
-//                "2": 4
-//            ]
-//        }
-//
-//        hope(r1) == 4
-//        hope(r2) == 4
-//        
-//        hope(count1) == 2
-//        hope(count2) == 3
+        try delta.set(1, "two", 3, to: ["a": 4, "b": 4])
+
+        delta.flow(of: 1, "two", 3, "a").sink{ a = $0 }.store(in: &bag)
+        delta.flow(of: 1, "two", 3, "b").sink{ b = $0 }.store(in: &bag)
+
+        hope(a) == 4
+        hope(b) == 4
+        
+        hope(count.a) == 1
+        hope(count.b) == 1
+
+        try delta.set(1, "two", 3, "b", to: 5)
+
+        hope(a) == 4
+        hope(b) == 5
+        
+        hope(count.a) == 1
+        hope(count.b) == 2
+
+        try delta.set(1, "two", 3, to: ["a": 4, "b": 4])
+
+        hope(a) == 4
+        hope(b) == 4
+        
+        hope(count.a) == 2
+        hope(count.b) == 3
 
     }
 }

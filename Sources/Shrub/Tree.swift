@@ -23,7 +23,7 @@ extension Tree {
     {
         get {
             guard let key = route.first else {
-                return Tree(value: value)
+                return self
             }
             return branches[key]?[route.dropFirst()]
         }
@@ -74,5 +74,24 @@ extension Tree {
         for (key, tree) in tree.branches {
             traverse(route: route + [key], tree: tree, yield: yield)
         }
+    }
+}
+
+extension Tree: CustomStringConvertible {
+    
+    public var description: String {
+        "\(Self.self)(value: \(String(describing: value)) branches: \(branches))"
+    }
+}
+
+extension Tree: CustomDebugStringConvertible {
+    
+    public var debugDescription: String {
+        var o = "\(Self.self)"
+        traverse { route, value in
+            let t = repeatElement("\t|", count: route.count + 1).joined()
+            o += "\n\(t)\(route):\n\(t)\(value.map(String.init(describing:)) ?? "nil")"
+        }
+        return o
     }
 }

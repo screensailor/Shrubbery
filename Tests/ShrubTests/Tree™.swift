@@ -20,10 +20,30 @@ class Tree™: Hopes {
         tree[value: 1] = nil
         hope(tree[value: 1, 2, 3]) == 3
         hope(tree[value: 1, "2", 3]) == 3
-        
+
         tree[1] = nil
         hope(tree[value: 1, 2, 3]) == nil
         hope(tree[value: 1, "2", 3]) == nil
+
+        tree[1, 2] = Tree(
+            value: nil,
+            branches: [
+                "a": Tree(value: 3),
+                "b": Tree(value: 4)
+            ]
+        )
+        hope(tree[value: 1, 2, "a"]) == 3
+        hope(tree[value: 1, 2, "b"]) == 4
+
+        tree[1, 2] = Tree(
+            value: nil,
+            branches: [
+                "a": Tree(value: 3),
+                "b": Tree(value: 5)
+            ]
+        )
+        hope(tree[value: 1, 2, "a"]) == 3
+        hope(tree[value: 1, 2, "b"]) == 5
     }
     
     func test_traverse() throws {
