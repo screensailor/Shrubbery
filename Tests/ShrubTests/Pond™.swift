@@ -21,6 +21,8 @@ class Pond™: Hopes {
 
         try pond.source.store.set(1, at: 1, "two", 3, "a")
         
+        hope.for(0.01)
+        
 //        hope(a) == 1
     }
 }

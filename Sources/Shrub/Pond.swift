@@ -71,15 +71,8 @@ where
     public func flow<A>(of route: Route, as: A.Type) -> Flow<A> {
         let o = source.source(of: route)
             .map{ Array(route.prefix($0)) }
-//            .flatMap{ source in
-//                self.source.gush(of: source).sink{ data in
-//                    
-//                }.store(in: &self.bag)
-//                fatalError()
-//            } // TODO:❗️test 🗑
         
         
-        
-        return Just(Result<A, Error>.failure("⚠️".error())).eraseToAnyPublisher()
+        return store.flow(of: route)
     }
 }

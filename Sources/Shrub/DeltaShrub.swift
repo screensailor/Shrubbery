@@ -95,7 +95,7 @@ extension DeltaShrub {
                 }
             }
             catch {
-                try! drop.set(A?.none, at: route) // TODO:❗️store error for new subscribers
+                drop.delete(route) // TODO:❗️store error for new subscribers (is using current value subject worth it?)
                 subjects[route]?.traverse { subroute, subject in
                     subject?.send(.failure(error))
                 }

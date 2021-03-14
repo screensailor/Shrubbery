@@ -11,6 +11,9 @@ public protocol Shrubbery:
     
     mutating
     func set(_ value: Any?, at path: [Index]) throws
+    
+    mutating
+    func delete(_ path: [Index])
 }
 
 // MARK: as
@@ -110,6 +113,14 @@ extension Shrubbery {
         Path.Element == Index
     {
         try set(value as Any?, at: path.array)
+    }
+    
+    public mutating func delete<Path>(_ path: Path)
+    where
+        Path: Collection,
+        Path.Element == Index
+    {
+        delete(path.array)
     }
 }
 

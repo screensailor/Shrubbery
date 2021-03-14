@@ -6,7 +6,7 @@ public prefix func ^ <Key, Value>(a: Value) -> Shrub<Key, Value> { .init(a) }
 
 public struct Shrub<Key, Value>: Shrubbery
 where Key: Hashable
-{    
+{
     public private(set) var unwrapped: Any?
     
     public init(_ unwrapped: Any? = nil) { try! set(unwrapped, at: []) }
@@ -18,6 +18,11 @@ where Key: Hashable
     mutating
     public func set(_ value: Any?, at path: [Index]) throws {
         try ShrubAny.set(value, at: path, in: &unwrapped)
+    }
+    
+    mutating
+    public func delete(_ path: [Index]) {
+        try! ShrubAny.set(nil, at: path, in: &unwrapped)
     }
 }
 
