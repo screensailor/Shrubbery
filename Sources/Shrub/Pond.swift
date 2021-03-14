@@ -51,15 +51,13 @@ where
     public typealias Fork = Source.Fork
     public typealias Route = Source.Route
     public typealias Basin = DeltaShrub<Key, Source.Value>
-    public typealias Subject = PassthroughSubject<Result<Basin, Error>, Never>
     
     public let geyser: Source
     
     private var basin: Basin
-    private var bag: Set<AnyCancellable> = []
     
     private let queue: DispatchQueue
-    private var subjects: Tree<Fork, Subject>
+    private var subscriptions: Tree<Fork, AnyCancellable>
 
     public init(
         geyser: Source,
@@ -68,12 +66,12 @@ where
             label: "\(Pond<Source, Key>.self).q",
             qos: .userInteractive
         ),
-        subjects: Tree<Fork, Subject> = .init()
+        subscriptions: Tree<Fork, AnyCancellable> = .init()
     ) {
         self.geyser = geyser
         self.basin = basin
         self.queue = queue
-        self.subjects = subjects
+        self.subscriptions = subscriptions
     }
     
     deinit { // TODO:❗️test 🗑
@@ -94,10 +92,13 @@ where
             return error.flow()
         }
         
-        geyser.gush(of: source).sink{ result in
-            self.basin.set(source, to: result)
-        }.store(in: &bag)
-        
+        let subscription = subscriptions[
+            value: source,
+            inserting: geyser.gush(of: source).sink{ result in
+                self.basin.set(source, to: result)
+            }
+        ]
+                
         return basin.flow(of: route)
     }
 }
