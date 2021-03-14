@@ -95,6 +95,7 @@ extension DeltaShrub {
                 }
             }
             catch {
+                try! drop.set(A?.none, at: route) // TODO:❗️store error for new subscribers
                 subjects[route]?.traverse { subroute, subject in
                     subject?.send(.failure(error))
                 }

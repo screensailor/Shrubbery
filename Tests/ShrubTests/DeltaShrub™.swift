@@ -70,6 +70,13 @@ class DeltaShrub™: Hopes {
         hope(count.a) == 2
         hope(count.b) == 3
 
+        delta.set(1, to: Result<Int, Error>.failure("👌".error()))
+
+        hope.throws(try a.get())
+        hope.throws(try b.get())
+        
+        hope(count.a) == 3
+        hope(count.b) == 4
     }
 }
 
