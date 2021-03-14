@@ -29,6 +29,9 @@ extension Pond™ {
 
     class Database: Geyser {
 
+        typealias Key = JSONRoute
+        typealias Value = JSON
+
         @Published var store: JSON = nil
         @Published var depth = 1
         

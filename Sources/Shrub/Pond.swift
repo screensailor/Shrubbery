@@ -25,12 +25,18 @@ public protocol Delta {
     func flow<A>(of: Key, as: A.Type) -> Flow<A>
 }
 
-public protocol Geyser {
-    associatedtype Key: Hashable, Collection where Key.Element: Hashable
+public protocol Geyser: Delta where Key: Collection {
     associatedtype Value
     typealias PrefixCount = Int
     func gush(of: Key) -> Flow<Value>
     func source(of: Key) -> AnyPublisher<PrefixCount, Error> // TODO: should Error be GeyserError?
+}
+
+extension Geyser where Value: Shrubbery {
+    
+    public func flow<A>(of route: Key, as: A.Type) -> Flow<A> {
+        gush(of: route).map{ o in Result{ try o.get().as(A.self) } }.eraseToAnyPublisher()
+    }
 }
 
 public enum GeyserError<Key>: Error {
