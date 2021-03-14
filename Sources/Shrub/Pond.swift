@@ -1,3 +1,4 @@
+import Dispatch // TODO:❗️generalise to Schedulers
 /**
  * - unflow everything?, keep .flow() as just an operator?
  * - Datum<Key, Value, Context> instead of Result<Value, Error>
@@ -22,7 +23,7 @@ public typealias Fork<Key> = EitherType<Int, Key> where Key: Hashable
 public typealias Route<Key> = [Fork<Key>] where Key: Hashable
 
 public protocol Delta {
-    associatedtype Key: Hashable
+    associatedtype Key: Hashable // TODO:❗️rename to Route
     func flow<A>(of: Key, as: A.Type) -> Flow<A>
 }
 
@@ -53,18 +54,29 @@ where
     public typealias Basin = DeltaShrub<Key, Value>
     public typealias Route = Source.Key
     public typealias Fork = Source.Key.Element
+    public typealias Subject = PassthroughSubject<Result<Basin, Error>, Never>
     
     public let geyser: Source
     
     private var basin: Basin
     private var bag: Set<AnyCancellable> = []
     
+    private let queue: DispatchQueue
+    private var subjects: Tree<Key, Subject>
+
     public init(
         geyser: Source,
-        basin: Basin = .init()
+        basin: Basin = .init(),
+        on queue: DispatchQueue = .init(
+            label: "\(DeltaShrub<Key, Value>.self).q",
+            qos: .userInteractive
+        ),
+        subjects: Tree<Key, Subject> = .init()
     ) {
         self.geyser = geyser
         self.basin = basin
+        self.queue = queue
+        self.subjects = subjects
     }
     
     deinit { // TODO:❗️test 🗑

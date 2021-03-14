@@ -40,7 +40,7 @@ extension Pond™ {
         @Published var depth = 1
         
         func gush(of route: JSONRoute) -> Flow<JSON> {
-            $depth.map{ [weak self] depth in
+            $depth.print("✅").map{ [weak self] depth in
                 Result{
                     guard let self = self else {
                         throw "🗑".error()
