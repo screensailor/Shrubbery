@@ -1,4 +1,5 @@
 /**
+ * - unflow everything?, keep .flow() as just an operator?
  * - Datum<Key, Value, Context> instead of Result<Value, Error>
  * - events vs? streams - i.e. events as streams of () or of Event value?
  * - subscribing vs observing
@@ -46,16 +47,18 @@ public enum GeyserError<Key>: Error {
 public class Pond<Source, Key, Value>: Delta
 where
     Source: Geyser,
-    Source.Key.Element == EitherType<Int, Key>,
+    Source.Key == [EitherType<Int, Key>],
     Source.Value == Value,
     Key: Hashable
 {
-    public typealias Fork = Source.Key.Element
-    public typealias Route = [Fork]
     public typealias Store = DeltaShrub<Key, Value>
+    public typealias Route = Source.Key
+    public typealias Fork = Source.Key.Element
     
     public let source: Source
+    
     private var store: Store
+    private var bag: Set<AnyCancellable> = []
     
     public init(
         source: Source,
@@ -65,7 +68,16 @@ where
         self.store = store
     }
 
-    public func flow<A>(of: Route, as: A.Type) -> Flow<A> {
+    public func flow<A>(of route: Route, as: A.Type) -> Flow<A> {
+        let o = source.source(of: route)
+            .map{ Array(route.prefix($0)) }
+//            .flatMap{ source in
+//                self.source.gush(of: source).sink{ data in
+//                    
+//                }.store(in: &self.bag)
+//                fatalError()
+//            } // TODO:❗️test 🗑
+        
         
         
         return Just(Result<A, Error>.failure("⚠️".error())).eraseToAnyPublisher()

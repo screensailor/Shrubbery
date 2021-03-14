@@ -74,3 +74,31 @@ extension DeltaShrub {
         }
     }
 }
+
+extension DeltaShrub {
+
+    public func set<A>(_ route: Fork..., to value: Result<A, Error>) {
+        set(route, to: value)
+    }
+    
+    public func set<A, Route>(_ route: Route, to value: Result<A, Error>)
+    where
+        Route: Collection,
+        Route.Element == Fork
+    {
+        queue.sync{
+            do {
+                let value = try value.get()
+                try drop.set(value, at: route)
+                subjects[route]?.traverse { subroute, subject in
+                    subject?.send(Result{ try drop.get(route + subroute) })
+                }
+            }
+            catch {
+                subjects[route]?.traverse { subroute, subject in
+                    subject?.send(.failure(error))
+                }
+            }
+        }
+    }
+}
