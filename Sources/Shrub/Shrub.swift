@@ -9,20 +9,20 @@ where Key: Hashable
 {
     public private(set) var unwrapped: Any?
     
-    public init(_ unwrapped: Any? = nil) { try! set(unwrapped, at: []) }
+    public init(_ unwrapped: Any? = nil) { try! set([], to: unwrapped) }
 
     public func get(_ route: Route) throws -> Self {
         try Self(ShrubAny.get(route, in: self.unwrapped))
     }
     
     mutating
-    public func set(_ value: Any?, at route: Route) throws {
-        try ShrubAny.set(value, at: route, in: &unwrapped)
+    public func set(_ route: Route, to value: Any?) throws {
+        try ShrubAny.set(route, in: &unwrapped, to: value)
     }
     
     mutating
     public func delete(_ route: Route) {
-        try! ShrubAny.set(nil, at: route, in: &unwrapped)
+        try! ShrubAny.set(route, in: &unwrapped, to: nil)
     }
 }
 
@@ -77,11 +77,11 @@ extension ShrubAny {
     
     public static var none: Any { Optional<Value>.none as Any }
 
-    public static func set(_ value: Any?, at route: Fork..., in any: inout Any?) throws {
-        try set(value, at: route, in: &any)
+    public static func set(_ route: Fork..., in any: inout Any?, to value: Any?) throws {
+        try set(route, in: &any, to: value)
     }
 
-    public static func set<Route>(_ value: Any?, at route: Route, in any: inout Any?) throws
+    public static func set<Route>(_ route: Route, in any: inout Any?, to value: Any?) throws
     where
         Route: Collection,
         Route.Element == Fork
@@ -102,7 +102,7 @@ extension ShrubAny {
             var array = any as? [Any] ?? []
             array.append(contentsOf: repeatElement(none, count: max(0, int - array.endIndex + 1)))
             var o: Any? = array[int]
-            try Self.set(value, at: route.dropFirst(), in: &o)
+            try Self.set(route.dropFirst(), in: &o, to: value)
             array[int] = o as Any
             for e in array.reversed() {
                 guard isNilAfterFlattening(e) else { break }
@@ -113,7 +113,7 @@ extension ShrubAny {
         case .b(let key):
             var dictionary = any as? [Key: Any] ?? [:]
             var o: Any? = dictionary[key] ?? []
-            try Self.set(value, at: route.dropFirst(), in: &o)
+            try Self.set(route.dropFirst(), in: &o, to: value)
             dictionary[key] = o
             any = dictionary.isEmpty ? none : dictionary
         }

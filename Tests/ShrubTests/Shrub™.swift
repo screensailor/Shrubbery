@@ -72,19 +72,19 @@ extension Shrub™ {
     func test_ShrubAny_set() throws {
 
         var any: Any? = 1
-        try ShrubAny<String>.set(2, at: [], in: &any)
+        try ShrubAny<String>.set([], in: &any, to: 2)
         hope(any as? Int) == 2
 
         any = ["one": 1]
-        try ShrubAny.set(2, at: "two", in: &any)
+        try ShrubAny.set("two", in: &any, to: 2)
         try hope(ShrubAny.get("two", in: any) as? Int) == 2
 
         any = [:]
-        try ShrubAny.set(3, at: "one", "two", "three", in: &any)
+        try ShrubAny.set("one", "two", "three", in: &any, to: 3)
         try hope(ShrubAny.get("one", "two", "three", in: any) as? Int) == 3
 
         any = 0
-        try ShrubAny.set("😃", at: 2, "three", 4, "five", in: &any)
+        try ShrubAny.set(2, "three", 4, "five", in: &any, to: "😃")
         try hope(ShrubAny.get(2, "three", 4, "five", in: any) as? String) == "😃"
     }
 }

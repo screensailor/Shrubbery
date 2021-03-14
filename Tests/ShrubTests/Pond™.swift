@@ -11,7 +11,7 @@ class Pond™: Hopes {
         
         var pond = Pond(geyser: Database())
 
-        try pond.geyser.store.set(["a": 0, "b": 0], at: 1, "two", 3)
+        try pond.geyser.store.set(1, "two", 3, to: ["a": 0, "b": 0])
 
         pond.flow(of: 1, "two", 3, "a").sink{ a = $0 }.store(in: &bag)
         pond.flow(of: 1, "two", 3, "b").sink{ b = $0 }.store(in: &bag)
@@ -22,28 +22,28 @@ class Pond™: Hopes {
         hope(count.a) == 1
         hope(count.b) == 1
 
-        try pond.geyser.store.set(1, at: 1, "two", 3, "a")
+        try pond.geyser.store.set(1, "two", 3, "a", to: 1)
         hope.for(0.01)
         hope(a) == 1
         hope(b) == 0
         hope(count.a) == 2
         hope(count.b) == 1
 
-        try pond.geyser.store.set(2, at: 1, "two", 3, "a")
+        try pond.geyser.store.set(1, "two", 3, "a", to: 2)
         hope.for(0.01)
         hope(a) == 2
         hope(b) == 0
         hope(count.a) == 3
         hope(count.b) == 1
 
-        try pond.geyser.store.set(3, at: 1, "two", 3, "a")
+        try pond.geyser.store.set(1, "two", 3, "a", to: 3)
         hope.for(0.01)
         hope(a) == 3
         hope(b) == 0
         hope(count.a) == 4
         hope(count.b) == 1
 
-        try pond.geyser.store.set(3, at: 1, "two", 3, "b")
+        try pond.geyser.store.set(1, "two", 3, "b", to: 3)
         hope.for(0.01)
         hope(a) == 3
         hope(b) == 3

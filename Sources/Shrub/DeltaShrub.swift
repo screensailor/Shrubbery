@@ -68,7 +68,7 @@ extension DeltaShrub {
         Route.Element == Fork
     {
         try queue.sync{
-            try drop.set(value, at: route)
+            try drop.set(route, to: value)
             subjects[route]?.traverse { subroute, subject in
                 subject?.send(Result{ try drop.get(route + subroute) })
             }
@@ -90,7 +90,7 @@ extension DeltaShrub {
         queue.sync{
             do {
                 let value = try value.get()
-                try drop.set(value, at: route)
+                try drop.set(route, to: value)
                 subjects[route]?.traverse { subroute, subject in
                     subject?.send(Result{ try drop.get(route + subroute) })
                 }

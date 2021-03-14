@@ -11,8 +11,8 @@ public protocol Shrubbery:
     func get(_ route: Route) throws -> Self
     
     mutating
-    func set(_ value: Any?, at route: Route) throws
-    
+    func set(_ route: Route, to: Any?) throws
+
     mutating
     func delete(_ route: Route)
 }
@@ -53,7 +53,7 @@ extension Shrubbery {
             return nil
         }
         set {
-            do { try set(newValue, at: route.array) }
+            do { try set(route.array, to: newValue) }
             catch { "\(error)".peek(as: .debug) }
         }
     }
@@ -77,7 +77,7 @@ extension Shrubbery {
             return nil
         }
         set {
-            do { try set(newValue, at: route.array) }
+            do { try set(route.array, to: newValue) }
             catch { "\(error)".peek(as: .debug) }
         }
     }
@@ -104,16 +104,16 @@ extension Shrubbery {
 
 extension Shrubbery {
 
-    public mutating func set<A>(_ value: A, at route: Fork...) throws {
-        try set(value as Any?, at: route)
+    public mutating func set<A>(_ route: Fork..., to value: A) throws {
+        try set(route, to: value as Any?)
     }
     
-    public mutating func set<A, Route>(_ value: A, at route: Route) throws
+    public mutating func set<A, Route>(_ route: Route, to value: A) throws
     where
         Route: Collection,
         Route.Element == Fork
     {
-        try set(value as Any?, at: route.array)
+        try set(route.array, to: value as Any?)
     }
     
     public mutating func delete<Route>(_ route: Route)
