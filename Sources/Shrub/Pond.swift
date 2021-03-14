@@ -80,10 +80,6 @@ where
         self.subscriptions = subscriptions
     }
     
-    deinit { // TODO:❗️test 🗑
-        print("✅ 🗑", Self.self, ObjectIdentifier(self))
-    }
-    
     public func flow<A>(of route: Route, as: A.Type) -> Flow<A> {
         
         let source: Route
@@ -103,7 +99,7 @@ where
             switch subscriptions[value: source]
             {
             case let .waiting(_, subject)?:
-                return subject.first().flatMap{ _ in
+                return subject.flatMap{ _ in
                     self.basin.flow(of: route)
                 }
                 .subscribe(on: queue)
@@ -132,7 +128,7 @@ where
                 else {
                     let subject = Subject()
                     subscriptions[value: source] = .waiting(subscription, subject)
-                    return subject.first().flatMap{ _ in
+                    return subject.flatMap{ _ in
                         self.basin.flow(of: route)
                     }
                     .subscribe(on: queue)
