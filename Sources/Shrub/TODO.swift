@@ -1,4 +1,5 @@
 /**
+ * - performance and stress testing
  * - unflow everything?, keep .flow() as just an operator?
  * - Datum<Key, Value, Context> instead of Result<Value, Error>
  * - events vs? streams - i.e. events as streams of () or of Event value?
