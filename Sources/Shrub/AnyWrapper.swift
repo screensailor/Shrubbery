@@ -9,12 +9,3 @@ public protocol AnyWrapper:
 extension AnyWrapper {
     public init(nilLiteral: ()) { self.init(nil) }
 }
-
-// MARK: peek
-
-extension Shrubbery {
-    
-    public var description: String {
-        String(describing: unwrapped ?? "nil")
-    }
-}

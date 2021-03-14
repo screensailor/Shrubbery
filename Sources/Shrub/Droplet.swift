@@ -23,7 +23,9 @@ extension Droplet {
 public prefix func ^ <Value>(v: Value) -> Result<Value, Error> { .success(v) }
 public prefix func ^ <Key, Value>(v: Value) -> Result<Shrub<Key, Value>, Error> { .success(.init(v)) }
 
-public typealias JSONResult = Result<JSON, Error>
+extension JSON {
+    public typealias Result = Swift.Result<JSON, Error>
+}
 
 extension Result: Droplet, CustomStringConvertible where Failure == Error {
     
@@ -32,19 +34,3 @@ extension Result: Droplet, CustomStringConvertible where Failure == Error {
     
     public var isError: Bool { if case .failure = self { return true } else { return false } }
 }
-
-// MARK: think...
-
-@dynamicMemberLookup
-public struct Drop<A, Key> {
-    public let key: Key
-    public let result: Result<A, Error>
-}
-
-extension Drop {
-    public subscript<T>(dynamicMember keyPath: KeyPath<Result<A, Error>, T>) -> T {
-        result[keyPath: keyPath]
-    }
-}
-
-

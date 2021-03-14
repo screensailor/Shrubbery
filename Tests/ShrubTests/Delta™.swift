@@ -17,7 +17,7 @@ class Delta™: Hopes {
     
     func test_CurrentValueSubject() throws {
 
-        let json: CurrentValueSubject<JSON, Never> = nil
+        let json: CurrentValueSubject<JSON, Never> = .init(nil)
         
         var result: Result<Int, Error> = .failure("😱")
         
@@ -30,9 +30,9 @@ class Delta™: Hopes {
     
     func test_flowFlatMap() throws {
         
-        let json = CurrentValueSubject<JSONResult, Never>(^0)
+        let json = CurrentValueSubject<JSON.Result, Never>(^0)
         
-        var result: JSONResult = .failure("😱")
+        var result: JSON.Result = .failure("😱")
 
         json.flowFlatMap{ o in Just(o).flow() }.sink{ result = $0 }.store(in: &bag)
 

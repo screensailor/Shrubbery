@@ -1,8 +1,8 @@
 import Dispatch
 
-public typealias DeltaJSON = DeltaShrub<String, JSONFragment>
+public typealias DeltaJSON = DeltaShrub<String, JSON.Fragment>
 
-// TODO:❗️protocol sDeltaShrubbery
+// TODO:❗️protocol DeltaShrubbery
 public class DeltaShrub<Key, Value>: Delta where Key: Hashable {
     
     public typealias Drop = Shrub<Key, Value>

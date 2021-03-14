@@ -147,3 +147,12 @@ public prefix func ^ <S: Shrubbery>(array: [S]) -> S {
 public prefix func ^ <S: Shrubbery>(dictionary: [S.Key: S]) -> S {
     S(dictionary.mapValues(\.unwrapped).ifNotEmpty)
 }
+
+// MARK: peek
+
+extension Shrubbery {
+    
+    public var description: String {
+        String(describing: unwrapped ?? "nil")
+    }
+}
