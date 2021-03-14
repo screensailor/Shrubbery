@@ -5,15 +5,16 @@ public protocol Shrubbery:
     ExpressibleByArrayLiteral,
     ExpressibleByDictionaryLiteral where Key: Hashable
 {
-    typealias Index = Fork<Key>
+    typealias Fork = EitherType<Int, Key> where Key: Hashable
+    typealias Route = [Fork]
 
-    func get(_ path: [Index]) throws -> Self
+    func get(_ route: Route) throws -> Self
     
     mutating
-    func set(_ value: Any?, at path: [Index]) throws
+    func set(_ value: Any?, at route: Route) throws
     
     mutating
-    func delete(_ path: [Index])
+    func delete(_ route: Route)
 }
 
 // MARK: as
@@ -36,23 +37,23 @@ extension Shrubbery {
 
 extension Shrubbery {
 
-    public subscript(_ path: Index...) -> Self? {
-        get { self[path] }
-        set { self[path] = newValue }
+    public subscript(_ route: Fork...) -> Self? {
+        get { self[route] }
+        set { self[route] = newValue }
     }
 
-    public subscript<Path>(_ path: Path) -> Self?
+    public subscript<Route>(_ route: Route) -> Self?
     where
-        Path: Collection,
-        Path.Element == Index
+        Route: Collection,
+        Route.Element == Fork
     {
         get {
-            do { return try get(path) }
+            do { return try get(route) }
             catch { "\(error)".peek(as: .debug) }
             return nil
         }
         set {
-            do { try set(newValue, at: path.array) }
+            do { try set(newValue, at: route.array) }
             catch { "\(error)".peek(as: .debug) }
         }
     }
@@ -60,23 +61,23 @@ extension Shrubbery {
 
 extension Shrubbery {
 
-    public subscript<A>(_ path: Index..., as _: A.Type = A.self) -> A? {
-        get { self[path, as: A.self] }
-        set { self[path, as: A.self] = newValue }
+    public subscript<A>(_ route: Fork..., as _: A.Type = A.self) -> A? {
+        get { self[route, as: A.self] }
+        set { self[route, as: A.self] = newValue }
     }
 
-    public subscript<A, Path>(_ path: Path, as _: A.Type = A.self) -> A?
+    public subscript<A, Route>(_ route: Route, as _: A.Type = A.self) -> A?
     where
-        Path: Collection,
-        Path.Element == Index
+        Route: Collection,
+        Route.Element == Fork
     {
         get {
-            do { return try get(path.array, as: A.self) }
+            do { return try get(route.array, as: A.self) }
             catch { "\(error)".peek(as: .debug) }
             return nil
         }
         set {
-            do { try set(newValue, at: path.array) }
+            do { try set(newValue, at: route.array) }
             catch { "\(error)".peek(as: .debug) }
         }
     }
@@ -86,16 +87,16 @@ extension Shrubbery {
 
 extension Shrubbery {
     
-    public func get<A>(_ path: Index..., as: A.Type = A.self) throws -> A {
-        try get(path.array).as(A.self)
+    public func get<A>(_ route: Fork..., as: A.Type = A.self) throws -> A {
+        try get(route.array).as(A.self)
     }
     
-    public func get<A, Path>(_ path: Path, as: A.Type = A.self) throws -> A
+    public func get<A, Route>(_ route: Route, as: A.Type = A.self) throws -> A
     where
-        Path: Collection,
-        Path.Element == Index
+        Route: Collection,
+        Route.Element == Fork
     {
-        try get(path.array).as(A.self)
+        try get(route.array).as(A.self)
     }
 }
 
@@ -103,24 +104,24 @@ extension Shrubbery {
 
 extension Shrubbery {
 
-    public mutating func set<A>(_ value: A, at path: Index...) throws {
-        try set(value as Any?, at: path)
+    public mutating func set<A>(_ value: A, at route: Fork...) throws {
+        try set(value as Any?, at: route)
     }
     
-    public mutating func set<A, Path>(_ value: A, at path: Path) throws
+    public mutating func set<A, Route>(_ value: A, at route: Route) throws
     where
-        Path: Collection,
-        Path.Element == Index
+        Route: Collection,
+        Route.Element == Fork
     {
-        try set(value as Any?, at: path.array)
+        try set(value as Any?, at: route.array)
     }
     
-    public mutating func delete<Path>(_ path: Path)
+    public mutating func delete<Route>(_ route: Route)
     where
-        Path: Collection,
-        Path.Element == Index
+        Route: Collection,
+        Route.Element == Fork
     {
-        delete(path.array)
+        delete(route.array)
     }
 }
 

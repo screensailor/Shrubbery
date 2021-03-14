@@ -6,7 +6,7 @@ public typealias DeltaJSON = DeltaShrub<String, JSONFragment>
 public class DeltaShrub<Key, Value>: Delta where Key: Hashable {
     
     public typealias Drop = Shrub<Key, Value>
-    public typealias Fork = Drop.Index
+    public typealias Fork = Drop.Fork
     public typealias Route = [Fork]
     public typealias Subject = PassthroughSubject<Result<Drop, Error>, Never>
     

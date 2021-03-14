@@ -1,8 +1,6 @@
 import Foundation
 
 public typealias JSON = Shrub<String, JSONFragment>
-public typealias JSONIndex = Fork<String>
-public typealias JSONRoute = Route<String>
 
 public protocol JSONFragment {}
 

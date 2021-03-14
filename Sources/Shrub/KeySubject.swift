@@ -31,6 +31,6 @@ extension Hashable {
     }
 }
 
-//extension Collection where Index == KeySubject {
+//extension Collection where Fork == KeySubject {
 //    
 //}

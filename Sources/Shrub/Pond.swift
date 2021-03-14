@@ -9,7 +9,7 @@ import Dispatch // TODO:❗️generalise to Schedulers
  * - decoder & encoder of ``Shrubbery`` (`as _: A.Type` tries a cast then decode where `A: Decodable`)
  */
 public struct Datum<Key, Value, Context> where Key: Hashable {
-    public let source: Route<Key>
+    public let source: [EitherType<Int, Key>]
     public let result: Result<Shrub<Key, Value>, Error>
     public let context: Context
 }
@@ -18,9 +18,6 @@ public protocol Encoded: Shrubbery where Key == String, Value: Codable {}
 public typealias Coded = Shrub<String, Codable>
 
 public typealias Flow<A> = AnyPublisher<Result<A, Error>, Never>
-
-public typealias Fork<Key> = EitherType<Int, Key> where Key: Hashable
-public typealias Route<Key> = [Fork<Key>] where Key: Hashable
 
 public protocol Delta {
     associatedtype Key: Hashable // TODO:❗️rename to Route

@@ -4,7 +4,7 @@ import Dispatch
 //    
 //    public typealias Subject = PassthroughSubject<DeltaSubject, Never>
 //    public typealias Drop = Shrub<Key, Subject>
-//    public typealias Fork = Drop.Index
+//    public typealias Fork = Drop.Fork
 //    public typealias Route = [Fork]
 //    
 //    private var drop: Drop

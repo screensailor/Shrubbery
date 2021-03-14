@@ -33,13 +33,13 @@ extension Pond™ {
 
     class Database: Geyser {
 
-        typealias Key = JSONRoute
+        typealias Key = JSON.Route
         typealias Value = JSON
 
         @Published var store: JSON = nil
         @Published var depth = 1
         
-        func gush(of route: JSONRoute) -> Flow<JSON> {
+        func gush(of route: JSON.Route) -> Flow<JSON> {
             $depth.print("✅").map{ [weak self] depth in
                 Result{
                     guard let self = self else {
@@ -55,7 +55,7 @@ extension Pond™ {
             .eraseToAnyPublisher()
         }
         
-        func source(of route: JSONRoute) throws -> JSONRoute.Index {
+        func source(of route: JSON.Route) throws -> JSON.Route.Index {
             guard route.count >= depth else {
                 throw GeyserError.badKey(
                     key: route,

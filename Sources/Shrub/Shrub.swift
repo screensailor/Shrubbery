@@ -11,18 +11,18 @@ where Key: Hashable
     
     public init(_ unwrapped: Any? = nil) { try! set(unwrapped, at: []) }
 
-    public func get(_ path: [Index]) throws -> Self {
-        try Self(ShrubAny.get(path, in: self.unwrapped))
+    public func get(_ route: Route) throws -> Self {
+        try Self(ShrubAny.get(route, in: self.unwrapped))
     }
     
     mutating
-    public func set(_ value: Any?, at path: [Index]) throws {
-        try ShrubAny.set(value, at: path, in: &unwrapped)
+    public func set(_ value: Any?, at route: Route) throws {
+        try ShrubAny.set(value, at: route, in: &unwrapped)
     }
     
     mutating
-    public func delete(_ path: [Index]) {
-        try! ShrubAny.set(nil, at: path, in: &unwrapped)
+    public func delete(_ route: Route) {
+        try! ShrubAny.set(nil, at: route, in: &unwrapped)
     }
 }
 
@@ -32,43 +32,43 @@ public typealias ShrubAny<Key> = Shrub<Key, Any?> where Key: Hashable
 
 extension ShrubAny {
 
-    public static func get(_ path: Index..., in any: Any?) throws -> Any? {
-        try get(path, in: any)
+    public static func get(_ route: Fork..., in any: Any?) throws -> Any? {
+        try get(route, in: any)
     }
     
-    public static func get<Path>(_ path: Path, in any: Any?) throws -> Any?
+    public static func get<Route>(_ route: Route, in any: Any?) throws -> Any?
     where
-        Path: Collection,
-        Path.Element == Index
+        Route: Collection,
+        Route.Element == Fork
     {
         let ºany = flattenOptionality(
             of: (any as? AnyWrapper)?.unwrapped ?? any
         )
-        guard let index = path.first else {
+        guard let index = route.first else {
             return ºany
         }
         guard let any = ºany else {
-            throw "Expected \(path) but found nil".error()
+            throw "Expected \(route) but found nil".error()
         }
         switch index.value
         {
         case .a(let int):
             guard let array = any as? [Any] else {
-                throw "Expected [Any] but found \(type(of: any)) at '\(index)' in \(path)".error()
+                throw "Expected [Any] but found \(type(of: any)) at '\(index)' in \(route)".error()
             }
             guard array.indices.contains(int) else {
-                throw "Index \(int) in \(path) is out of bounds - found only \(array.count) elements".error()
+                throw "Index \(int) in \(route) is out of bounds - found only \(array.count) elements".error()
             }
-            return try get(path.dropFirst(), in: array[int])
+            return try get(route.dropFirst(), in: array[int])
             
         case .b(let key):
             guard let dictionary = any as? [Key: Any] else {
-                throw "Expected [Any] but found \(type(of: any)) at '\(key)' in \(path)".error()
+                throw "Expected [Any] but found \(type(of: any)) at '\(key)' in \(route)".error()
             }
             guard let any = dictionary[key] else {
-                throw "No value found at \(key) in \(path)".error()
+                throw "No value found at \(key) in \(route)".error()
             }
-            return try get(path.dropFirst(), in: any)
+            return try get(route.dropFirst(), in: any)
         }
     }
 }
@@ -77,19 +77,19 @@ extension ShrubAny {
     
     public static var none: Any { Optional<Value>.none as Any }
 
-    public static func set(_ value: Any?, at path: Index..., in any: inout Any?) throws {
-        try set(value, at: path, in: &any)
+    public static func set(_ value: Any?, at route: Fork..., in any: inout Any?) throws {
+        try set(value, at: route, in: &any)
     }
 
-    public static func set<Path>(_ value: Any?, at path: Path, in any: inout Any?) throws
+    public static func set<Route>(_ value: Any?, at route: Route, in any: inout Any?) throws
     where
-        Path: Collection,
-        Path.Element == Index
+        Route: Collection,
+        Route.Element == Fork
     {
         let value = flattenOptionality(
             of: (value as? AnyWrapper)?.unwrapped ?? value
         )
-        guard let index = path.first else {
+        guard let index = route.first else {
             any = value
             return
         }
@@ -97,12 +97,12 @@ extension ShrubAny {
         {
         case .a(let int):
             guard int >= 0 else { // TODO: allow relative indexing
-                throw "Index in path \(path) is negative".error()
+                throw "Fork in route \(route) is negative".error()
             }
             var array = any as? [Any] ?? []
             array.append(contentsOf: repeatElement(none, count: max(0, int - array.endIndex + 1)))
             var o: Any? = array[int]
-            try Self.set(value, at: path.dropFirst(), in: &o)
+            try Self.set(value, at: route.dropFirst(), in: &o)
             array[int] = o as Any
             for e in array.reversed() {
                 guard isNilAfterFlattening(e) else { break }
@@ -113,7 +113,7 @@ extension ShrubAny {
         case .b(let key):
             var dictionary = any as? [Key: Any] ?? [:]
             var o: Any? = dictionary[key] ?? []
-            try Self.set(value, at: path.dropFirst(), in: &o)
+            try Self.set(value, at: route.dropFirst(), in: &o)
             dictionary[key] = o
             any = dictionary.isEmpty ? none : dictionary
         }
