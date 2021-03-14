@@ -76,13 +76,18 @@ where
         let source: Route
         
         do {
-            source = try Array(route.prefix(geyser.source(of: route)))
+            let endIndex = try geyser.source(of: route)
+            guard endIndex >= route.startIndex else {
+                return "Invalid end index of the source of route \(route)".error().flow()
+            }
+            source = route[..<endIndex].array.peek("✅ source")
         } catch {
             return error.flow()
         }
         
-        
-        
+        geyser.gush(of: source).sink{ result in
+            self.basin.set(source, to: result)
+        }.store(in: &bag)
         
         return basin.flow(of: route)
     }
