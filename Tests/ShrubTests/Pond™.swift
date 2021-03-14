@@ -28,7 +28,7 @@ class Pond™: Hopes {
         hope(b) == 0
         hope(count.a) == 2
         // TODO: pass the commented out hopes
-        // These ↓ reflect the fact that `store.set` is causing a geyser gush,
+        // These ↓ reflect the fact that `store.set` is causing the geyser to gush,
         // which in turn causes subscribers of all the fields within the source
         // to be called.
 //        hope(count.b) == 1

@@ -1,5 +1,6 @@
 @_exported import Combine
 
+public typealias Flow<A> = AnyPublisher<Result<A, Error>, Never>
 
 extension Publisher {
     

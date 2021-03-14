@@ -1,3 +1,9 @@
+public protocol Delta {
+    associatedtype Fork
+    typealias Route = [Fork]
+    func flow<A>(of: Route, as: A.Type) -> Flow<A>
+}
+
 extension Delta {
     
     public subscript<A>(of: Route, as _: A.Type = A.self) -> Flow<A> {
