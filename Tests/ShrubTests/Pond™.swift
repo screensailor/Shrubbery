@@ -55,17 +55,14 @@ extension Pond™ {
             .eraseToAnyPublisher()
         }
         
-        func source(of route: JSONRoute) -> AnyPublisher<PrefixCount, Error> {
-            $depth.tryMap{ depth in
-                guard route.count >= depth else {
-                    throw GeyserError.badKey(
-                        key: route,
-                        message: "Can flow only at depth \(depth)"
-                    )
-                }
-                return depth
+        func source(of route: JSONRoute) throws -> JSONRoute.Index {
+            guard route.count >= depth else {
+                throw GeyserError.badKey(
+                    key: route,
+                    message: "Can flow only at depth \(depth)"
+                )
             }
-            .eraseToAnyPublisher()
+            return depth
         }
     }
 }

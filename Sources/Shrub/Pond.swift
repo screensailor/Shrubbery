@@ -28,9 +28,8 @@ public protocol Delta {
 
 public protocol Geyser: Delta where Key: Collection {
     associatedtype Value
-    typealias PrefixCount = Int
     func gush(of: Key) -> Flow<Value>
-    func source(of: Key) throws -> PrefixCount // TODO:❗️-> AnyPublisher<PrefixCount, Error>
+    func source(of: Key) throws -> Key.Index // TODO:❗️-> AnyPublisher<PrefixCount, Error>
 }
 
 extension Geyser where Value: Shrubbery {
