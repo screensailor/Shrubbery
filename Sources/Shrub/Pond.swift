@@ -99,39 +99,45 @@ where
             return error.flow()
         }
         
-        switch subscriptions[value: source]
-        {
-        case let .waiting(_, subject)?:
-            return subject.first().flatMap{ _ in
-                self.basin.flow(of: route)
-            }.eraseToAnyPublisher()
-            
-        case .ready?:
-            return basin.flow(of: route)
-            
-        default:
-            var didSink = false
-            let subscription = geyser.gush(of: source).sink{ result in
-                self.basin.set(source, to: result)
-                if
-                    !didSink,
-                    case let .waiting(subscription, subject) = self.subscriptions[value: source]
-                {
-                    self.subscriptions[value: source] = .ready(subscription)
-                    subject.send()
-                }
-                didSink = true
-            }
-            if didSink {
-                subscriptions[value: source] = .ready(subscription)
-                return basin.flow(of: route)
-            }
-            else {
-                let subject = Subject()
-                subscriptions[value: source] = .waiting(subscription, subject)
+        return queue.sync {
+            switch subscriptions[value: source]
+            {
+            case let .waiting(_, subject)?:
                 return subject.first().flatMap{ _ in
                     self.basin.flow(of: route)
-                }.eraseToAnyPublisher()
+                }
+                .subscribe(on: queue)
+                .eraseToAnyPublisher()
+                
+            case .ready?:
+                return basin.flow(of: route)
+                
+            default:
+                var didSink = false
+                let subscription = geyser.gush(of: source).sink{ result in
+                    self.basin.set(source, to: result)
+                    if
+                        !didSink,
+                        case let .waiting(subscription, subject) = self.subscriptions[value: source]
+                    {
+                        self.subscriptions[value: source] = .ready(subscription)
+                        subject.send()
+                    }
+                    didSink = true
+                }
+                if didSink {
+                    subscriptions[value: source] = .ready(subscription)
+                    return basin.flow(of: route)
+                }
+                else {
+                    let subject = Subject()
+                    subscriptions[value: source] = .waiting(subscription, subject)
+                    return subject.first().flatMap{ _ in
+                        self.basin.flow(of: route)
+                    }
+                    .subscribe(on: queue)
+                    .eraseToAnyPublisher()
+                }
             }
         }
     }

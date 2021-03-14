@@ -76,6 +76,7 @@ extension Pond™ {
                 }
             }
             .merge(with: $store.flow(of: route))
+            .delay(for: 0, scheduler: DispatchQueue.main)
             .eraseToAnyPublisher()
         }
         
