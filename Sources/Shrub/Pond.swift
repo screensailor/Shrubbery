@@ -51,21 +51,21 @@ where
     Source.Value == Value,
     Key: Hashable
 {
-    public typealias Store = DeltaShrub<Key, Value>
+    public typealias Basin = DeltaShrub<Key, Value>
     public typealias Route = Source.Key
     public typealias Fork = Source.Key.Element
     
-    public let source: Source
+    public let geyser: Source
     
-    private var store: Store
+    private var basin: Basin
     private var bag: Set<AnyCancellable> = []
     
     public init(
-        source: Source,
-        store: Store = .init()
+        geyser: Source,
+        basin: Basin = .init()
     ) {
-        self.source = source
-        self.store = store
+        self.geyser = geyser
+        self.basin = basin
     }
 
     public func flow<A>(of route: Route, as: A.Type) -> Flow<A> { // TODO:❗️test 🗑
@@ -73,22 +73,25 @@ where
         // just a thinking tool ↓
         var source = route
         
-        self.source.source(of: route)
-            .map{ count -> Route in source = Array(route.prefix(count)); return source }
+        geyser.source(of: route)
+            .map{ count -> Route in
+                source = Array(route.prefix(count))
+                return source
+            }
             .sink(
                 receiveCompletion: { error in
                     print("✅⚠️", error)
-                    self.store.set(source, to: Result<A, Error>.failure("\(error)".error()))
+                    self.basin.set(source, to: Result<A, Error>.failure("\(error)".error()))
                 },
                 receiveValue: { source in
                     print("✅", source)
-                    self.source.gush(of: source).sink { result in
-                        self.store.set(source, to: result)
+                    self.geyser.gush(of: source).sink { result in
+                        self.basin.set(source, to: result)
                     }.store(in: &self.bag)
                 }
             )
             .store(in: &bag)
         
-        return store.flow(of: route)
+        return basin.flow(of: route)
     }
 }
