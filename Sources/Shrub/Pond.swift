@@ -29,8 +29,12 @@ public protocol Geyser {
     associatedtype Key: Hashable, Collection where Key.Element: Hashable
     associatedtype Value
     typealias PrefixCount = Int
-    func gush(of: Key) -> Value
-    func source(of: Key) -> AnyPublisher<PrefixCount, Error>
+    func gush(of: Key) -> Flow<Value>
+    func source(of: Key) -> AnyPublisher<PrefixCount, Error> // TODO: should Error be GeyserError?
+}
+
+public enum GeyserError<Key>: Error {
+    case badKey(key: Key, message: String)
 }
 
 public class Pond<Source, Key, Value>: Delta
@@ -56,6 +60,8 @@ where
     }
 
     public func flow<A>(of: Route, as: A.Type) -> Flow<A> {
-        fatalError()
+        
+        
+        return Just(Result<A, Error>.failure("⚠️".error())).eraseToAnyPublisher()
     }
 }
