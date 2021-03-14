@@ -42,3 +42,10 @@ where
             .eraseToAnyPublisher()
     }
 }
+
+extension Error {
+    
+    public func flow<A>(of: A.Type = A.self) -> Flow<A> {
+        Just(Result<A, Error>.failure(self)).eraseToAnyPublisher()
+    }
+}

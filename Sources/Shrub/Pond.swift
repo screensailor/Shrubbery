@@ -30,7 +30,7 @@ public protocol Geyser: Delta where Key: Collection {
     associatedtype Value
     typealias PrefixCount = Int
     func gush(of: Key) -> Flow<Value>
-    func source(of: Key) -> AnyPublisher<PrefixCount, Error> // TODO: should Error be GeyserError?
+    func source(of: Key) throws -> PrefixCount // TODO:❗️-> AnyPublisher<PrefixCount, Error>
 }
 
 extension Geyser where Value: Shrubbery {
@@ -67,30 +67,23 @@ where
         self.geyser = geyser
         self.basin = basin
     }
+    
+    deinit { // TODO:❗️test 🗑
+        print("✅ 🗑", Self.self, ObjectIdentifier(self))
+    }
 
-    public func flow<A>(of route: Route, as: A.Type) -> Flow<A> { // TODO:❗️test 🗑
+    public func flow<A>(of route: Route, as: A.Type) -> Flow<A> {
         
-        // just a thinking tool ↓
-        var source = route
+        let source: Route
         
-        geyser.source(of: route)
-            .map{ count -> Route in
-                source = Array(route.prefix(count))
-                return source
-            }
-            .sink(
-                receiveCompletion: { error in
-                    print("✅⚠️", error)
-                    self.basin.set(source, to: Result<A, Error>.failure("\(error)".error()))
-                },
-                receiveValue: { source in
-                    print("✅", source)
-                    self.geyser.gush(of: source).sink { result in
-                        self.basin.set(source, to: result)
-                    }.store(in: &self.bag)
-                }
-            )
-            .store(in: &bag)
+        do {
+            source = try Array(route.prefix(geyser.source(of: route)))
+        } catch {
+            return error.flow()
+        }
+        
+        
+        
         
         return basin.flow(of: route)
     }

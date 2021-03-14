@@ -4,7 +4,7 @@ class Pond™: Hopes {
     
     func test() throws {
 
-        let pond = Pond(geyser: Database())
+        var pond = Pond(geyser: Database())
         
         var count = (a: 0, b: 0)
         
@@ -24,6 +24,8 @@ class Pond™: Hopes {
         hope.for(0.01)
         
         hope(a) == 1
+        
+        pond = Pond(geyser: Database())
     }
 }
 
