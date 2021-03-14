@@ -14,7 +14,6 @@ let package = Package(
     dependencies: [
         .package(url: "https://github.com/screensailor/Peek.git", .branch("trunk")),
         .package(url: "https://github.com/screensailor/Hope.git", .branch("trunk")),
-        .package(url: "https://github.com/screensailor/combine-schedulers.git", .branch("trunk")),
     ],
     targets: [
         .target(
@@ -23,10 +22,7 @@ let package = Package(
         ),
         .testTarget(
             name: "ShrubTests",
-            dependencies: [
-                "Shrub", "Hope", "Peek",
-                .product(name: "CombineSchedulers", package: "combine-schedulers"),
-            ]
+            dependencies: ["Shrub", "Hope", "Peek"]
         ),
     ]
 )

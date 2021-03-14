@@ -2,7 +2,6 @@
 @_exported import Peek
 @_exported import Shrub
 @_exported import Combine
-@_exported import CombineSchedulers
 
 extension String: Error {}
 
