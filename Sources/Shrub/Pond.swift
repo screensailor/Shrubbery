@@ -92,13 +92,19 @@ where
             return error.flow()
         }
         
-        let subscription = subscriptions[
-            value: source,
-            inserting: geyser.gush(of: source).sink{ result in
-                self.basin.set(source, to: result)
-            }
-        ]
-                
-        return basin.flow(of: route)
+        guard subscriptions[value: source] == nil else {
+            return basin.flow(of: route)
+        }
+        
+        let o = geyser.gush(of: source).share()
+        
+        subscriptions[value: source] = o.sink{ result in
+            self.basin.set(source, to: result)
+        }
+        
+        return o.first().flatMap{ _ in
+            self.basin.flow(of: route)
+        }
+        .eraseToAnyPublisher()
     }
 }
