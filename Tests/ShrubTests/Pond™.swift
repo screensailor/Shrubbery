@@ -32,9 +32,8 @@ class Pond™: Hopes {
 extension Pond™ {
 
     class Database: Geyser {
-
-        typealias Key = JSON.Route
-        typealias Value = JSON
+        
+        typealias Fork = JSON.Fork
 
         @Published var store: JSON = nil
         @Published var depth = 1
@@ -57,8 +56,8 @@ extension Pond™ {
         
         func source(of route: JSON.Route) throws -> JSON.Route.Index {
             guard route.count >= depth else {
-                throw GeyserError.badKey(
-                    key: route,
+                throw GeyserError.badRoute(
+                    route: route,
                     message: "Can flow only at depth \(depth)"
                 )
             }

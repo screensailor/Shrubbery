@@ -20,37 +20,37 @@ public typealias Coded = Shrub<String, Codable>
 public typealias Flow<A> = AnyPublisher<Result<A, Error>, Never>
 
 public protocol Delta {
-    associatedtype Key: Hashable // TODO:❗️rename to Route
-    func flow<A>(of: Key, as: A.Type) -> Flow<A>
+    associatedtype Fork
+    typealias Route = [Fork]
+    func flow<A>(of: Route, as: A.Type) -> Flow<A>
 }
 
-public protocol Geyser: Delta where Key: Collection {
+public protocol Geyser: Delta {
     associatedtype Value
-    func gush(of: Key) -> Flow<Value>
-    func source(of: Key) throws -> Key.Index // TODO:❗️-> AnyPublisher<PrefixCount, Error>
+    func gush(of: Route) -> Flow<Value>
+    func source(of: Route) throws -> Route.Index // TODO:❗️-> AnyPublisher<Route.Index, Error>
+}
+
+public enum GeyserError<Route>: Error {
+    case badRoute(route: Route, message: String)
 }
 
 extension Geyser where Value: Shrubbery {
     
-    public func flow<A>(of route: Key, as: A.Type) -> Flow<A> {
+    public func flow<A>(of route: Route, as: A.Type) -> Flow<A> {
         gush(of: route).map{ o in Result{ try o.get().as(A.self) } }.eraseToAnyPublisher()
     }
 }
 
-public enum GeyserError<Key>: Error {
-    case badKey(key: Key, message: String)
-}
-
-public class Pond<Source, Key, Value>: Delta
+public class Pond<Source, Key>: Delta
 where
+    Key: Hashable,
     Source: Geyser,
-    Source.Key == [EitherType<Int, Key>],
-    Source.Value == Value,
-    Key: Hashable
+    Source.Fork == EitherType<Int, Key>
 {
-    public typealias Basin = DeltaShrub<Key, Value>
-    public typealias Route = Source.Key
-    public typealias Fork = Source.Key.Element
+    public typealias Fork = Source.Fork
+    public typealias Route = Source.Route
+    public typealias Basin = DeltaShrub<Key, Source.Value>
     public typealias Subject = PassthroughSubject<Result<Basin, Error>, Never>
     
     public let geyser: Source
@@ -59,16 +59,16 @@ where
     private var bag: Set<AnyCancellable> = []
     
     private let queue: DispatchQueue
-    private var subjects: Tree<Key, Subject>
+    private var subjects: Tree<Fork, Subject>
 
     public init(
         geyser: Source,
         basin: Basin = .init(),
         on queue: DispatchQueue = .init(
-            label: "\(DeltaShrub<Key, Value>.self).q",
+            label: "\(Pond<Source, Key>.self).q",
             qos: .userInteractive
         ),
-        subjects: Tree<Key, Subject> = .init()
+        subjects: Tree<Fork, Subject> = .init()
     ) {
         self.geyser = geyser
         self.basin = basin

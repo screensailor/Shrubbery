@@ -1,18 +1,18 @@
 extension Delta {
     
-    public subscript<A>(of: Key, as _: A.Type = A.self) -> Flow<A> {
+    public subscript<A>(of: Route, as _: A.Type = A.self) -> Flow<A> {
         self.flow(of: of, as: A.self)
     }
 }
 
-extension Delta where Key: RangeReplaceableCollection {
+extension Delta {
     
-    public func flow<A>(of: Key.Element..., as: A.Type = A.self) -> Flow<A> {
-        self.flow(of: Key(of), as: A.self)
+    public func flow<A>(of: Fork..., as: A.Type = A.self) -> Flow<A> {
+        self.flow(of: Route(of), as: A.self)
     }
     
-    public subscript<A>(of: Key.Element..., as _: A.Type = A.self) -> Flow<A> {
-        self.flow(of: Key(of), as: A.self)
+    public subscript<A>(of: Fork..., as _: A.Type = A.self) -> Flow<A> {
+        self.flow(of: Route(of), as: A.self)
     }
 }
 
