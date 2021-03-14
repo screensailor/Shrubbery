@@ -23,7 +23,7 @@ class Pond™: Hopes {
         
         hope.for(0.01)
         
-//        hope(a) == 1
+        hope(a) == 1
     }
 }
 

@@ -68,10 +68,26 @@ where
         self.store = store
     }
 
-    public func flow<A>(of route: Route, as: A.Type) -> Flow<A> {
-        let o = source.source(of: route)
-            .map{ Array(route.prefix($0)) }
+    public func flow<A>(of route: Route, as: A.Type) -> Flow<A> { // TODO:❗️test 🗑
         
+        // just a thinking tool ↓
+        var source = route
+        
+        self.source.source(of: route)
+            .map{ count -> Route in source = Array(route.prefix(count)); return source }
+            .sink(
+                receiveCompletion: { error in
+                    print("✅⚠️", error)
+                    self.store.set(source, to: Result<A, Error>.failure("\(error)".error()))
+                },
+                receiveValue: { source in
+                    print("✅", source)
+                    self.source.gush(of: source).sink { result in
+                        self.store.set(source, to: result)
+                    }.store(in: &self.bag)
+                }
+            )
+            .store(in: &bag)
         
         return store.flow(of: route)
     }
