@@ -3,7 +3,7 @@ public protocol Droplet: CustomStringConvertible {
     associatedtype Value
     
     static func value(_: Value) -> Self
-    static func error<E: Error>(_: E) -> Self
+    static func error(_: Error) -> Self
     
     var isError: Bool { get }
     

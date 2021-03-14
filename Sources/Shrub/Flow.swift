@@ -44,6 +44,17 @@ where
     }
 }
 
+extension Publisher
+where
+    Output: Droplet,
+    Output.Value: Equatable,
+    Failure == Never
+{
+    public func removeDuplicates() -> Flow<Output.Value> {
+        unflow().removeDuplicates().flow()
+    }
+}
+
 extension Error {
     
     public func flow<A>(of: A.Type = A.self) -> Flow<A> {

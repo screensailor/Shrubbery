@@ -13,8 +13,13 @@ class Pond™: Hopes {
 
         try pond.geyser.store.set(1, "two", 3, to: ["a": 0, "b": 0])
 
-        pond.flow(of: 1, "two", 3, "a").sink{ a = $0 }.store(in: &bag)
-        pond.flow(of: 1, "two", 3, "b").sink{ b = $0 }.store(in: &bag)
+        // TODO: pass all the hopes without removeDuplicates operator
+        // These ↓ reflect the fact that `store.set` is causing the geyser to gush,
+        // which in turn causes subscribers of all the fields within the source
+        // to be called.
+
+        pond.flow(of: 1, "two", 3, "a").removeDuplicates().sink{ a = $0 }.store(in: &bag)
+        pond.flow(of: 1, "two", 3, "b").removeDuplicates().sink{ b = $0 }.store(in: &bag)
         
         hope.for(0.01)
         hope(a) == 0
@@ -27,32 +32,28 @@ class Pond™: Hopes {
         hope(a) == 1
         hope(b) == 0
         hope(count.a) == 2
-        // TODO: pass the commented out hopes
-        // These ↓ reflect the fact that `store.set` is causing the geyser to gush,
-        // which in turn causes subscribers of all the fields within the source
-        // to be called.
-//        hope(count.b) == 1
+        hope(count.b) == 1
 
         try pond.geyser.store.set(1, "two", 3, "a", to: 2)
         hope.for(0.01)
         hope(a) == 2
         hope(b) == 0
         hope(count.a) == 3
-//        hope(count.b) == 1
+        hope(count.b) == 1
 
         try pond.geyser.store.set(1, "two", 3, "a", to: 3)
         hope.for(0.01)
         hope(a) == 3
         hope(b) == 0
         hope(count.a) == 4
-//        hope(count.b) == 1
+        hope(count.b) == 1
 
         try pond.geyser.store.set(1, "two", 3, "b", to: 3)
         hope.for(0.01)
         hope(a) == 3
         hope(b) == 3
-//        hope(count.a) == 4
-//        hope(count.b) == 2
+        hope(count.a) == 4
+        hope(count.b) == 2
 
         pond = Pond(geyser: Database())
     }
