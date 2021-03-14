@@ -48,13 +48,25 @@ extension Shrubbery {
         Route.Element == Fork
     {
         get {
-            do { return try get(route) }
-            catch { "\(error)".peek(as: .debug) }
+            do {
+                return try get(route)
+            }
+            catch {
+                if #available(iOS 14.0, *) {
+                    "\(error)".peek(as: .debug)
+                }
+            }
             return nil
         }
         set {
-            do { try set(route.array, to: newValue) }
-            catch { "\(error)".peek(as: .debug) }
+            do {
+                try set(route.array, to: newValue)
+            }
+            catch {
+                if #available(iOS 14.0, *) {
+                    "\(error)".peek(as: .debug)
+                }
+            }
         }
     }
 }
@@ -72,13 +84,23 @@ extension Shrubbery {
         Route.Element == Fork
     {
         get {
-            do { return try get(route.array, as: A.self) }
-            catch { "\(error)".peek(as: .debug) }
+            do {
+                return try get(route.array, as: A.self)
+            }
+            catch {
+                if #available(iOS 14.0, *) {
+                    "\(error)".peek(as: .debug)
+                }
+            }
             return nil
         }
         set {
             do { try set(route.array, to: newValue) }
-            catch { "\(error)".peek(as: .debug) }
+            catch {
+                if #available(iOS 14.0, *) {
+                    "\(error)".peek(as: .debug)
+                }
+            }
         }
     }
 }
