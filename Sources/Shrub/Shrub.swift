@@ -1,8 +1,4 @@
-prefix operator ^ /// lift operator
-
-public prefix func ^ <Key, Value>(a: Value) -> Shrub<Key, Value> { .init(a) }
-
-public struct Shrub<Key, Value>: Shrubbery
+public struct Shrub<Key>: Shrubbery
 where Key: Hashable
 {
     public private(set) var unwrapped: Any?
@@ -10,25 +6,23 @@ where Key: Hashable
     public init(_ unwrapped: Any? = nil) { try! set([], to: unwrapped) }
 
     public func get(_ route: Route) throws -> Self {
-        try Self(ShrubAny.get(route, in: self.unwrapped))
+        try Self(Self.get(route, in: self.unwrapped))
     }
     
     mutating
     public func set(_ route: Route, to value: Any?) throws {
-        try ShrubAny.set(route, in: &unwrapped, to: value)
+        try Self.set(route, in: &unwrapped, to: value)
     }
     
     mutating
     public func delete(_ route: Route) {
-        try! ShrubAny.set(route, in: &unwrapped, to: nil)
+        try! Self.set(route, in: &unwrapped, to: nil)
     }
 }
 
 // MARK: static get & set
 
-public typealias ShrubAny<Key> = Shrub<Key, Any?> where Key: Hashable
-
-extension ShrubAny {
+extension Shrub {
 
     public static func get(_ route: Fork..., in any: Any?) throws -> Any? {
         try get(route, in: any)
@@ -71,7 +65,7 @@ extension ShrubAny {
     }
 }
 
-extension ShrubAny {
+extension Shrub {
     
     public static var none: Any { Optional<Value>.none as Any }
 

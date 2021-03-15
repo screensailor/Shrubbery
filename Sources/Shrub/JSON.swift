@@ -1,6 +1,6 @@
 import Foundation
 
-public typealias JSON = Shrub<String, JSONFragment>
+public typealias JSON = Shrub<String>
 
 public protocol JSONFragment {}
 extension JSON { public typealias Fragment = JSONFragment }

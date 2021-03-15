@@ -21,7 +21,7 @@ extension Droplet {
 // MARK: Result
 
 public prefix func ^ <Value>(v: Value) -> Result<Value, Error> { .success(v) }
-public prefix func ^ <Key, Value>(v: Value) -> Result<Shrub<Key, Value>, Error> { .success(.init(v)) }
+public prefix func ^ <Key, Value>(v: Value) -> Result<Shrub<Key>, Error> { .success(.init(v)) }
 
 extension JSON {
     public typealias Result = Swift.Result<JSON, Error>

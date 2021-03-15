@@ -1,3 +1,5 @@
+prefix operator ^ /// lift operator
+
 public prefix func ^ <A, B>(a: A) -> EitherType<A, B> { .init(a) }
 public prefix func ^ <A, B>(b: B) -> EitherType<A, B> { .init(b) }
 
@@ -121,6 +123,23 @@ extension EitherType {
         switch value {
         case let .a(o): return String(describing: o)
         case let .b(o): return String(describing: o)
+        }
+    }
+}
+
+extension EitherType {
+    public static func randomRoute(
+        in a: [A],
+        and b: [B],
+        bias: Double = 0.5,
+        length: ClosedRange<Int>
+    ) -> [Self] {
+        let lower = max(0, length.lowerBound)
+        let upper = max(lower, length.upperBound)
+        return (0 ..< Int.random(in: lower...upper)).compactMap{ _ -> Self? in
+            Double.random(in: 0...1) < bias
+                ? a.randomElement().map{ Self($0) }
+                : b.randomElement().map{ Self($0) }
         }
     }
 }

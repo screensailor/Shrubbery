@@ -3,7 +3,10 @@ import Peek
 public protocol Shrubbery:
     AnyWrapper,
     ExpressibleByArrayLiteral,
-    ExpressibleByDictionaryLiteral where Key: Hashable
+    ExpressibleByDictionaryLiteral
+where
+    Key: Hashable,
+    Value == Any
 {
     typealias Fork = EitherType<Int, Key> where Key: Hashable
     typealias Route = [Fork]
@@ -151,11 +154,11 @@ extension Shrubbery {
 
 extension Shrubbery {
 
-    public init(arrayLiteral elements: Value...) {
+    public init(arrayLiteral elements: Any...) {
         self.init(elements)
     }
     
-    public init(dictionaryLiteral elements: (Key, Value)...) {
+    public init(dictionaryLiteral elements: (Key, Any)...) {
         self.init(Dictionary(elements){ _, last in last })
     }
 }

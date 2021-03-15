@@ -54,36 +54,36 @@ extension Shrub™ {
     func test_ShrubAny_get() throws {
 
         var any: Any = 1
-        try hope(Shrub<String, Any>.get([], in: any) as? Int) == 1
-        hope.throws(try ShrubAny.get("one", in: any))
+        try hope(JSON.get([], in: any) as? Int) == 1
+        hope.throws(try JSON.get("one", in: any))
 
         any = ["one": 1]
-        try hope(ShrubAny.get("one", in: any) as? Int) == 1
-        hope.throws(try ShrubAny.get("two", in: any))
+        try hope(JSON.get("one", in: any) as? Int) == 1
+        hope.throws(try JSON.get("two", in: any))
 
         any = ["one": ["two": ["three": 3]]]
-        try hope(ShrubAny.get("one", "two", "three", in: any) as? Int) == 3
+        try hope(JSON.get("one", "two", "three", in: any) as? Int) == 3
 
         any = [any, any, any]
-        try hope(ShrubAny.get(1, "one", "two", "three", in: any) as? Int) == 3
+        try hope(JSON.get(1, "one", "two", "three", in: any) as? Int) == 3
     }
 
     func test_ShrubAny_set() throws {
 
         var any: Any? = 1
-        try ShrubAny<String>.set([], in: &any, to: 2)
+        try JSON.set([], in: &any, to: 2)
         hope(any as? Int) == 2
 
         any = ["one": 1]
-        try ShrubAny.set("two", in: &any, to: 2)
-        try hope(ShrubAny.get("two", in: any) as? Int) == 2
+        try JSON.set("two", in: &any, to: 2)
+        try hope(JSON.get("two", in: any) as? Int) == 2
 
         any = [:]
-        try ShrubAny.set("one", "two", "three", in: &any, to: 3)
-        try hope(ShrubAny.get("one", "two", "three", in: any) as? Int) == 3
+        try JSON.set("one", "two", "three", in: &any, to: 3)
+        try hope(JSON.get("one", "two", "three", in: any) as? Int) == 3
 
         any = 0
-        try ShrubAny.set(2, "three", 4, "five", in: &any, to: "😃")
-        try hope(ShrubAny.get(2, "three", 4, "five", in: any) as? String) == "😃"
+        try JSON.set(2, "three", 4, "five", in: &any, to: "😃")
+        try hope(JSON.get(2, "three", 4, "five", in: any) as? String) == "😃"
     }
 }

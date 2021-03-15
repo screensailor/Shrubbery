@@ -53,6 +53,8 @@ class Pond™: Hopes {
         hope(b) == 3
         hope(count.a) == 4
         hope(count.b) == 2
+        
+        hope.true(Thread.isMainThread)
 
         pond = Pond(geyser: Database())
     }
@@ -68,7 +70,8 @@ extension Pond™ {
         @Published var depth = 1
         
         func gush(of route: JSON.Route) -> Flow<JSON> {
-            $store.flow(of: route)
+            assert(Thread.isMainThread)
+            return $store.flow(of: route)
                 .delay(for: 0, scheduler: DispatchQueue.main)
                 .eraseToAnyPublisher()
         }

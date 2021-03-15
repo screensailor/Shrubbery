@@ -24,7 +24,7 @@ where
     
     public init(
         geyser: Source,
-        basin: Basin = .init(),
+        basin: Basin? = nil,
         on queue: DispatchQueue = .init(
             label: "\(Pond<Source, Key>.self).q",
             qos: .userInteractive
@@ -32,7 +32,7 @@ where
         subscriptions: Tree<Fork, Subscription> = .init()
     ) {
         self.geyser = geyser
-        self.basin = basin
+        self.basin = basin ?? .init(on: queue)
         self.queue = queue
         self.subscriptions = subscriptions
     }
@@ -52,7 +52,7 @@ where
             return error.flow()
         }
         
-        return queue.sync {
+//        return queue.sync {
             switch subscriptions[value: source]
             {
             case let .waiting(_, subject)?:
@@ -92,7 +92,7 @@ where
                     .eraseToAnyPublisher()
                 }
             }
-        }
+//        }
     }
 }
-
+import Foundation

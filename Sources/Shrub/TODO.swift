@@ -1,4 +1,9 @@
 /**
+ * - repos for:
+ *      - Datum/Droplet
+ *      - EitherType
+ *      - Shrub
+ *      - Pond
  * - performance and stress testing
  * - unflow everything?, keep .flow() as just an operator?
  * - Datum<Key, Value, Context> instead of Result<Value, Error>
@@ -10,9 +15,9 @@
  */
 public struct Datum<Key, Value, Context> where Key: Hashable {
     public let source: [EitherType<Int, Key>]
-    public let result: Result<Shrub<Key, Value>, Error>
+    public let result: Result<Shrub<Key>, Error>
     public let context: Context
 }
 
-public protocol Encoded: Shrubbery where Key == String, Value: Codable {}
-public typealias Coded = Shrub<String, Codable>
+public protocol Encoded: Shrubbery /* where Key == String, Value: Codable */ {}
+public typealias Coded = Shrub<String>

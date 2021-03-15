@@ -5,7 +5,7 @@ public typealias DeltaJSON = DeltaShrub<String, JSON.Fragment>
 // TODO:❗️protocol DeltaShrubbery
 public class DeltaShrub<Key, Value>: Delta where Key: Hashable {
     
-    public typealias Drop = Shrub<Key, Value>
+    public typealias Drop = Shrub<Key>
     public typealias Fork = Drop.Fork
     public typealias Route = [Fork]
     public typealias Subject = PassthroughSubject<Result<Drop, Error>, Never>
@@ -52,7 +52,8 @@ extension DeltaShrub {
         Route: Collection,
         Route.Element == Fork
     {
-        try queue.sync{ try drop.get(route) }
+//        try queue.sync{ try drop.get(route) }
+        try drop.get(route)
     }
 }
 
@@ -67,12 +68,12 @@ extension DeltaShrub {
         Route: Collection,
         Route.Element == Fork
     {
-        try queue.sync{
+//        try queue.sync{
             try drop.set(route, to: value)
-            subjects[route]?.traverse { subroute, subject in
+            subjects[route]?.traverse{ subroute, subject in
                 subject?.send(Result{ try drop.get(route + subroute) })
             }
-        }
+//        }
     }
 }
 
@@ -87,20 +88,20 @@ extension DeltaShrub {
         Route: Collection,
         Route.Element == Fork
     {
-        queue.sync{
+//        queue.sync{
             do {
                 let value = try value.get()
                 try drop.set(route, to: value)
-                subjects[route]?.traverse { subroute, subject in
+                subjects[route]?.traverse{ subroute, subject in
                     subject?.send(Result{ try drop.get(route + subroute) })
                 }
             }
             catch {
                 drop.delete(route) // TODO:❗️store error for new subscribers (is using current value subject worth it?)
-                subjects[route]?.traverse { subroute, subject in
+                subjects[route]?.traverse{ subroute, subject in
                     subject?.send(.failure(error))
                 }
             }
-        }
+//        }
     }
 }
