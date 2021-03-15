@@ -20,5 +20,13 @@ public struct Datum<Key, Value, Context> where Key: Hashable {
     public let context: Context
 }
 
-public protocol Encoded: Shrubbery /* where Key == String, Value: Codable */ {}
-public typealias Coded = Shrub<String>
+public protocol Hedgerow {
+    associatedtype Key: Hashable
+    associatedtype Value
+}
+
+public struct Hedge<Key, Value>: Hedgerow
+where Key: Hashable {}
+
+public protocol Encoded: Hedgerow where Key == String, Value: Codable {}
+public typealias Coded<Value> = Hedge<String, Value> where Value: Codable
