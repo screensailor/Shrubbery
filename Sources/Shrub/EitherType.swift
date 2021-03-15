@@ -128,6 +128,7 @@ extension EitherType {
 }
 
 extension EitherType {
+    
     public static func randomRoute(
         in a: [A],
         and b: [B],
@@ -136,10 +137,69 @@ extension EitherType {
     ) -> [Self] {
         let lower = max(0, length.lowerBound)
         let upper = max(lower, length.upperBound)
+        
         return (0 ..< Int.random(in: lower...upper)).compactMap{ _ -> Self? in
             Double.random(in: 0...1) < bias
                 ? a.randomElement().map{ Self($0) }
                 : b.randomElement().map{ Self($0) }
         }
     }
+
+    public static func randomRoutes(
+        count: Int,
+        in a: [A],
+        and b: [B],
+        bias: Double = 0.5,
+        length: ClosedRange<Int>
+    ) -> [[Self]] {
+        (0..<max(0, count)).map{ _ in
+            randomRoute(in: a, and: b, bias: bias, length: length)
+        }
+    }
 }
+
+#if canImport(GameplayKit)
+import GameplayKit
+
+extension EitherType {
+    
+    public static func randomRoute(
+        in a: [A],
+        and b: [B],
+        bias: Double = 0.5,
+        length: ClosedRange<Int>,
+        random: GKARC4RandomSource
+    ) -> [Self] {
+        let lower = max(0, length.lowerBound)
+        let upper = max(lower, length.upperBound)
+        let count = random.nextInt(upperBound: upper - lower + 1) + lower
+        return (0 ..< count).compactMap{ _ -> Self? in
+            Double(random.nextUniform()) < bias
+                ? random.randomElement(in: a).map{ Self($0) }
+                : random.randomElement(in: b).map{ Self($0) }
+        }
+    }
+
+    public static func randomRoutes(
+        count: Int,
+        in a: [A],
+        and b: [B],
+        bias: Double = 0.5,
+        length: ClosedRange<Int>,
+        seed: Int
+    ) -> [[Self]] {
+        let random = GKARC4RandomSource(seed: "seed \(seed)".data(using: .utf8)!)
+        return (0..<max(0, count)).map{ _ in
+            randomRoute(in: a, and: b, bias: bias, length: length, random: random)
+        }
+    }
+}
+
+private extension GKARC4RandomSource {
+    
+    func randomElement<A>(in a: [A]) -> A? {
+        guard !a.isEmpty else { return nil }
+        return a[nextInt(upperBound: a.count)]
+    }
+}
+#endif
