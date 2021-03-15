@@ -1,6 +1,6 @@
 import Foundation
 
-public typealias JSON = Shrub<String>
+public typealias JSON = Shrub<String> // TODO:❗️Hedge<String, JSONFragment>
 
 public protocol JSONFragment {}
 extension JSON { public typealias Fragment = JSONFragment }

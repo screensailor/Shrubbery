@@ -8,7 +8,7 @@ where
 {
     public typealias Fork = Source.Fork
     public typealias Route = Source.Route
-    public typealias Basin = DeltaShrub<Key, Source.Value>
+    public typealias Basin = DeltaShrub<Key>
     public typealias Subject = PassthroughSubject<(), Never>
     
     public enum Subscription {

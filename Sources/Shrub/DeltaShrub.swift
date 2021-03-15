@@ -1,9 +1,9 @@
 import Dispatch
 
-public typealias DeltaJSON = DeltaShrub<String, JSON.Fragment>
+public typealias DeltaJSON = DeltaShrub<String>
 
 // TODO:❗️protocol DeltaShrubbery
-public class DeltaShrub<Key, Value>: Delta where Key: Hashable {
+public class DeltaShrub<Key>: Delta where Key: Hashable {
     
     public typealias Drop = Shrub<Key>
     public typealias Fork = Drop.Fork
@@ -17,7 +17,7 @@ public class DeltaShrub<Key, Value>: Delta where Key: Hashable {
     public init(
         drop: Drop = nil,
         on queue: DispatchQueue = .init(
-            label: "\(DeltaShrub<Key, Value>.self).q",
+            label: "\(DeltaShrub<Key>.self).q",
             qos: .userInteractive
         ),
         subjects: Tree<Fork, Subject> = .init()

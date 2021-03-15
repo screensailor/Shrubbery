@@ -3,6 +3,7 @@
  *      - Datum/Droplet
  *      - EitherType
  *      - Shrub
+ *      - Hedge<Key, Value>
  *      - Pond
  * - performance and stress testing
  * - unflow everything?, keep .flow() as just an operator?
