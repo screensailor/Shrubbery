@@ -91,21 +91,26 @@ extension Shrub™ {
             
         let routes = testRoutes //testRoutesAndPrint()
         
-        var json: JSON = nil
+        var json1: JSON = nil
+        var json2: JSON = nil
         
-        var print = ""
-            
-        for i in 1...10 {
-            for (j, route) in routes.enumerated() {
-                try json.set(route, to: j)
-            }
-            if i == 1 {
-                print = json.debugDescription
-            } else {
-                hope(json.debugDescription) == print
-            }
-            json = nil
+        for (i, route) in routes.enumerated() {
+            try json1.set(route, to: i)
         }
+            
+        measure {
+            do {
+                try json1.traverse { route, value in
+                    guard case .leaf = value else { return }
+                    let o = try json1.get(route)
+                    try json2.set(route, to: o)
+                }
+            } catch {
+                hope.less("\(error)")
+            }
+        }
+        
+        hope(json2.debugDescription) == json1.debugDescription
     }
     
     private func testRoutesAndPrint() -> [JSON.Route] {

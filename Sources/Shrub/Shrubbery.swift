@@ -205,39 +205,39 @@ extension Shrubbery {
     /// Depth first traversal
     public func traverse(
         sort: ([Key: Any]) -> [(Key, Any)] = { $0.map{ $0 } },
-        yield: ((route: [Fork], value: ShrubberyValue<Key>)) -> ()
-    ) {
-        Self.traverse(route: [], this: self, sort: sort, yield: yield)
+        yield: ((route: [Fork], value: ShrubberyValue<Key>)) throws -> ()
+    ) rethrows {
+        try Self.traverse(route: [], this: self, sort: sort, yield: yield)
     }
     
     private static func traverse(
         route: [Fork],
         this: Any?,
         sort: ([Key: Any]) -> [(Key, Any)] = { $0.map{ $0 } },
-        yield: ((route: [Fork], value: ShrubberyValue<Key>)) -> ()
-    ) {
+        yield: ((route: [Fork], value: ShrubberyValue<Key>)) throws -> ()
+    ) rethrows {
         let ºany = flattenOptionality(
             of: (this as? AnyWrapper)?.unwrapped ?? this
         )
         switch ºany
         {
         case let array as [Any]:
-            yield((route, .array(array)))
+            try yield((route, .array(array)))
             for (i, element) in array.enumerated() {
-                traverse(route: route + [^i], this: element, sort: sort, yield: yield)
+                try traverse(route: route + [^i], this: element, sort: sort, yield: yield)
             }
             
         case let dictionary as [Key: Any]:
-            yield((route, .dictionary(dictionary)))
+            try yield((route, .dictionary(dictionary)))
             for (key, value) in sort(dictionary) {
-                traverse(route: route + [^key], this: value, sort: sort, yield: yield)
+                try traverse(route: route + [^key], this: value, sort: sort, yield: yield)
             }
             
         case let any?:
-            yield((route, .leaf(any)))
+            try yield((route, .leaf(any)))
             
         case nil:
-            yield((route, .none))
+            try yield((route, .none))
         }
     }
 }
@@ -247,9 +247,9 @@ extension Shrubbery where Key: Comparable {
     /// Depth first traversal
     public func traverse(
         sort: ([Key: Any]) -> [(Key, Any)] = { $0.sorted{ $0.key < $1.key } },
-        yield: ((route: [Fork], value: ShrubberyValue<Key>)) -> ()
-    ) {
-        Self.traverse(route: [], this: self, sort: sort, yield: yield)
+        yield: ((route: [Fork], value: ShrubberyValue<Key>)) throws -> ()
+    ) rethrows {
+        try Self.traverse(route: [], this: self, sort: sort, yield: yield)
     }
 }
 
