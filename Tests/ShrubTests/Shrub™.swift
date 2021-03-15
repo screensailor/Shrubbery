@@ -91,11 +91,11 @@ extension Shrub™ {
             
         let routes = JSON.Fork.randomRoutes(
             count: 1000,
-            in: Array(0...3),
-            and: "qwertyuiopasdfghjklzxcvbnm".map(String.init),
-            bias: 0.2,
-            length: 3...7,
-            seed: 817145 // Int.random(in: 1000...1_000_000).peek("✅")
+            in: Array(0...2),
+            and: "abc".map(String.init),
+            bias: 0.1,
+            length: 5...7,
+            seed: 502645 // Int.random(in: 1000...1_000_000).peek("✅")
         )
         
         var json1: JSON = nil
@@ -104,7 +104,9 @@ extension Shrub™ {
         for (i, route) in routes.enumerated() {
             try json1.set(route, to: i)
         }
-            
+        
+        // debugPrint(json1)
+
         measure {
             do {
                 try json1.traverse { route, value in
