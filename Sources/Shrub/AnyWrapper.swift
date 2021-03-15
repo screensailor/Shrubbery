@@ -7,5 +7,15 @@ public protocol AnyWrapper:
 }
 
 extension AnyWrapper {
-    public init(nilLiteral: ()) { self.init(nil) }
+    
+    public init(nilLiteral: ()) {
+        self.init(nil)
+    }
+}
+
+extension AnyWrapper {
+    
+    public var description: String {
+        String(describing: unwrapped ?? "nil")
+    }
 }

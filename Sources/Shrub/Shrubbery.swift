@@ -3,7 +3,8 @@ import Peek
 public protocol Shrubbery:
     AnyWrapper,
     ExpressibleByArrayLiteral,
-    ExpressibleByDictionaryLiteral
+    ExpressibleByDictionaryLiteral,
+    CustomDebugStringConvertible
 where
     Key: Hashable,
     Value == Any
@@ -173,11 +174,110 @@ public prefix func ^ <S: Shrubbery>(dictionary: [S.Key: S]) -> S {
     S(dictionary.mapValues(\.unwrapped).ifNotEmpty)
 }
 
-// MARK: peek
+// MARK: traverse
+
+public enum ShrubberyValue<Key>
+where Key: Hashable
+{
+    case none
+    case leaf(Any)
+    case array([Any])
+    case dictionary([Key: Any])
+}
+
+extension ShrubberyValue {
+    
+    public var any: Any? {
+        switch self
+        {
+        case .none: return nil
+        case .leaf(let leaf): return leaf
+        case .array(let array): return array
+        case .dictionary(let dictionary): return dictionary
+        }
+    }
+}
 
 extension Shrubbery {
     
-    public var description: String {
-        String(describing: unwrapped ?? "nil")
+    // TODO:❗️breadth vs depth first
+    // TODO: make it a Publisher
+    /// Depth first traversal
+    public func traverse(
+        sort: ([Key: Any]) -> [(Key, Any)] = { $0.map{ $0 } },
+        yield: ((route: [Fork], value: ShrubberyValue<Key>)) -> ()
+    ) {
+        Self.traverse(route: [], this: self, sort: sort, yield: yield)
+    }
+    
+    private static func traverse(
+        route: [Fork],
+        this: Any?,
+        sort: ([Key: Any]) -> [(Key, Any)] = { $0.map{ $0 } },
+        yield: ((route: [Fork], value: ShrubberyValue<Key>)) -> ()
+    ) {
+        let ºany = flattenOptionality(
+            of: (this as? AnyWrapper)?.unwrapped ?? this
+        )
+        switch ºany
+        {
+        case let array as [Any]:
+            yield((route, .array(array)))
+            for (i, element) in array.enumerated() {
+                traverse(route: route + [^i], this: element, sort: sort, yield: yield)
+            }
+            
+        case let dictionary as [Key: Any]:
+            yield((route, .dictionary(dictionary)))
+            for (key, value) in sort(dictionary) {
+                traverse(route: route + [^key], this: value, sort: sort, yield: yield)
+            }
+            
+        case let any?:
+            yield((route, .leaf(any)))
+            
+        case nil:
+            yield((route, .none))
+        }
+    }
+}
+
+extension Shrubbery where Key: Comparable {
+    
+    /// Depth first traversal
+    public func traverse(
+        sort: ([Key: Any]) -> [(Key, Any)] = { $0.sorted{ $0.key < $1.key } },
+        yield: ((route: [Fork], value: ShrubberyValue<Key>)) -> ()
+    ) {
+        Self.traverse(route: [], this: self, sort: sort, yield: yield)
+    }
+}
+
+extension Shrubbery {
+    
+    public var debugDescription: String {
+        sortedDescription{ $0.sorted{ "\($0.key)" < "\($1.key)" } }
+    }
+    
+    public func sortedDescription(_ sort: ([Key: Any]) -> [(Key, Any)]) -> String {
+        var o = "\(Self.self)"
+        traverse(sort: sort) { route, value in
+            let t = repeatElement("  |", count: max(0, route.count - 1)).joined()
+            switch value {
+            case .none, .leaf:
+                o += "\(t)  \(route.last?.description ?? ""): "
+                o += "\(value.any.map(String.init(describing:)) ?? "nil")\n"
+            case .array, .dictionary:
+                o += "\(t)  \(route.last?.description ?? "")\n"
+            }
+        }
+        return o
+    }
+}
+
+extension Shrubbery where Key: Comparable {
+    
+    public var debugDescription: String {
+        sortedDescription{ $0.sorted{ $0.key < $1.key } }
     }
 }
