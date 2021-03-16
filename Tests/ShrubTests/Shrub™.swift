@@ -5,45 +5,10 @@
 
 extension String: Error {}
 
-@dynamicMemberLookup
-struct I<K>: Hashable, Collection where K: Hashable {
-    
-    typealias Element = EitherType<Int, K>
-    
-    var array: [Element]
-    
-    var startIndex: Int { array.startIndex }
-    var endIndex: Int { array.endIndex }
-    
-    public init(_ array: Element...) { self.init(array) }
-    public init(_ array: [Element]) { self.array = array }
-    
-    func then(_ i: Int) -> Self { Self(array + [^i]) }
-    func then(_ k: K) -> Self { Self(array + [^k]) }
-    
-    subscript(dynamicMember i: KeyPath<(Int, Int, Int), Int>) -> Self {
-        let int = (0, 1, 2)
-        return then(int[keyPath: i])
-    }
-
-    subscript(position: Int) -> Element { array[position] }
-
-    func index(after i: Int) -> Int { array.index(after: i) }
-    func hash(into hasher: inout Hasher) { array.hash(into: &hasher) }
-}
-
-extension Shrub {
-    
-    subscript<A>(route: I<Key>, as type: A.Type = A.self) -> A? {
-        get { self[route.array, as: A.self] }
-        set { self[route.array, as: A.self] = newValue }
-    }
-}
-
 private extension I where K == String {
-    var a: Self { then("a") }
-    var b: Self { then("b") }
-    var c: Self { then("c") }
+    var a: Self { __("a") }
+    var b: Self { __("b") }
+    var c: Self { __("c") }
 }
 
 class Shrub™: Hopes {
