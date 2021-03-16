@@ -19,9 +19,10 @@ where
     public func __(_ i: Int) -> Self { Self(array + [^i]) }
     public func __(_ k: Key) -> Self { Self(array + [^k]) }
     
-    public subscript(dynamicMember i: KeyPath<(Int, Int, Int), Int>) -> Self {
-        let int = (0, 1, 2)
-        return __(int[keyPath: i])
+    public typealias Ints = (Int, Int, Int, Int, Int, Int, Int, Int, Int, Int)
+    
+    public subscript(dynamicMember i: KeyPath<Ints, Int>) -> Self {
+        __(ints[keyPath: i])
     }
 
     public subscript(position: Int) -> Fork { array[position] }
@@ -29,6 +30,8 @@ where
     public func index(after i: Int) -> Int { array.index(after: i) }
     public func hash(into hasher: inout Hasher) { array.hash(into: &hasher) }
 }
+
+private let ints = (0, 1, 2, 3, 4, 5, 6, 7, 8, 9)
 
 extension Forks {
     
