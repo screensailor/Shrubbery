@@ -5,7 +5,7 @@
 
 extension String: Error {}
 
-private extension I where K == String {
+private extension I where Key == String {
     var a: Self { __("a") }
     var b: Self { __("b") }
     var c: Self { __("c") }
