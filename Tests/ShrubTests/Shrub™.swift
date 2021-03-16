@@ -5,10 +5,10 @@
 
 extension String: Error {}
 
-private extension I where Key == String {
-    var a: Self { __("a") }
-    var b: Self { __("b") }
-    var c: Self { __("c") }
+private extension Forks where Key == String {
+    var a: Forks { __("a") }
+    var b: Forks { __("b") }
+    var c: Forks { __("c") }
 }
 
 class Shrub™: Hopes {
@@ -53,9 +53,9 @@ class Shrub™: Hopes {
         hope(o[^.a, ^2, ^.c]) == "c"
     }
     
-    func test_subscript_with_I_of_K() throws {
+    func test_subscript_with_I() throws {
         
-        let my = I<JSON.Key>()
+        let my: Forks<JSON.Key> = []
         
         var o: JSON = nil
         
