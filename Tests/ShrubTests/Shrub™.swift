@@ -55,9 +55,9 @@ class Shrub™: Hopes {
     
     func test_subscript_with_I_of_K() throws {
         
-        let my = I<String>()
+        let my = I<JSON.Key>()
         
-        var o: Shrub<String> = nil
+        var o: JSON = nil
         
         o[my.a] = "a"
         hope(o[my.a]) == "a"
