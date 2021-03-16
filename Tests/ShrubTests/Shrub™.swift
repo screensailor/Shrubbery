@@ -71,8 +71,8 @@ class Shrub™: Hopes {
 
     func test_expressible() throws {
         
-        let o: JSON = ^[
-            "one": ^[
+        let o: JSON = [
+            "one": [
                 "two": [
                     3, 4, 5
                 ]

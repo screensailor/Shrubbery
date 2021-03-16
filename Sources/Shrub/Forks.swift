@@ -13,7 +13,6 @@ where
     public var startIndex: Int { array.startIndex }
     public var endIndex: Int { array.endIndex }
     
-    public init(_ array: Fork...) { self.init(array) }
     public init(_ array: [Fork]) { self.array = array }
     
     public func __(_ i: Int) -> Self { Self(array + [^i]) }
@@ -34,6 +33,10 @@ where
 private let ints = (0, 1, 2, 3, 4, 5, 6, 7, 8, 9)
 
 extension Forks {
+    
+    public init(_ array: Fork...) {
+        self.init(array)
+    }
     
     public init(arrayLiteral elements: Fork...) {
         self.init(elements)
