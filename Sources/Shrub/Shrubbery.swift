@@ -198,6 +198,8 @@ extension ShrubberyValue {
     }
 }
 
+// MARK: traverse
+
 extension Shrubbery {
     
     // TODO:❗️breadth vs depth first
@@ -252,6 +254,8 @@ extension Shrubbery where Key: Comparable {
         try Self.traverse(route: [], this: self, sort: sort, yield: yield)
     }
 }
+
+// MARK: debug description
 
 extension Shrubbery {
     

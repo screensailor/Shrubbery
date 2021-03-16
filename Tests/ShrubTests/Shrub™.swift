@@ -5,6 +5,47 @@
 
 extension String: Error {}
 
+@dynamicMemberLookup
+struct I<K>: Hashable, Collection where K: Hashable {
+    
+    typealias Element = EitherType<Int, K>
+    
+    var array: [Element]
+    
+    var startIndex: Int { array.startIndex }
+    var endIndex: Int { array.endIndex }
+    
+    public init(_ array: Element...) { self.init(array) }
+    public init(_ array: [Element]) { self.array = array }
+    
+    func then(_ i: Int) -> Self { Self(array + [^i]) }
+    func then(_ k: K) -> Self { Self(array + [^k]) }
+    
+    subscript(dynamicMember i: KeyPath<(Int, Int, Int), Int>) -> Self {
+        let int = (0, 1, 2)
+        return then(int[keyPath: i])
+    }
+
+    subscript(position: Int) -> Element { array[position] }
+
+    func index(after i: Int) -> Int { array.index(after: i) }
+    func hash(into hasher: inout Hasher) { array.hash(into: &hasher) }
+}
+
+extension Shrub {
+    
+    subscript<A>(route: I<Key>, as type: A.Type = A.self) -> A? {
+        get { self[route.array, as: A.self] }
+        set { self[route.array, as: A.self] = newValue }
+    }
+}
+
+private extension I where K == String {
+    var a: Self { then("a") }
+    var b: Self { then("b") }
+    var c: Self { then("c") }
+}
+
 class Shrub™: Hopes {
     
     func test_subscript() throws { 
@@ -34,6 +75,35 @@ class Shrub™: Hopes {
         hope.true(isNilAfterFlattening(o["one", "two"]))
     }
     
+    func test_subscript_with_dedicated_keys() throws {
+        
+        enum K { case a, b, c }
+        
+        var o: Shrub<K> = nil
+        
+        o[^.a] = "a"
+        hope(o[^.a]) == "a"
+        
+        o[^.a, ^2, ^.c] = "c"
+        hope(o[^.a, ^2, ^.c]) == "c"
+    }
+    
+    func test_subscript_with_I_of_K() throws {
+        
+        let my = I<String>()
+        
+        var o: Shrub<String> = nil
+        
+        o[my.a] = "a"
+        hope(o[my.a]) == "a"
+        
+        o[my.a.b.c] = "abc"
+        hope(o[my.a.b.c]) == "abc"
+        
+        o[my.a.2.c] = "a2c"
+        hope(o[my.a.2.c]) == "a2c"
+    }
+
     func test_expressible() throws {
         
         let o: JSON = ^[
