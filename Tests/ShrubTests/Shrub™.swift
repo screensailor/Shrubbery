@@ -46,8 +46,8 @@ class Shrub™: Hopes {
         
         var o: Shrub<K> = nil
         
-        o[^.a] = "a"
-        hope(o[^.a]) == "a"
+        o[.a] = "a"
+        hope(o[.a]) == "a"
         
         o[^.a, ^2, ^.c] = "c"
         hope(o[^.a, ^2, ^.c]) == "c"
@@ -86,7 +86,7 @@ class Shrub™: Hopes {
 
 extension Shrub™ {
 
-    func test_ShrubAny_get() throws {
+    func test_Shrub_get() throws {
 
         var any: Any = 1
         try hope(JSON.get([], in: any) as? Int) == 1
@@ -103,7 +103,7 @@ extension Shrub™ {
         try hope(JSON.get(1, "one", "two", "three", in: any) as? Int) == 3
     }
 
-    func test_ShrubAny_set() throws {
+    func test_Shrub_set() throws {
 
         var any: Any? = 1
         try JSON.set([], in: &any, to: 2)

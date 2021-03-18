@@ -37,10 +37,24 @@ extension Shrubbery {
     }
 }
 
-// MARK: subscript
+// MARK: subscript -> Self
 
 extension Shrubbery {
 
+    public subscript(_ route: Key, _ rest: Key...) -> Self? {
+        get { self[[route] + rest] }
+        set { self[[route] + rest] = newValue }
+    }
+
+    public subscript<Route>(_ route: Route) -> Self?
+    where
+        Route: Collection,
+        Route.Element == Key
+    {
+        get { self[route.map(Fork.init)] }
+        set { self[route.map(Fork.init)] = newValue }
+    }
+    
     public subscript(_ route: Fork...) -> Self? {
         get { self[route] }
         set { self[route] = newValue }
@@ -75,8 +89,24 @@ extension Shrubbery {
     }
 }
 
+// MARK: subscript<A> -> A
+
 extension Shrubbery {
 
+    public subscript<A>(_ route: Key, _ rest: Key..., as _: A.Type = A.self) -> A?{
+        get { self[[route] + rest, as: A.self] }
+        set { self[[route] + rest, as: A.self] = newValue }
+    }
+
+    public subscript<A, Route>(_ route: Route, as _: A.Type = A.self) -> A?
+    where
+        Route: Collection,
+        Route.Element == Key
+    {
+        get { self[route.map(Fork.init), as: A.self] }
+        set { self[route.map(Fork.init), as: A.self] = newValue }
+    }
+    
     public subscript<A>(_ route: Fork..., as _: A.Type = A.self) -> A? {
         get { self[route, as: A.self] }
         set { self[route, as: A.self] = newValue }
@@ -113,6 +143,18 @@ extension Shrubbery {
 
 extension Shrubbery {
     
+    public func get<A>(_ route: Key, _ rest: Key..., as: A.Type = A.self) throws -> A {
+        try get([route] + rest, as: A.self)
+    }
+
+    public func get<A, Route>(_ route: Route, as: A.Type = A.self) throws -> A
+    where
+        Route: Collection,
+        Route.Element == Key
+    {
+        try get(route.map(Fork.init), as: A.self)
+    }
+
     public func get<A>(_ route: Fork..., as: A.Type = A.self) throws -> A {
         try get(route.array).as(A.self)
     }
@@ -129,6 +171,18 @@ extension Shrubbery {
 // MARK: set
 
 extension Shrubbery {
+
+    public mutating func set<A>(_ route: Key, rest: Key..., to value: A) throws {
+        try set([route] + rest, to: value as Any?)
+    }
+    
+    public mutating func set<A, Route>(_ route: Route, to value: A) throws
+    where
+        Route: Collection,
+        Route.Element == Key
+    {
+        try set(route.array, to: value)
+    }
 
     public mutating func set<A>(_ route: Fork..., to value: A) throws {
         try set(route, to: value as Any?)

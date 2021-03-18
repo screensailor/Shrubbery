@@ -20,7 +20,7 @@ public struct Datum<Key, Value, Context> where Key: Hashable {
     public let context: Context
 }
 
-public protocol Hedgerow {
+public protocol Hedgerow /* Shrubbery */ {
     associatedtype Key: Hashable
     associatedtype Value
 }
