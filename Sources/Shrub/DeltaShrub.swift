@@ -1,7 +1,6 @@
 import Dispatch
 
-// TODO:❗️protocol DeltaShrubbery
-public class DeltaShrub<Key>: Delta where Key: Hashable {
+public class DeltaShrub<Key>: Delta /* TODO:❗️, Shrubbery */ where Key: Hashable {
     
     public typealias Drop = Shrub<Key>
     public typealias Fork = Drop.Fork

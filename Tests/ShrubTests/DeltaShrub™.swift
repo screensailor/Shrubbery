@@ -176,26 +176,23 @@ class DeltaShrub™: Hopes {
             }.store(in: &bag)
         }
         
-        let qs = (1...5).map{ i in
-            DispatchQueue(label: "qs[\(i)]", attributes: .concurrent)
+        let q = (1...4).map{ i in
+            DispatchQueue(label: "q[\(i)]", attributes: .concurrent)
         }
         
         let g = DispatchGroup()
         
         for (i, route) in routes.enumerated() {
             g.enter()
-            let q = qs[i % qs.count]
-            q.asyncAfter(deadline: .now() + .random(in: 0...0.01)) {
+            q[i % q.count].asyncAfter(deadline: .now() + .random(in: 0...0.01)) {
                 try? json1.set(route, to: i)
                 g.leave()
             }
         }
         
-        hope(g.wait(timeout: .now() + 5)) == .success
+        hope(g.wait(timeout: .now() + 1)) == .success
 
         hope(json2.debugDescription) == json1.debugDescription
-        
-        debugPrint(json2)
     }
 }
 
