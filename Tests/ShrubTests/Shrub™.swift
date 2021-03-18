@@ -122,7 +122,7 @@ extension Shrub™ {
         try hope(JSON.get(2, "three", 4, "five", in: any) as? String) == "😃"
     }
     
-    func test_debugDescription() throws {
+    func test_traverse_and_debugDescription() throws {
             
         let routes = JSON.Fork.randomRoutes(
             count: 1000,

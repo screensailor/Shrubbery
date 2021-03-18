@@ -1,5 +1,7 @@
 import Foundation
 
+public typealias DeltaJSON = DeltaShrub<String> // TODO:❗️DeltaHedge<String, JSONFragment>
+
 public typealias JSON = Shrub<String> // TODO:❗️Hedge<String, JSONFragment>
 
 extension JSON {

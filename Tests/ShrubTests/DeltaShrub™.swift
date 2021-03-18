@@ -127,5 +127,75 @@ class DeltaShrub™: Hopes {
         hope(count.a) == 4
         hope(count.b) == 2
     }
+    
+    func test_thousand_subscriptions() throws {
+        
+        let routes = JSON.Fork.randomRoutes(
+            count: 1000,
+            in: Array(0...2),
+            and: "abc".map(String.init),
+            bias: 0.1,
+            length: 5...7,
+            seed: 502645 // Int.random(in: 1000...1_000_000).peek("✅")
+        )
+        
+        let json1: DeltaJSON = .init()
+        let json2: DeltaJSON = .init()
+        
+        for route in routes {
+            json1.flow(of: route, as: Int.self).sink{ result in
+                try? json2.set(route, to: result.get())
+            }.store(in: &bag)
+        }
+        
+        for (i, route) in routes.enumerated() {
+            try json1.set(route, to: i)
+        }
+
+        hope(json2.debugDescription) == json1.debugDescription
+        
+    }
+    
+    func test_thousand_subscriptions_and_concurrent_updates() throws {
+        
+        let routes = JSON.Fork.randomRoutes(
+            count: 1000,
+            in: Array(0...2),
+            and: "abc".map(String.init),
+            bias: 0.1,
+            length: 5...7,
+            seed: 502645 // Int.random(in: 1000...1_000_000).peek("✅")
+        )
+        
+        let json1: DeltaJSON = .init()
+        let json2: DeltaJSON = .init()
+        
+        for route in routes {
+            json1.flow(of: route, as: Int.self).sink{ result in
+                try? json2.set(route, to: result.get())
+            }.store(in: &bag)
+        }
+        
+        let qs = (1...5).map{ i in
+            DispatchQueue(label: "qs[\(i)]", attributes: .concurrent)
+        }
+        
+        let g = DispatchGroup()
+        
+        for (i, route) in routes.enumerated() {
+            g.enter()
+            let q = qs[i % qs.count]
+            q.asyncAfter(deadline: .now() + .random(in: 0...0.01)) {
+                try? json1.set(route, to: i)
+                g.leave()
+            }
+        }
+        
+        hope(g.wait(timeout: .now() + 5)) == .success
+
+        hope(json2.debugDescription) == json1.debugDescription
+        
+        debugPrint(json2)
+    }
 }
 
