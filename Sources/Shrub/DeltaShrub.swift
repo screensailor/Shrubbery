@@ -33,6 +33,7 @@ extension DeltaShrub {
                 Result{ try o.get().as(A.self) }
             }
         )
+        .subscribe(on: queue)
         .eraseToAnyPublisher()
     }
 }
@@ -48,7 +49,7 @@ extension DeltaShrub {
         Route: Collection,
         Route.Element == Fork
     {
-        try drop.get(route)
+        try queue.sync{ try drop.get(route) }
     }
 }
 
@@ -63,9 +64,11 @@ extension DeltaShrub {
         Route: Collection,
         Route.Element == Fork
     {
-        try drop.set(route, to: value)
-        subscriptions[route]?.traverse{ subroute, subject in
-            subject?.send(Result{ try drop.get(route + subroute) })
+        try queue.sync{
+            try drop.set(route, to: value)
+            subscriptions[route]?.traverse{ subroute, subject in
+                subject?.send(Result{ try drop.get(route + subroute) })
+            }
         }
     }
 }
@@ -81,17 +84,19 @@ extension DeltaShrub {
         Route: Collection,
         Route.Element == Fork
     {
-        do {
-            let value = try value.get()
-            try drop.set(route, to: value)
-            subscriptions[route]?.traverse{ subroute, subject in
-                subject?.send(Result{ try drop.get(route + subroute) })
+        queue.sync{
+            do {
+                let value = try value.get()
+                try drop.set(route, to: value)
+                subscriptions[route]?.traverse{ subroute, subject in
+                    subject?.send(Result{ try drop.get(route + subroute) })
+                }
             }
-        }
-        catch {
-            drop.delete(route) // TODO:❗️store error for new subscribers (is using current value subject worth it?)
-            subscriptions[route]?.traverse{ subroute, subject in
-                subject?.send(.failure(error))
+            catch {
+                drop.delete(route) // TODO:❗️store error for new subscribers (is using current value subject worth it?)
+                subscriptions[route]?.traverse{ subroute, subject in
+                    subject?.send(.failure(error))
+                }
             }
         }
     }
