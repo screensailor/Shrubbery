@@ -30,3 +30,23 @@ where Key: Hashable {}
 
 public protocol Encoded: Hedgerow where Key == String, Value: Codable {}
 public typealias Coded<Value> = Hedge<String, Value> where Value: Codable
+
+public struct AnyEquatableError: Equatable, Error {
+    
+    public static func == (lhs: AnyEquatableError, rhs: AnyEquatableError) -> Bool {
+        lhs.isEqualTo(rhs.error)
+    }
+
+    public let error: Error
+    public let isEqualTo: (Error) -> Bool
+    
+    public init<E>(_ error: E) where E: Error, E: Equatable {
+        self.error = error
+        self.isEqualTo = { error == $0 as? E }
+    }
+}
+
+extension Error where Self: Equatable {
+    
+    public func typeErased() -> AnyEquatableError { .init(self) }
+}
