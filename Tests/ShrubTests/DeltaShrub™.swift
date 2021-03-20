@@ -128,6 +128,46 @@ class DeltaShrub™: Hopes {
         hope(count.b) == 2
     }
     
+    func test_update_down() throws {
+        
+        let json: DeltaJSON = .init()
+        
+        var result: Result<Int, Error> = .failure("😱".error())
+        
+        json.flow(of: "a", "b", "c").sink{ result = $0 }.store(in: &bag)
+        hope.throws(try result.get())
+        
+        try json.set("a", "b", "c", to: 1)
+        hope.for(0.01)
+        hope(result) == 1
+        
+        json.delete("a", "b")
+        hope.throws(try result.get())
+
+        try json.set("a", to: ["b": ["c": 2]])
+        hope(result) == 2
+    }
+    
+    func test_update_up() throws {
+        
+        let json: DeltaJSON = .init()
+        
+        var result: Result<JSON, Error> = .failure("😱".error())
+        
+        json.flow(of: "a").sink{ result = $0 }.store(in: &bag)
+        hope.throws(try result.get())
+        
+        try json.set("a", "b", "c", to: 1)
+        hope.for(0.01)
+        hope(try result.get().get()) == ["b": ["c": 1]]
+        
+        json.delete("a", "b")
+        hope.throws(try result.get())
+
+        try json.set("a", to: ["b": ["c": 2]])
+        hope(try result.get().get()) ==  ["b": ["c": 2]]
+    }
+
     func test_thousand_subscriptions() throws {
         
         let routes = JSON.Fork.randomRoutes(

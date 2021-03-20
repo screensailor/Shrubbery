@@ -55,7 +55,7 @@ extension Shrub {
             
         case .b(let key):
             guard let dictionary = any as? [Key: Any] else {
-                throw "Expected [Any] but found \(type(of: any)) at '\(key)' in \(route)".error()
+                throw "Expected [\(Key.self): Any] but found \(type(of: any)) at '\(key)' in \(route)".error()
             }
             guard let any = dictionary[key] else {
                 throw "No value found at \(key) in \(route)".error()

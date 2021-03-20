@@ -9,32 +9,27 @@ where
     public typealias Fork = Source.Fork
     public typealias Route = Source.Route
     public typealias Basin = DeltaShrub<Key>
-    public typealias Subject = PassthroughSubject<(), Never>
+    public typealias Subject = CurrentValueSubject<Bool, Never>
     
-    public enum Subscription {
-        case waiting(AnyCancellable, Subject)
-        case ready(AnyCancellable)
+    public struct Subscription {
+        public let didSink: Subject
+        public let cancellable: AnyCancellable
     }
 
     public let geyser: Source
     
-    private var basin: Basin
-    private let queue: DispatchQueue
-    private var subscriptions: Tree<Fork, Subscription>
+    private var basin: Basin = .init()
+    private var subscriptions: Tree<Fork, Subscription> = .init()
     
-    public init(
-        geyser: Source,
-        basin: Basin? = nil,
-        on queue: DispatchQueue = .init(
-            label: "\(Pond<Source, Key>.self).q",
-            qos: .userInteractive
-        ),
-        subscriptions: Tree<Fork, Subscription> = .init()
-    ) {
+    private let queueKey: DispatchSpecificKey<Void>
+    private let queue: DispatchQueue = .init(
+        label: "\(Pond<Source, Key>.self).q",
+        qos: .userInteractive
+    )
+    
+    public init(geyser: Source) {
+        self.queueKey = queue.setSpecificKey()
         self.geyser = geyser
-        self.basin = basin ?? .init(on: queue)
-        self.queue = queue
-        self.subscriptions = subscriptions
     }
     
     public func flow<A>(of route: Route, as: A.Type) -> Flow<A> {
@@ -52,47 +47,39 @@ where
             return error.flow()
         }
         
-//        return queue.sync {
-            switch subscriptions[value: source]
-            {
-            case let .waiting(_, subject)?:
-                return subject.flatMap{ _ in
-                    self.basin.flow(of: route)
-                }
-                .subscribe(on: queue)
-                .eraseToAnyPublisher()
-                
-            case .ready?:
-                return basin.flow(of: route)
-                
-            default:
-                var didSink = false
-                let subscription = geyser.gush(of: source).sink{ result in
-                    self.basin.set(source, to: result)
-                    if
-                        !didSink,
-                        case let .waiting(subscription, subject) = self.subscriptions[value: source]
-                    {
-                        self.subscriptions[value: source] = .ready(subscription)
-                        subject.send()
+        return flow(of: route, from: source, as: A.self)
+    }
+        
+    private func flow<A>(of route: Route, from source: Route, as: A.Type) -> Flow<A> {
+        queue.sync {
+            guard let subscription = subscriptions[value: source] else {
+                let didSink = Subject(false)
+                subscriptions[value: source] = Subscription(
+                    didSink: didSink,
+                    cancellable: geyser.gush(of: source).receive(on: queue).sink{
+                        [weak didSink] result in
+                        self.basin.set(source, to: result)
+                        didSink?.send(true)
                     }
-                    didSink = true
-                }
-                if didSink {
-                    subscriptions[value: source] = .ready(subscription)
-                    return basin.flow(of: route)
-                }
-                else {
-                    let subject = Subject()
-                    subscriptions[value: source] = .waiting(subscription, subject)
-                    return subject.flatMap{ _ in
-                        self.basin.flow(of: route)
-                    }
-                    .subscribe(on: queue)
-                    .eraseToAnyPublisher()
-                }
+                )
+                return didSink.flow(of: route, in: basin, on: queue)
             }
-//        }
+            return subscription.didSink.flow(of: route, in: basin, on: queue)
+        }
     }
 }
-import Foundation
+
+private extension CurrentValueSubject where Output == Bool, Failure == Never {
+    
+    func flow<A, Key>(
+        of route: DeltaShrub<Key>.Route,
+        in basin: DeltaShrub<Key>,
+        on queue: DispatchQueue
+    ) -> Flow<A> {
+        self.first(where: { $0 }).flatMap{ _ in
+            basin.flow(of: route)
+        }
+        .subscribe(on: queue)
+        .eraseToAnyPublisher()
+    }
+}
