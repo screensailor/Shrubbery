@@ -12,8 +12,8 @@ where
     public typealias Subject = CurrentValueSubject<Bool, Never>
     
     public struct Subscription {
+        public let cancel: () -> ()
         public let didSink: Subject
-        public let lifecycle: (Int) -> ()
         public let cancellable: AnyCancellable
     }
 
@@ -52,25 +52,19 @@ where
     private func flow<A>(of route: Route, from source: Route, as: A.Type) -> Flow<A> {
         queue.sync {
             guard let subscription = subscriptions[value: source] else {
-                var count = 0
-                let lifecycle = { (x: Int) -> () in
-                    count += x
-                    if count < 1 { assert(count == 0)
-                        self.subscriptions[value: source] = nil
-                    }
-                }
+                let cancel = { self.subscriptions[value: source] = nil }
                 let didSink = Subject(false)
                 subscriptions[value: source] = Subscription(
+                    cancel: cancel,
                     didSink: didSink,
-                    lifecycle: lifecycle,
                     cancellable: geyser.gush(of: source).receive(on: queue).sink{ [weak didSink] result in
                         self.basin.set(source, to: result)
                         didSink?.send(true)
                     }
                 )
-                return didSink.flow(of: route, in: basin, on: queue, lifecycle: lifecycle)
+                return didSink.flow(of: route, in: basin, on: queue, cancel: cancel)
             }
-            return subscription.didSink.flow(of: route, in: basin, on: queue, lifecycle: subscription.lifecycle)
+            return subscription.didSink.flow(of: route, in: basin, on: queue, cancel: subscription.cancel)
         }
     }
 }
@@ -81,14 +75,20 @@ private extension CurrentValueSubject where Output == Bool, Failure == Never {
         of route: DeltaShrub<Key>.Route,
         in basin: DeltaShrub<Key>,
         on queue: DispatchQueue,
-        lifecycle: @escaping (Int) -> ()
+        cancel: @escaping () -> ()
     ) -> Flow<A> {
-        self.first(where: { $0 }).flatMap{ _ in
+        var count = 0
+        return self.first(where: { $0 }).flatMap{ _ in
             basin.flow(of: route)
         }
         .handleEvents(
-            receiveSubscription: { _ in lifecycle(1) },
-            receiveCancel: { lifecycle(-1) }
+            receiveSubscription: { _ in count += 1 },
+            receiveCancel: {
+                count -= 1
+                if count < 1 { assert(count == 0)
+                    cancel()
+                }
+            }
         )
         .subscribe(on: queue)
         .eraseToAnyPublisher()
