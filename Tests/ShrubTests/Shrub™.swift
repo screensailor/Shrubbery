@@ -34,10 +34,10 @@ class Shrub™: Hopes {
         hope(o["one"]) == [nil, nil, 2] // did not append
         
         o["one", 2] = nil
-        hope.true(isNilAfterFlattening(o["one"])) // none left
+        hope.true(isNilAfterFlattening(o["one"].unwrapped)) // none left
         
         o["one", "two"] = nil
-        hope.true(isNilAfterFlattening(o["one", "two"]))
+        hope.true(isNilAfterFlattening(o["one", "two"].unwrapped))
     }
     
     func test_subscript_with_dedicated_keys() throws {

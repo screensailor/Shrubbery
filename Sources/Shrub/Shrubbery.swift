@@ -41,12 +41,12 @@ extension Shrubbery {
 
 extension Shrubbery {
 
-    public subscript(_ route: Key, _ rest: Key...) -> Self? {
+    public subscript(_ route: Key, _ rest: Key...) -> Self {
         get { self[[route] + rest] }
         set { self[[route] + rest] = newValue }
     }
 
-    public subscript<Route>(_ route: Route) -> Self?
+    public subscript<Route>(_ route: Route) -> Self
     where
         Route: Collection,
         Route.Element == Key
@@ -55,12 +55,12 @@ extension Shrubbery {
         set { self[route.map(Fork.init)] = newValue }
     }
     
-    public subscript(_ route: Fork...) -> Self? {
+    public subscript(_ route: Fork...) -> Self {
         get { self[route] }
         set { self[route] = newValue }
     }
 
-    public subscript<Route>(_ route: Route) -> Self?
+    public subscript<Route>(_ route: Route) -> Self
     where
         Route: Collection,
         Route.Element == Fork
@@ -78,7 +78,7 @@ extension Shrubbery {
         }
         set {
             do {
-                try set(route.array, to: newValue)
+                try set(route.array, to: newValue.unwrapped)
             }
             catch {
                 if #available(iOS 14.0, *) {
