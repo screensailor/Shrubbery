@@ -3,11 +3,11 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 52;
 	objects = {
 
 /* Begin PBXBuildFile section */
-		077071C82607397D00370086 /* ExampleAppApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 077071C72607397D00370086 /* ExampleAppApp.swift */; };
+		077071C82607397D00370086 /* ExampleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 077071C72607397D00370086 /* ExampleApp.swift */; };
 		077071CA2607397D00370086 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 077071C92607397D00370086 /* ContentView.swift */; };
 		077071CC2607398100370086 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 077071CB2607398100370086 /* Assets.xcassets */; };
 		077071CF2607398100370086 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 077071CE2607398100370086 /* Preview Assets.xcassets */; };
@@ -15,6 +15,7 @@
 		077071D42607398100370086 /* ExampleApp.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 077071D22607398100370086 /* ExampleApp.xcdatamodeld */; };
 		077071DF2607398100370086 /* ExampleAppTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 077071DE2607398100370086 /* ExampleAppTests.swift */; };
 		077071EA2607398100370086 /* ExampleAppUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 077071E92607398100370086 /* ExampleAppUITests.swift */; };
+		077071FF26076DB700370086 /* Shrub in Frameworks */ = {isa = PBXBuildFile; productRef = 077071FE26076DB700370086 /* Shrub */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -36,7 +37,7 @@
 
 /* Begin PBXFileReference section */
 		077071C42607397D00370086 /* ExampleApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ExampleApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		077071C72607397D00370086 /* ExampleAppApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExampleAppApp.swift; sourceTree = "<group>"; };
+		077071C72607397D00370086 /* ExampleApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExampleApp.swift; sourceTree = "<group>"; };
 		077071C92607397D00370086 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		077071CB2607398100370086 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		077071CE2607398100370086 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
@@ -56,6 +57,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				077071FF26076DB700370086 /* Shrub in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -99,11 +101,11 @@
 		077071C62607397D00370086 /* ExampleApp */ = {
 			isa = PBXGroup;
 			children = (
-				077071C72607397D00370086 /* ExampleAppApp.swift */,
-				077071C92607397D00370086 /* ContentView.swift */,
-				077071CB2607398100370086 /* Assets.xcassets */,
-				077071D02607398100370086 /* Persistence.swift */,
 				077071D52607398100370086 /* Info.plist */,
+				077071C92607397D00370086 /* ContentView.swift */,
+				077071C72607397D00370086 /* ExampleApp.swift */,
+				077071D02607398100370086 /* Persistence.swift */,
+				077071CB2607398100370086 /* Assets.xcassets */,
 				077071D22607398100370086 /* ExampleApp.xcdatamodeld */,
 				077071CD2607398100370086 /* Preview Content */,
 			);
@@ -152,6 +154,9 @@
 			dependencies = (
 			);
 			name = ExampleApp;
+			packageProductDependencies = (
+				077071FE26076DB700370086 /* Shrub */,
+			);
 			productName = ExampleApp;
 			productReference = 077071C42607397D00370086 /* ExampleApp.app */;
 			productType = "com.apple.product-type.application";
@@ -223,6 +228,9 @@
 				Base,
 			);
 			mainGroup = 077071BB2607397D00370086;
+			packageReferences = (
+				077071FD26076DB700370086 /* XCRemoteSwiftPackageReference "Shrub" */,
+			);
 			productRefGroup = 077071C52607397D00370086 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -268,7 +276,7 @@
 				077071D42607398100370086 /* ExampleApp.xcdatamodeld in Sources */,
 				077071D12607398100370086 /* Persistence.swift in Sources */,
 				077071CA2607397D00370086 /* ContentView.swift in Sources */,
-				077071C82607397D00370086 /* ExampleAppApp.swift in Sources */,
+				077071C82607397D00370086 /* ExampleApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -588,6 +596,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		077071FD26076DB700370086 /* XCRemoteSwiftPackageReference "Shrub" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "git@github.com:screensailor/Shrub.git";
+			requirement = {
+				branch = trunk;
+				kind = branch;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		077071FE26076DB700370086 /* Shrub */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 077071FD26076DB700370086 /* XCRemoteSwiftPackageReference "Shrub" */;
+			productName = Shrub;
+		};
+/* End XCSwiftPackageProductDependency section */
 
 /* Begin XCVersionGroup section */
 		077071D22607398100370086 /* ExampleApp.xcdatamodeld */ = {

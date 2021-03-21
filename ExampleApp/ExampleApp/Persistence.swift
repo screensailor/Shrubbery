@@ -1,6 +1,8 @@
-import CoreData
-
 struct PersistenceController {
+    
+    // App:
+    // let persistenceController = PersistenceController.shared
+    // ContentView().environment(\.managedObjectContext, persistenceController.container.viewContext)
     
     static let shared = PersistenceController()
 

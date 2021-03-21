@@ -41,6 +41,10 @@ extension EitherType {
     @inlinable public func cast<T>(to: T.Type = T.self) -> T? { a as? T ?? b as? T }
 }
 
+extension EitherType: Identifiable where A: Hashable, B: Hashable {
+    public var id: Self { return self }
+}
+
 extension EitherType.Value: Equatable where A: Equatable, B: Equatable {}
 
 extension EitherType: Equatable where A: Equatable, B: Equatable {
