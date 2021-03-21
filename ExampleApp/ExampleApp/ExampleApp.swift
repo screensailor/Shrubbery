@@ -37,7 +37,7 @@ struct Sources: View {
         return NavigationView {
             Group {
                 List {
-                    ForEach(Array(json.forks)) { fork in
+                    ForEach(Array(json.branches)) { fork in
                         Text("\(json[fork, "name"] ?? "😱")")
                     }
                     .onDelete(perform: {_ in})

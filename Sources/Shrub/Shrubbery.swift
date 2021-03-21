@@ -25,7 +25,7 @@ where
 
 extension Shrubbery {
     
-    public var forks: AnyCollection<Fork> {
+    public var branches: AnyCollection<Fork> {
         switch unwrapped {
         case let o as [Any?]: return AnyCollection(o.indices.lazy.map(Fork.init))
         case let o as [Key: Any?]: return AnyCollection(o.keys.lazy.map(Fork.init))
