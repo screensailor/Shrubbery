@@ -78,6 +78,17 @@ extension EitherType: Hashable where A: Hashable, B: Hashable {
     }
 }
 
+extension EitherType: Comparable where A: Comparable, B: Comparable {
+    public static func < (lhs: EitherType<A, B>, rhs: EitherType<A, B>) -> Bool {
+        switch (lhs.value, rhs.value) {
+        case (.a, .b): return true
+        case (.b, .a): return false
+        case let (.a(lhs), .a(rhs)): return lhs < rhs
+        case let (.b(lhs), .b(rhs)): return lhs < rhs
+        }
+    }
+}
+
 extension EitherType: CustomStringConvertible {
     public var description: String {
         switch value {

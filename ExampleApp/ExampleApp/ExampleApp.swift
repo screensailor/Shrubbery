@@ -33,12 +33,11 @@ struct Sources: View {
     @Binding var json: JSON
     
     var body: some View {
-        
-        return NavigationView {
+        NavigationView {
             Group {
                 List {
-                    ForEach(Array(json.branches)) { fork in
-                        Text("\(json[fork, "name"] ?? "😱")")
+                    ForEach(json.branches.sorted()) { branch in
+                        Text("\(json[branch, "name"] ?? "😱")")
                     }
                     .onDelete(perform: {_ in})
                 }
@@ -47,10 +46,15 @@ struct Sources: View {
             .navigationBarTitle("Sources", displayMode: .large)
             .navigationBarItems(
                 leading: EditButton(),
-                trailing: Button(action: {}) {
+                trailing: Button(action: add) {
                     Label("Add", systemImage: "plus")
                 }
             )
         }
+    }
+    
+    func add() {
+        let i = json.branches.count
+        json[^i, "name"] = "Yay ✕ \(i)"
     }
 }
