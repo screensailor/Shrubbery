@@ -106,6 +106,37 @@ extension Shrubbery {
 
 extension Shrubbery {
 
+    public subscript<A>(_ route: Key, _ rest: Key..., default o: A) -> A {
+        get { self[[route] + rest] ?? o }
+        set { self[[route] + rest] = newValue }
+    }
+    
+    public subscript<A, Route>(_ route: Route, default o: A) -> A
+    where
+        Route: Collection,
+        Route.Element == Key
+    {
+        get { self[route] ?? o }
+        set { self[route] = newValue }
+    }
+    
+    public subscript<A>(_ route: Fork..., default o: A) -> A {
+        get { self[route] ?? o }
+        set { self[route] = newValue }
+    }
+    
+    public subscript<A, Route>(_ route: Route, default o: A) -> A
+    where
+        Route: Collection,
+        Route.Element == Fork
+    {
+        get { self[route] ?? o }
+        set { self[route] = newValue }
+    }
+}
+
+extension Shrubbery {
+
     public subscript<A>(_ route: Key, _ rest: Key..., as _: A.Type = A.self) -> A?{
         get { self[[route] + rest, as: A.self] }
         set { self[[route] + rest, as: A.self] = newValue }

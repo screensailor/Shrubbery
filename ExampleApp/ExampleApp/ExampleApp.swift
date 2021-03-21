@@ -13,23 +13,22 @@
 struct ExampleApp: App {
 
     @State private var json: JSON = [
+        "count": 1,
         "sources": [
-            ["name": "Yay"],
-            ["name": "Double Yay"],
+            "Source No 1": ["message": "Yay"]
         ]
     ]
     
     var body: some Scene {
         return WindowGroup {
-            Group {
-                Sources(json: $json["sources"])
-            }
+            Sources(count: $json["count", default: 1], json: $json["sources"])
         }
     }
 }
 
 struct Sources: View {
     
+    @Binding var count: Int
     @Binding var json: JSON
     
     var body: some View {
@@ -37,9 +36,17 @@ struct Sources: View {
             Group {
                 List {
                     ForEach(json.branches.sorted()) { branch in
-                        Text("\(json[branch, "name"] ?? "😱")")
+                        VStack {
+                            Text(branch.stringValue).font(.headline)
+                            Text(json[branch, "message", default: "😱"] as String).font(.subheadline)
+                        }
                     }
-                    .onDelete(perform: {_ in})
+                    .onDelete{ indices in
+                        for i in indices.peek() {
+                            let key = json.branches.sorted()[i]
+                            json[key] = nil
+                        }
+                    }
                 }
                 .listStyle(PlainListStyle())
             }
@@ -54,7 +61,7 @@ struct Sources: View {
     }
     
     func add() {
-        let i = json.branches.count
-        json[^i, "name"] = "Yay ✕ \(i)"
+        count += 1
+        json["Source No \(count)", "message"] = "Yay 😃"
     }
 }
