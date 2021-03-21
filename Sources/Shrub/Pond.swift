@@ -12,7 +12,7 @@ where
     public typealias Subject = CurrentValueSubject<Bool, Never>
     
     public struct Subscription {
-        public let cancel: () -> ()
+        public let cancel: (Int) -> ()
         public let didSink: Subject
         public let cancellable: AnyCancellable
     }
@@ -52,7 +52,14 @@ where
     private func flow<A>(of route: Route, from source: Route, as: A.Type) -> Flow<A> {
         queue.sync {
             guard let subscription = subscriptions[value: source] else {
-                let cancel = { self.subscriptions[value: source] = nil }
+                var count = 0
+                let cancel = { (x: Int) in
+                    count += x
+                    if count < 1 {
+                        assert(count == 0)
+                        self.subscriptions[value: source] = nil
+                    }
+                }
                 let didSink = Subject(false)
                 subscriptions[value: source] = Subscription(
                     cancel: cancel,
@@ -75,20 +82,14 @@ private extension CurrentValueSubject where Output == Bool, Failure == Never {
         of route: DeltaShrub<Key>.Route,
         in basin: DeltaShrub<Key>,
         on queue: DispatchQueue,
-        cancel: @escaping () -> ()
+        cancel: @escaping (Int) -> ()
     ) -> Flow<A> {
-        var count = 0
         return self.first(where: { $0 }).flatMap{ _ in
             basin.flow(of: route)
         }
         .handleEvents(
-            receiveSubscription: { _ in count += 1 },
-            receiveCancel: {
-                count -= 1
-                if count < 1 { assert(count == 0)
-                    cancel()
-                }
-            }
+            receiveSubscription: { _ in cancel(+1) },
+            receiveCancel: { cancel(-1) }
         )
         .subscribe(on: queue)
         .eraseToAnyPublisher()
