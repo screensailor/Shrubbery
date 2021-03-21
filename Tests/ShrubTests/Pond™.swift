@@ -1,6 +1,42 @@
 class Pond™: Hopes {
     
     private var bag: Set<AnyCancellable> = []
+    
+    func test_subscription_lifecycle() throws {
+        
+        let db = Database(depth: 1)
+        let pond = Pond(geyser: db)
+        
+        hope(db.count.subscriptions) == 0
+        
+        var a: Result<Int, Error> = .failure("😱")
+        
+        pond.flow(of: "a", 2, "c").sink{ a = $0 }.store(in: &bag)
+        
+        hope(db.count.subscriptions) == 1
+        hope.throws(try a.get())
+        
+        try db.store.set("a", 2, "c", to: 2)
+        hope.for(0.01)
+        hope(db.count.subscriptions) == 1
+        hope(a) == 2
+        
+        pond.flow(of: "a", 2, "c").sink{ a = $0 }.store(in: &bag)
+        hope.for(0.01)
+        hope(db.count.subscriptions) == 1
+        
+        pond.flow(of: "a", 2, "d").sink{ a = $0 }.store(in: &bag)
+        hope.for(0.1)
+        hope(db.count.subscriptions) == 1
+        
+        pond.flow(of: "b", 2, "c").sink{ a = $0 }.store(in: &bag)
+        hope.for(0.01)
+        hope(db.count.subscriptions) == 2
+
+        bag.removeAll()
+        hope.for(0.01)
+        hope(db.count.subscriptions) == 0
+    }
 
     func test_with_Published_store() throws {
         
@@ -184,10 +220,24 @@ extension Pond™ {
 
         let store: DeltaJSON = .init()
         
-        var depth = 1
+        let depth: Int
+        
+        private(set) var count = (
+            subscriptions: 0,
+            ()
+        )
+        
+        public init(depth: Int = 1) {
+            self.depth = depth
+        }
         
         func gush(of route: JSON.Route) -> Flow<JSON> {
             store.flow(of: route, as: JSON.self)
+                .handleEvents(
+                    receiveSubscription: { _ in self.count.subscriptions += 1 },
+                    receiveCancel: { self.count.subscriptions -= 1 }
+                )
+                .eraseToAnyPublisher()
         }
         
         func source(of route: JSON.Route) throws -> JSON.Route.Index {

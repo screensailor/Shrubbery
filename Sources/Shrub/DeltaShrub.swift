@@ -8,7 +8,7 @@ public class DeltaShrub<Key>: Delta /* TODO:❗️, Shrubbery */ where Key: Hash
     
     private var drop: Drop
     private let queue: DispatchQueue // TODO: a more generic Scheduler
-    private let queueKey: DispatchSpecificKey<Void>
+    private let queueKey: DispatchSpecificKey<Void> // TODO: get rid of this
     private var subscriptions: Tree<Fork, Subject>
 
     public init(

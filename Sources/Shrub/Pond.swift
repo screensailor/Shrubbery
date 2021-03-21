@@ -13,6 +13,7 @@ where
     
     public struct Subscription {
         public let didSink: Subject
+        public let lifecycle: (Int) -> ()
         public let cancellable: AnyCancellable
     }
 
@@ -21,14 +22,12 @@ where
     private var basin: Basin = .init()
     private var subscriptions: Tree<Fork, Subscription> = .init()
     
-    private let queueKey: DispatchSpecificKey<Void>
     private let queue: DispatchQueue = .init(
         label: "\(Pond<Source, Key>.self).q",
         qos: .userInteractive
     )
     
     public init(geyser: Source) {
-        self.queueKey = queue.setSpecificKey()
         self.geyser = geyser
     }
     
@@ -53,18 +52,25 @@ where
     private func flow<A>(of route: Route, from source: Route, as: A.Type) -> Flow<A> {
         queue.sync {
             guard let subscription = subscriptions[value: source] else {
+                var count = 0
+                let lifecycle = { (x: Int) -> () in
+                    count += x
+                    if count < 1 { assert(count == 0)
+                        self.subscriptions[value: source] = nil
+                    }
+                }
                 let didSink = Subject(false)
                 subscriptions[value: source] = Subscription(
                     didSink: didSink,
-                    cancellable: geyser.gush(of: source).receive(on: queue).sink{
-                        [weak didSink] result in
+                    lifecycle: lifecycle,
+                    cancellable: geyser.gush(of: source).receive(on: queue).sink{ [weak didSink] result in
                         self.basin.set(source, to: result)
                         didSink?.send(true)
                     }
                 )
-                return didSink.flow(of: route, in: basin, on: queue)
+                return didSink.flow(of: route, in: basin, on: queue, lifecycle: lifecycle)
             }
-            return subscription.didSink.flow(of: route, in: basin, on: queue)
+            return subscription.didSink.flow(of: route, in: basin, on: queue, lifecycle: subscription.lifecycle)
         }
     }
 }
@@ -74,11 +80,16 @@ private extension CurrentValueSubject where Output == Bool, Failure == Never {
     func flow<A, Key>(
         of route: DeltaShrub<Key>.Route,
         in basin: DeltaShrub<Key>,
-        on queue: DispatchQueue
+        on queue: DispatchQueue,
+        lifecycle: @escaping (Int) -> ()
     ) -> Flow<A> {
         self.first(where: { $0 }).flatMap{ _ in
             basin.flow(of: route)
         }
+        .handleEvents(
+            receiveSubscription: { _ in lifecycle(1) },
+            receiveCancel: { lifecycle(-1) }
+        )
         .subscribe(on: queue)
         .eraseToAnyPublisher()
     }
