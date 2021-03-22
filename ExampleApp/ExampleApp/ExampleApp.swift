@@ -33,16 +33,20 @@ extension View {
     }
 }
 
-public protocol TryView: View {
-    func doBody() throws -> AnyView
-    func catchBody(_ error: Error) -> AnyView
+public protocol TryView: View where Body == AnyView {
+    
+    associatedtype DoBody: View
+    associatedtype CatchBody: View
+    
+    func doBody() throws -> DoBody
+    func catchBody(_ error: Error) -> CatchBody
 }
 
 extension TryView {
     
-    public var body: AnyView {
-        do { return try doBody() }
-        catch { return catchBody(error) }
+    public var body: Body {
+        do { return try doBody().eraseToAnyView() }
+        catch { return catchBody(error).eraseToAnyView() }
     }
 }
 
