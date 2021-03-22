@@ -26,6 +26,26 @@ struct ExampleApp: App {
     }
 }
 
+extension View {
+    
+    public func eraseToAnyView() -> AnyView {
+        AnyView(erasing: self)
+    }
+}
+
+public protocol TryView: View {
+    func doBody() throws -> AnyView
+    func catchBody(_ error: Error) -> AnyView
+}
+
+extension TryView {
+    
+    public var body: AnyView {
+        do { return try doBody() }
+        catch { return catchBody(error) }
+    }
+}
+
 struct Sources: View {
     
     @Binding var count: Int
