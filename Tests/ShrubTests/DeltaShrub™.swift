@@ -118,7 +118,60 @@ class DeltaShrub™: Hopes {
         hope(count.a) == 4
         hope(count.b) == 2
     }
-    
+
+    func test_transaction() throws {
+
+        var count = (a: 0, b: 0)
+
+        var a: Result<Int, Error> = .failure("😱") { didSet { count.a += 1 } }
+        var b: Result<Int, Error> = .failure("😱") { didSet { count.b += 1 } }
+
+        let delta = DeltaJSON()
+
+        try delta.set(1, "two", 3, to: ["a": 0, "b": 0])
+
+        delta.flow(of: 1, "two", 3, "a").sink{ a = $0 }.store(in: &bag)
+        delta.flow(of: 1, "two", 3, "b").sink{ b = $0 }.store(in: &bag)
+
+        delta.beginTransaction()
+
+        hope(a) == 0
+        hope(b) == 0
+        hope(count.a) == 1
+        hope(count.b) == 1
+
+        try delta.set(1, "two", 3, "a", to: 1)
+        hope(a) == 0
+        hope(b) == 0
+        hope(count.a) == 1
+        hope(count.b) == 1
+
+        try delta.set(1, "two", 3, "a", to: 2)
+        hope(a) == 0
+        hope(b) == 0
+        hope(count.a) == 1
+        hope(count.b) == 1
+
+        try delta.set(1, "two", 3, "a", to: 3)
+        hope(a) == 0
+        hope(b) == 0
+        hope(count.a) == 1
+        hope(count.b) == 1
+
+        try delta.set(1, "two", 3, "b", to: 3)
+        hope(a) == 0
+        hope(b) == 0
+        hope(count.a) == 1
+        hope(count.b) == 1
+
+        try delta.endTransaction()
+
+        hope(a) == 3
+        hope(b) == 3
+        hope(count.a) == 2
+        hope(count.b) == 2
+    }
+
     func test_update_down() throws {
         
         let json: DeltaJSON = .init()

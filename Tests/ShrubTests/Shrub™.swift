@@ -121,7 +121,64 @@ extension Shrub™ {
         try JSON.set(2, "three", 4, "five", in: &any, to: "😃")
         try hope(JSON.get(2, "three", 4, "five", in: any) as? String) == "😃"
     }
-    
+
+    func test_merge() throws {
+
+        var a: JSON = [
+            "one": [
+                "two": [
+                    1, 2
+                ],
+                "four": [
+                    "x": [
+                        "y": [
+                            "z": "Ω"
+                        ]
+                    ]
+                ]
+            ],
+            "and": ["so", "on", "..."]
+        ]
+
+        let b: JSON = [
+            "one": [
+                "two": 2,
+                "three": "👋",
+                "four": [
+                    "x": [
+                        "y": [
+                            "z": "Z",
+                            "zzz": "😴"
+                        ]
+                    ]
+                ]
+            ],
+            "and": [
+                "so": "forth..."
+            ]
+        ]
+
+        a.merge(b)
+
+        hope(a.debugDescription) == JSON([
+            "one": [
+                "two": 2,
+                "three": "👋",
+                "four": [
+                    "x": [
+                        "y": [
+                            "z": "Z",
+                            "zzz": "😴"
+                        ]
+                    ]
+                ]
+            ],
+            "and": [
+                "so": "forth..."
+            ]
+        ]).debugDescription
+    }
+
     func test_traverse_and_debugDescription() throws {
             
         let routes = JSON.Fork.randomRoutes(
@@ -154,6 +211,10 @@ extension Shrub™ {
             }
         }
         
-        hope(json2.debugDescription) == json1.debugDescription
+        hope(json1.debugDescription) == json2.debugDescription
+
+        json1.merge(json2)
+
+        hope(json1.debugDescription) == json2.debugDescription
     }
 }
