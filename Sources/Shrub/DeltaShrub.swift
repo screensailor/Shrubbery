@@ -26,14 +26,22 @@ public class DeltaShrub<Key>: Delta /* TODO:❗️, Shrubbery */ where Key: Hash
 }
 
 extension DeltaShrub {
+
+    public convenience init(_ unwrapped: Any) {
+        self.init(drop: Drop(unwrapped), subscriptions: .init())
+    }
+}
+
+extension DeltaShrub {
     
     public func flow<A>(of route: Route, as: A.Type = A.self) -> Flow<A> {
         Just(Result{ try get(route) }).merge(
-            with: subscriptions[value: route, inserting: Subject()].map{ o in
-                Result{ try o.get().as(A.self) }
+            with: queue.sync(with: queueKey){
+                subscriptions[value: route, inserting: Subject()].map{ o in
+                    Result{ try o.get().as(A.self) }
+                }
             }
         )
-        .subscribe(on: queue)
         .eraseToAnyPublisher()
     }
 }

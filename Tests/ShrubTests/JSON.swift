@@ -8,6 +8,10 @@ extension JSON {
     public typealias Fragment = JSONFragment
 }
 
+extension JSON {
+    public typealias Result = Swift.Result<JSON, Error>
+}
+
 public protocol JSONFragment {}
 
 extension NSNull: JSON.Fragment {}

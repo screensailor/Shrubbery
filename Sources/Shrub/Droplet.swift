@@ -23,10 +23,6 @@ extension Droplet {
 public prefix func ^ <Value>(v: Value) -> Result<Value, Error> { .success(v) }
 public prefix func ^ <Key, Value>(v: Value) -> Result<Shrub<Key>, Error> { .success(.init(v)) }
 
-extension JSON {
-    public typealias Result = Swift.Result<JSON, Error>
-}
-
 extension Result: Droplet, CustomStringConvertible where Failure == Error {
     
     public static func value(_ value: Success) -> Self { .success(value) }
