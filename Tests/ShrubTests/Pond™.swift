@@ -73,7 +73,7 @@ class Pond™: Hopes {
         // which in turn causes subscribers of all the fields within the gush to be called.
         pond.flow(of: 1, "two", 3, "a").removeDuplicates().sink{ a = $0 }.store(in: &bag)
         pond.flow(of: 1, "two", 3, "b").removeDuplicates().sink{ b = $0 }.store(in: &bag)
-        
+
         hope.for(0.01)
         
         hope(a) == 0

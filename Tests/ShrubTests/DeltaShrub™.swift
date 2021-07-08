@@ -15,8 +15,6 @@ class DeltaShrub™: Hopes {
         for i in result.indices {
             delta.flow(of: 1, "two", 3).sink{ result[i] = $0 }.store(in: &bag)
         }
-        
-        hope.for(0.01)
 
         hope(try result.map{ try $0.get() }) == Array(repeating: 4, count: result.count)
 
@@ -45,8 +43,6 @@ class DeltaShrub™: Hopes {
 
         delta.flow(of: 1, "two", 3, "a").sink{ a = $0 }.store(in: &bag)
         delta.flow(of: 1, "two", 3, "b").sink{ b = $0 }.store(in: &bag)
-        
-        hope.for(0.01)
 
         hope(a) == 4
         hope(b) == 4
@@ -92,36 +88,31 @@ class DeltaShrub™: Hopes {
 
         delta.flow(of: 1, "two", 3, "a").sink{ a = $0 }.store(in: &bag)
         delta.flow(of: 1, "two", 3, "b").sink{ b = $0 }.store(in: &bag)
-        
-        hope.for(0.01)
+
         hope(a) == 0
         hope(b) == 0
         hope(count.a) == 1
         hope(count.b) == 1
 
         try delta.set(1, "two", 3, "a", to: 1)
-        hope.for(0.01)
         hope(a) == 1
         hope(b) == 0
         hope(count.a) == 2
         hope(count.b) == 1
 
         try delta.set(1, "two", 3, "a", to: 2)
-        hope.for(0.01)
         hope(a) == 2
         hope(b) == 0
         hope(count.a) == 3
         hope(count.b) == 1
 
         try delta.set(1, "two", 3, "a", to: 3)
-        hope.for(0.01)
         hope(a) == 3
         hope(b) == 0
         hope(count.a) == 4
         hope(count.b) == 1
 
         try delta.set(1, "two", 3, "b", to: 3)
-        hope.for(0.01)
         hope(a) == 3
         hope(b) == 3
         hope(count.a) == 4
@@ -138,7 +129,6 @@ class DeltaShrub™: Hopes {
         hope.throws(try result.get())
         
         try json.set("a", "b", "c", to: 1)
-        hope.for(0.01)
         hope(result) == 1
         
         json.delete("a", "b")
@@ -152,20 +142,24 @@ class DeltaShrub™: Hopes {
         
         let json: DeltaJSON = .init()
         
-        var result: Result<JSON, Error> = .failure("😱".error())
-        
-        json.flow(of: "a").sink{ result = $0 }.store(in: &bag)
-        hope.throws(try result.get())
+        var result_a: Result<JSON, Error> = .failure("😱".error())
+        var result_b: Result<JSON, Error> = .failure("😱".error())
+
+        json.flow(of: "a").sink{ result_a = $0 }.store(in: &bag)
+        json.flow(of: "a", "b").sink{ result_b = $0 }.store(in: &bag)
+        hope.throws(try result_a.get())
         
         try json.set("a", "b", "c", to: 1)
-        hope.for(0.01)
-        hope(try result.get().get()) == ["b": ["c": 1]]
-        
+        hope(try result_a.get().get()) == ["b": ["c": 1]]
+        hope(try result_b.get().get()) == ["c": 1]
+
         json.delete("a", "b")
-        hope.throws(try result.get())
+        hope.throws(try result_a.get())
+        hope.throws(try result_b.get())
 
         try json.set("a", to: ["b": ["c": 2]])
-        hope(try result.get().get()) ==  ["b": ["c": 2]]
+        hope(try result_a.get().get()) ==  ["b": ["c": 2]]
+        hope(try result_b.get().get()) ==  ["c": 2]
     }
 
     func test_thousand_subscriptions() throws {

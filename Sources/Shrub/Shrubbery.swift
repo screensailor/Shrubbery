@@ -166,18 +166,16 @@ extension Shrubbery {
                 return try get(route.array, as: A.self)
             }
             catch {
-                if #available(iOS 14.0, *) {
-                    "\(error)".peek(as: .debug)
-                }
+                "\(error)".peek(as: .debug)
             }
             return nil
         }
         set {
-            do { try set(route.array, to: newValue) }
+            do {
+                try set(route.array, to: newValue)
+            }
             catch {
-                if #available(iOS 14.0, *) {
-                    "\(error)".peek(as: .debug)
-                }
+                "\(error)".peek(as: .debug)
             }
         }
     }
@@ -239,13 +237,49 @@ extension Shrubbery {
     {
         try set(route.array, to: value as Any?)
     }
-    
+
+    @inlinable public mutating func delete() {
+        delete([])
+    }
+
     public mutating func delete<Route>(_ route: Route)
     where
         Route: Collection,
         Route.Element == Fork
     {
         delete(route.array)
+    }
+}
+
+// MARK: merge
+
+extension Shrubbery {
+
+    public mutating func merge(_ other: Self) {
+        let ºother = flattenOptionality(of: other.unwrapped)
+        switch ºother
+        {
+        case let other as [Any]:
+            try! self.set(to: other) // TODO: consider merging?
+
+        case let other as [Key: Any]:
+            if var this = self as? [Key: Any] {
+                this.merge(other) { this, other in
+                    var this = Self(this)
+                    this.merge(Self(other))
+                    return this.unwrapped as Any
+                }
+            } else {
+                try! self.set(to: other) // TODO: improve the api for setting `self`
+            }
+
+        case let other?:
+            try! self.set(to: other)
+
+        case nil:
+            self.delete()
+        }
+
     }
 }
 

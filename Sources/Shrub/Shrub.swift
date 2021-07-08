@@ -5,22 +5,24 @@ where Key: Hashable
     
     public init(_ unwrapped: Any? = nil) { try! set([], to: unwrapped) }
 
-    public func get(_ route: Route) throws -> Self {
+    @inlinable public func get(_ route: Route) throws -> Self {
         try Self(Self.get(route, in: self.unwrapped))
     }
-    
-    mutating
-    public func set(_ route: Route, to value: Any?) throws {
+
+    public mutating func set(_ route: Route, to value: Any?) throws {
         try Self.set(route, in: &unwrapped, to: value)
     }
-    
-    mutating
-    public func delete(_ route: Route) {
+
+    public mutating func delete(_ route: Route) {
         try! Self.set(route, in: &unwrapped, to: nil)
+    }
+
+    public mutating func delete() {
+        try! Self.set(in: &unwrapped, to: nil)
     }
 }
 
-// MARK: static get & set
+// MARK: static get
 
 extension Shrub {
 
@@ -64,6 +66,8 @@ extension Shrub {
         }
     }
 }
+
+// MARK: static set
 
 extension Shrub {
     
