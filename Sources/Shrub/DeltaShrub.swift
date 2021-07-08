@@ -35,14 +35,14 @@ extension DeltaShrub {
 extension DeltaShrub {
     
     public func flow<A>(of route: Route, as: A.Type = A.self) -> Flow<A> {
-        Just(Result{ try get(route) }).merge(
-            with: queue.sync(with: queueKey){
-                subscriptions[value: route, inserting: Subject()].map{ o in
+        queue.sync(with: queueKey){
+            Just(Result{ try drop.get(route) }).merge(
+                with: subscriptions[value: route, inserting: Subject()].map{ o in
                     Result{ try o.get().as(A.self) }
                 }
-            }
-        )
-        .eraseToAnyPublisher()
+            )
+            .eraseToAnyPublisher()
+        }
     }
 }
 
