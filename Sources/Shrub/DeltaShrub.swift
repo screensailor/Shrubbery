@@ -10,7 +10,9 @@ public class DeltaShrub<Key>: Delta /* TODO:❗️, Shrubbery */ where Key: Hash
     private let queue: DispatchQueue // TODO: a more generic Scheduler
     private let queueKey: DispatchSpecificKey<Void> // TODO: get rid of this
     private var subscriptions: Tree<Fork, Subject>
-    private var transaction: [(route: [Fork], value: Any)] = []
+
+    private var transactionRoutes: Set<[Fork]> = []
+    private var transactionDiff: Drop = nil
     private var didEnterTransaction = false
 
     public init(
@@ -76,7 +78,8 @@ extension DeltaShrub {
     {
         try queue.sync(with: queueKey){
             guard !didEnterTransaction else {
-                transaction.append((Array(route), value))
+                try transactionDiff.set(route, to: value)
+                transactionRoutes.insert(route.array)
                 return
             }
             try drop.set(route, to: value)
@@ -96,21 +99,28 @@ extension DeltaShrub {
         queue.sync(with: queueKey){ didEnterTransaction }
     }
 
+    public func transaction(_ edits: () throws -> ()) throws {
+        beginTransaction()
+        do {
+            try edits()
+            endTransaction()
+        } catch {
+            cancelTransaction()
+            throw error
+        }
+    }
+
     public func beginTransaction() {
         queue.sync(with: queueKey){ didEnterTransaction = true }
     }
 
-    public func endTransaction() throws {
-        try queue.sync(with: queueKey) {
-            var diff: Drop = .init()
-            for (route, value) in transaction {
-                try diff.set(route, to: value)
-            }
-            drop.merge(diff)
+    public func endTransaction() {
+        queue.sync(with: queueKey) {
+            drop.merge(transactionDiff)
             var routes: [[Fork]: Subject] = [:]
-            for (route, _) in transaction {
+            for route in transactionRoutes {
                 for route in route.lineage.reversed() {
-                    routes[Array(route)] = subscriptions[route]?.value
+                    routes[route.array] = subscriptions[route]?.value
                 }
                 subscriptions[route]?.traverse{ subroute, subject in
                     routes[route + subroute] = subject
@@ -119,13 +129,14 @@ extension DeltaShrub {
             for (route, subject) in routes.sorted(by: { a, b in a.key.count < b.key.count }) {
                 subject.send(Result{ try drop.get(route) })
             }
-            didEnterTransaction = false
+            cancelTransaction()
         }
     }
 
     public func cancelTransaction() {
         queue.sync(with: queueKey) {
-            transaction = []
+            transactionDiff = nil
+            transactionRoutes = []
             didEnterTransaction = false
         }
     }
@@ -164,6 +175,13 @@ extension DeltaShrub {
         Route.Element == Fork
     {
         queue.sync(with: queueKey){
+            guard !didEnterTransaction else {
+                do {
+                    try transactionDiff.set(route, to: Any?.none)
+                    transactionRoutes.insert(route.array)
+                } catch {}
+                return
+            }
             drop.delete(route) // TODO:❗️store error for new subscribers (is using current value subject worth it?)
             let error: Result<Drop, Error> = .failure(error ?? "Route '\(route)' has been deleted".error())
             for route in route.lineage.reversed() {

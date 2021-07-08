@@ -164,11 +164,35 @@ class DeltaShrub™: Hopes {
         hope(count.a) == 1
         hope(count.b) == 1
 
-        try delta.endTransaction()
+        delta.endTransaction()
 
         hope(a) == 3
         hope(b) == 3
         hope(count.a) == 2
+        hope(count.b) == 2
+
+        delta.beginTransaction()
+        delta.endTransaction()
+
+        hope(a) == 3
+        hope(b) == 3
+        hope(count.a) == 2
+        hope(count.b) == 2
+
+        delta.beginTransaction()
+
+        delta.delete(1, "two", 3, "a")
+
+        hope(a) == 3
+        hope(b) == 3
+        hope(count.a) == 2
+        hope(count.b) == 2
+
+        delta.endTransaction()
+
+        hope.throws(try a.get())
+        hope(b) == 3
+        hope(count.a) == 3
         hope(count.b) == 2
     }
 
