@@ -133,67 +133,46 @@ class DeltaShrub™: Hopes {
         delta.flow(of: 1, "two", 3, "a").sink{ a = $0 }.store(in: &bag)
         delta.flow(of: 1, "two", 3, "b").sink{ b = $0 }.store(in: &bag)
 
-        delta.beginTransaction()
+        var transaction = delta.transaction()
 
         hope(a) == 0
         hope(b) == 0
         hope(count.a) == 1
         hope(count.b) == 1
 
-        try delta.set(1, "two", 3, "a", to: 1)
+        try transaction.set(1, "two", 3, "a", to: 1)
+        try transaction.set(1, "two", 3, "a", to: 2)
+        try transaction.set(1, "two", 3, "a", to: 3)
+        try transaction.set(1, "two", 3, "b", to: 3)
+
         hope(a) == 0
         hope(b) == 0
         hope(count.a) == 1
         hope(count.b) == 1
 
-        try delta.set(1, "two", 3, "a", to: 2)
-        hope(a) == 0
-        hope(b) == 0
-        hope(count.a) == 1
-        hope(count.b) == 1
-
-        try delta.set(1, "two", 3, "a", to: 3)
-        hope(a) == 0
-        hope(b) == 0
-        hope(count.a) == 1
-        hope(count.b) == 1
-
-        try delta.set(1, "two", 3, "b", to: 3)
-        hope(a) == 0
-        hope(b) == 0
-        hope(count.a) == 1
-        hope(count.b) == 1
-
-        delta.endTransaction()
+        delta.apply(transaction)
 
         hope(a) == 3
         hope(b) == 3
         hope(count.a) == 2
         hope(count.b) == 2
 
-        delta.beginTransaction()
-        delta.endTransaction()
+        print("✅",  delta.debugDescription)
 
-        hope(a) == 3
-        hope(b) == 3
-        hope(count.a) == 2
-        hope(count.b) == 2
+        transaction = delta.transaction()
 
-        delta.beginTransaction()
+        transaction.delete(1, "two", 3, "a")
 
-        delta.delete(1, "two", 3, "a")
+        delta.apply(transaction)
 
-        hope(a) == 3
-        hope(b) == 3
-        hope(count.a) == 2
-        hope(count.b) == 2
-
-        delta.endTransaction()
+        print("✅",  delta.debugDescription)
 
         hope.throws(try a.get())
         hope(b) == 3
         hope(count.a) == 3
         hope(count.b) == 2
+        hope.throws(try delta.shrub.get(1, "two", 3, "a") as Any)
+        hope(try? delta.shrub.get(1, "two", 3, "b") as Int) == 3
     }
 
     func test_update_down() throws {
@@ -227,11 +206,12 @@ class DeltaShrub™: Hopes {
         hope.throws(try result_a.get())
         
         try json.set("a", "b", "c", to: 1)
-        hope(try result_a.get().get()) == ["b": ["c": 1]]
+        try json.set("a", "B", "C", to: 2)
+        hope(try result_a.get().get()) == ["b": ["c": 1], "B": ["C": 2]]
         hope(try result_b.get().get()) == ["c": 1]
 
         json.delete("a", "b")
-        hope.throws(try result_a.get())
+        hope(try result_a.get().get()) == ["B": ["C": 2]]
         hope.throws(try result_b.get())
 
         try json.set("a", to: ["b": ["c": 2]])

@@ -256,21 +256,39 @@ extension Shrubbery {
 extension Shrubbery {
 
     public mutating func merge(_ other: Self) {
-        let ºother = flattenOptionality(of: other.unwrapped)
+        let ºother = other.unwrapped
         switch ºother
         {
         case let other as [Any]:
-            try! self.set(to: other) // TODO: consider merging?
+            guard self.unwrapped is [Any] else {
+                try! self.set(to: other) // TODO: improve the api for setting `self`
+                return
+            }
+            for (i, other) in other.enumerated() {
+                let i = [Fork(i)]
+                if let other = other as? Sentinel, other == .deletion {
+                    self.delete(i)
+                    continue
+                }
+                var o = Self(try? get(i))
+                o.merge(Self(other))
+                try! set(i, to: o)
+            }
 
         case let other as [Key: Any]:
-            if var this = self as? [Key: Any] {
-                this.merge(other) { this, other in
-                    var this = Self(this)
-                    this.merge(Self(other))
-                    return this.unwrapped as Any
-                }
-            } else {
+            guard self.unwrapped is [Key: Any] else {
                 try! self.set(to: other) // TODO: improve the api for setting `self`
+                return
+            }
+            for (key, other) in other {
+                let key = [Fork(key)]
+                if let other = other as? Sentinel, other == .deletion {
+                    self.delete(key)
+                    continue
+                }
+                var o = Self(try? get(key))
+                o.merge(Self(other))
+                try! set(key, to: o)
             }
 
         case let other?:
@@ -279,7 +297,6 @@ extension Shrubbery {
         case nil:
             self.delete()
         }
-
     }
 }
 
