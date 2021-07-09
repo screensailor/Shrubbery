@@ -157,15 +157,11 @@ class DeltaShrub™: Hopes {
         hope(count.a) == 2
         hope(count.b) == 2
 
-        print("✅",  delta.debugDescription)
-
         transaction = delta.transaction()
 
         transaction.delete(1, "two", 3, "a")
 
         delta.apply(transaction)
-
-        print("✅",  delta.debugDescription)
 
         hope.throws(try a.get())
         hope(b) == 3

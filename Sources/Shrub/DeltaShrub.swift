@@ -149,18 +149,6 @@ extension DeltaShrub {
 
         fileprivate init() {}
 
-        public override func get<A, Route>(_ route: Route) throws -> A
-        where
-            Route: Collection,
-            Route.Element == Fork
-        {
-            try queue.sync(with: queueKey){
-                let o: A = try super.get(route)
-                routes.insert(route.array)
-                return o
-            }
-        }
-
         public override func set<A, Route>(_ route: Route, to value: A) throws
         where
             Route: Collection,
