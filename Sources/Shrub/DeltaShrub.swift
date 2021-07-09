@@ -6,32 +6,31 @@ public class DeltaShrub<Key>: Delta /* TODO:❗️, Shrubbery */ where Key: Hash
     public typealias Subject = PassthroughSubject<Result<Shrub<Key>, Error>, Never>
     
     public private(set) var shrub: Shrub<Key>
-
-    private let queue: DispatchQueue // TODO: a more generic Scheduler
-    private let queueKey: DispatchSpecificKey<Void> // TODO: get rid of this
     private var subscriptions: Tree<Fork, Subject>
+
+    private let k: DispatchSpecificKey<Void>
+    private let q: DispatchQueue = .init(
+        label: "\(DeltaShrub<Key>.self).q_\(#file)_\(#line)",
+        qos: .userInteractive
+    )
 
     public init(
         drop: Shrub<Key> = nil,
         subscriptions: Tree<Fork, Subject> = .init()
     ) {
         self.shrub = drop
-        self.queue = .init(
-            label: "\(DeltaShrub<Key>.self).q_\(#file)_\(#line)",
-            qos: .userInteractive
-        )
-        self.queueKey = queue.setSpecificKey()
         self.subscriptions = subscriptions
+        self.k = q.setSpecificKey()
     }
 
     public convenience init(_ unwrapped: Any) {
-        self.init(drop: Shrub<Key>(unwrapped), subscriptions: .init())
+        self.init(drop: Shrub<Key>(unwrapped))
     }
 
     // MARK: delta flow
 
     public func flow<A>(of route: Route, as: A.Type = A.self) -> Flow<A> {
-        queue.sync(with: queueKey){
+        q.sync(k){
             Just(Result{ try shrub.get(route) }).merge(
                 with: subscriptions[value: route, inserting: Subject()].map{ o in
                     Result{ try o.get().as(A.self) }
@@ -52,7 +51,7 @@ public class DeltaShrub<Key>: Delta /* TODO:❗️, Shrubbery */ where Key: Hash
         Route: Collection,
         Route.Element == Fork
     {
-        try queue.sync(with: queueKey){ try shrub.get(route) }
+        try q.sync(k){ try shrub.get(route) }
     }
 
     // MARK: set
@@ -70,7 +69,7 @@ public class DeltaShrub<Key>: Delta /* TODO:❗️, Shrubbery */ where Key: Hash
         Route: Collection,
         Route.Element == Fork
     {
-        try queue.sync(with: queueKey){
+        try q.sync(k){
             try shrub.set(route, to: value)
             for route in route.lineage.reversed() {
                 subscriptions[route]?.value?.send(Result{ try shrub.get(route) })
@@ -90,7 +89,7 @@ public class DeltaShrub<Key>: Delta /* TODO:❗️, Shrubbery */ where Key: Hash
         Route: Collection,
         Route.Element == Fork
     {
-        queue.sync(with: queueKey){
+        q.sync(k){
             do {
                 try set(route, to: value.get())
             } catch {
@@ -110,7 +109,7 @@ public class DeltaShrub<Key>: Delta /* TODO:❗️, Shrubbery */ where Key: Hash
         Route: Collection,
         Route.Element == Fork
     {
-        queue.sync(with: queueKey){
+        q.sync(k){
             shrub.delete(route)
             for route in route.lineage.reversed() {
                 subscriptions[route]?.value?.send(Result{ try shrub.get(route) })
@@ -130,7 +129,7 @@ extension DeltaShrub {
     }
 
     public func apply(_ transaction: Transaction) {
-        queue.sync(with: queueKey) {
+        q.sync(k) {
             shrub.merge(transaction.shrub)
             var routes: [[Fork]: Subject] = [:]
             for route in transaction.routes {
@@ -158,7 +157,7 @@ extension DeltaShrub {
             Route: Collection,
             Route.Element == Fork
         {
-            try queue.sync(with: queueKey){
+            try q.sync(k){
                 try super.set(route, to: value)
                 routes.insert(route.array)
             }
@@ -169,7 +168,7 @@ extension DeltaShrub {
             Route: Collection,
             Route.Element == Fork
         {
-            queue.sync(with: queueKey){
+            q.sync(k){
                 do {
                     try super.set(route, to: Sentinel.deletion)
                     routes.insert(route.array)

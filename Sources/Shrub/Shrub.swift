@@ -1,6 +1,5 @@
-public struct Shrub<Key>: Shrubbery
-where Key: Hashable
-{
+public struct Shrub<Key>: Shrubbery where Key: Hashable {
+
     public private(set) var unwrapped: Any?
     
     public init(_ unwrapped: Any? = nil) { try! set([], to: unwrapped) }

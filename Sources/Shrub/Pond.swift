@@ -1,14 +1,10 @@
 import Dispatch
 
-public class Pond<Source, Key>: Delta
-where
-    Key: Hashable,
-    Source: Geyser,
-    Source.Fork == EitherType<Int, Key>
-{
+public class Pond<Source>: Delta where Source: Geyser {
+
     public typealias Fork = Source.Fork
     public typealias Route = Source.Route
-    public typealias Basin = DeltaShrub<Key>
+    public typealias Basin = DeltaShrub<Source.Key>
     public typealias Subject = CurrentValueSubject<Bool, Never>
     
     public struct Subscription {
@@ -23,7 +19,7 @@ where
     public private(set) var subscriptions: Tree<Fork, Subscription>
     
     private let q: DispatchQueue = .init(
-        label: "\(Pond<Source, Key>.self).q_\(#file)_\(#line)",
+        label: "\(Pond<Source>.self).q_\(#file)_\(#line)",
         qos: .userInteractive
     )
     

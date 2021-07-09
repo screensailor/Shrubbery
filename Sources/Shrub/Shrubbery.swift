@@ -9,7 +9,7 @@ where
     Key: Hashable,
     Value == Any
 {
-    typealias Fork = EitherType<Int, Key> where Key: Hashable
+    typealias Fork = EitherType<Int, Key>
     typealias Route = [Fork]
 
     func get(_ route: Route) throws -> Self

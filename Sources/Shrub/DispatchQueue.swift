@@ -8,7 +8,7 @@ extension DispatchQueue {
         return o
     }
     
-    func sync<T>(with key: DispatchSpecificKey<Void>, execute work: () throws -> T) rethrows -> T {
+    func sync<T>(_ key: DispatchSpecificKey<Void>, execute work: () throws -> T) rethrows -> T {
         DispatchQueue.getSpecific(key: key) == nil
             ? try sync(execute: work)
             : try work()
