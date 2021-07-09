@@ -57,8 +57,12 @@ public class DeltaShrub<Key>: Delta /* TODO:❗️, Shrubbery */ where Key: Hash
 
     // MARK: set
 
-    public func set<A>(_ route: Fork..., to value: A) throws {
-        try set(route, to: value)
+    public func set(to unwrapped: Any?) {
+        set(to: .success(unwrapped))
+    }
+
+    public func set<A>(_ fork: Fork, rest: Fork..., to value: A) throws {
+        try set([fork] + rest, to: value)
     }
 
     public func set<A, Route>(_ route: Route, to value: A) throws

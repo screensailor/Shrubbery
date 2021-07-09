@@ -1,0 +1,25 @@
+{
+  "object": {
+    "pins": [
+      {
+        "package": "Hope",
+        "repositoryURL": "https://github.com/screensailor/Hope.git",
+        "state": {
+          "branch": "trunk",
+          "revision": "1d606cae908817c6de4bdc0ba595d3c20f5fa4ad",
+          "version": null
+        }
+      },
+      {
+        "package": "Peek",
+        "repositoryURL": "https://github.com/screensailor/Peek.git",
+        "state": {
+          "branch": "trunk",
+          "revision": "0f3692e56058305061767de6c2a8eb364d0f1277",
+          "version": null
+        }
+      }
+    ]
+  },
+  "version": 1
+}
