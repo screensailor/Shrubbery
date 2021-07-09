@@ -23,7 +23,7 @@ where
     private var subscriptions: Tree<Fork, Subscription> = .init()
     
     private let queue: DispatchQueue = .init(
-        label: "\(Pond<Source, Key>.self).q",
+        label: "\(Pond<Source, Key>.self).q_\(#file)_\(#line)",
         qos: .userInteractive
     )
     
