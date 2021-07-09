@@ -1,4 +1,4 @@
-import Dispatch // TODO:❗️generalise to Schedulers
+import Dispatch
 
 public class Pond<Source, Key>: Delta
 where
@@ -22,7 +22,7 @@ where
     public private(set) var basin: Basin
     public private(set) var subscriptions: Tree<Fork, Subscription>
     
-    private let q: DispatchQueue = .init( // TODO:❗️ generalise as Scheduler
+    private let q: DispatchQueue = .init(
         label: "\(Pond<Source, Key>.self).q_\(#file)_\(#line)",
         qos: .userInteractive
     )
