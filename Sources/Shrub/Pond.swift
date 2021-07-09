@@ -22,7 +22,7 @@ where
     private var basin: Basin = .init()
     private var subscriptions: Tree<Fork, Subscription> = .init()
     
-    private let queue: DispatchQueue = .init(
+    private let q: DispatchQueue = .init(
         label: "\(Pond<Source, Key>.self).q_\(#file)_\(#line)",
         qos: .userInteractive
     )
@@ -50,7 +50,7 @@ where
     }
         
     private func flow<A>(of route: Route, from source: Route, as: A.Type) -> Flow<A> {
-        queue.sync {
+        q.sync {
             guard let subscription = subscriptions[value: source] else {
                 var count = 0
                 let cancel = { (x: Int) in
@@ -64,14 +64,14 @@ where
                 subscriptions[value: source] = Subscription(
                     cancel: cancel,
                     didSink: didSink,
-                    cancellable: geyser.gush(of: source).receive(on: queue).sink{ [weak didSink] result in
+                    cancellable: geyser.gush(of: source).sink{ [weak didSink] result in
                         self.basin.set(source, to: result)
                         didSink?.send(true)
                     }
                 )
-                return didSink.flow(of: route, in: basin, on: queue, cancel: cancel)
+                return didSink.flow(of: route, in: basin, cancel: cancel)
             }
-            return subscription.didSink.flow(of: route, in: basin, on: queue, cancel: subscription.cancel)
+            return subscription.didSink.flow(of: route, in: basin, cancel: subscription.cancel)
         }
     }
 }
@@ -81,17 +81,15 @@ private extension CurrentValueSubject where Output == Bool, Failure == Never {
     func flow<A, Key>(
         of route: DeltaShrub<Key>.Route,
         in basin: DeltaShrub<Key>,
-        on queue: DispatchQueue,
         cancel: @escaping (Int) -> ()
     ) -> Flow<A> {
-        return self.first(where: { $0 }).flatMap{ _ in
+        self.first(where: { $0 }).flatMap{ _ in
             basin.flow(of: route)
         }
         .handleEvents(
             receiveSubscription: { _ in cancel(+1) },
             receiveCancel: { cancel(-1) }
         )
-        .subscribe(on: queue)
         .eraseToAnyPublisher()
     }
 }

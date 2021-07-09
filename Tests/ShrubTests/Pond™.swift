@@ -17,24 +17,19 @@ class Pond™: Hopes {
         hope.throws(try a.get())
         
         try db.store.set("a", 2, "c", to: 2)
-        hope.for(0.01)
         hope(db.count.subscriptions) == 1
         hope(a) == 2
         
         pond.flow(of: "a", 2, "c").sink{ a = $0 }.store(in: &bag)
-        hope.for(0.01)
         hope(db.count.subscriptions) == 1
         
         pond.flow(of: "a", 2, "d").sink{ a = $0 }.store(in: &bag)
-        hope.for(0.1)
         hope(db.count.subscriptions) == 1
         
         pond.flow(of: "b", 2, "c").sink{ a = $0 }.store(in: &bag)
-        hope.for(0.01)
         hope(db.count.subscriptions) == 2
 
         bag.removeAll()
-        hope.for(0.01)
         hope(db.count.subscriptions) == 0
     }
 
@@ -74,15 +69,12 @@ class Pond™: Hopes {
         pond.flow(of: 1, "two", 3, "a").removeDuplicates().sink{ a = $0 }.store(in: &bag)
         pond.flow(of: 1, "two", 3, "b").removeDuplicates().sink{ b = $0 }.store(in: &bag)
 
-        hope.for(0.01)
-        
         hope(a) == 0
         hope(b) == 0
         hope(count.a) == 1
         hope(count.b) == 1
 
         try pond.geyser.store.set(1, "two", 3, "a", to: 1)
-        hope.for(0.01)
 
         hope(a) == 1
         hope(b) == 0
@@ -90,7 +82,6 @@ class Pond™: Hopes {
         hope(count.b) == 1
 
         try pond.geyser.store.set(1, "two", 3, "a", to: 2)
-        hope.for(0.01)
 
         hope(a) == 2
         hope(b) == 0
@@ -98,7 +89,6 @@ class Pond™: Hopes {
         hope(count.b) == 1
 
         try pond.geyser.store.set(1, "two", 3, "a", to: 3)
-        hope.for(0.01)
 
         hope(a) == 3
         hope(b) == 0
@@ -106,7 +96,6 @@ class Pond™: Hopes {
         hope(count.b) == 1
 
         try pond.geyser.store.set(1, "two", 3, "b", to: 3)
-        hope.for(0.01)
 
         hope(a) == 3
         hope(b) == 3
@@ -130,8 +119,6 @@ class Pond™: Hopes {
         // which in turn causes subscribers of all the fields within the gush to be called.
         pond.flow(of: 1, "two", 3, "a").removeDuplicates().sink{ a = $0 }.store(in: &bag)
         pond.flow(of: 1, "two", 3, "b").removeDuplicates().sink{ b = $0 }.store(in: &bag)
-        
-        hope.for(0.01)
 
         hope(a) == 0
         hope(b) == 0
@@ -139,7 +126,6 @@ class Pond™: Hopes {
         hope(count.b) == 1
 
         try pond.geyser.store.set(1, "two", 3, "a", to: 1)
-        hope.for(0.01)
 
         hope(a) == 1
         hope(b) == 0
@@ -147,7 +133,6 @@ class Pond™: Hopes {
         hope(count.b) == 1
 
         try pond.geyser.store.set(1, "two", 3, "a", to: 2)
-        hope.for(0.01)
 
         hope(a) == 2
         hope(b) == 0
@@ -155,15 +140,13 @@ class Pond™: Hopes {
         hope(count.b) == 1
 
         try pond.geyser.store.set(1, "two", 3, "a", to: 3)
-        hope.for(0.01)
-        
+
         hope(a) == 3
         hope(b) == 0
         hope(count.a) == 4
         hope(count.b) == 1
 
         try pond.geyser.store.set(1, "two", 3, "b", to: 3)
-        hope.for(0.01)
 
         hope(a) == 3
         hope(b) == 3
@@ -206,7 +189,6 @@ class Pond™: Hopes {
         }
 
         hope(g.wait(timeout: .now() + 1)) == .success
-        hope.for(0.1)
 
         hope(json.debugDescription) == pond.geyser.store.debugDescription
     }
