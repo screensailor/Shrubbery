@@ -34,20 +34,12 @@ public class Pond<Source>: Delta where Source: Geyser {
     }
     
     public func flow<A>(of route: Route, as: A.Type) -> Flow<A> {
-        
-        let source: Route
-        
         do {
-            let endIndex = try geyser.source(of: route)
-            guard endIndex >= route.startIndex else {
-                return "Invalid source end index of route \(route)".error().flow()
-            }
-            source = route[..<endIndex].array
+            let source = try geyser.source(of: route)
+            return flow(of: route, from: source, as: A.self)
         } catch {
             return error.flow()
         }
-        
-        return flow(of: route, from: source, as: A.self)
     }
 
     private func flow<A>(of route: Route, from source: Route, as: A.Type) -> Flow<A> {

@@ -46,11 +46,11 @@ class Pond™: Hopes {
                 $store.flow(of: route)
             }
             
-            func source(of route: JSON.Route) throws -> JSON.Route.Index {
+            func source(of route: JSON.Route) throws -> JSON.Route {
                 guard route.count >= depth else {
-                    throw GeyserError.badRoute(route: route, message: "Can flow only at depth \(depth)")
+                    throw "Can flow only at depth \(depth)"
                 }
-                return depth
+                return Route(route.prefix(depth))
             }
         }
 
@@ -222,11 +222,11 @@ extension Pond™ {
                 .eraseToAnyPublisher()
         }
         
-        func source(of route: JSON.Route) throws -> JSON.Route.Index {
+        func source(of route: JSON.Route) throws -> JSON.Route {
             guard route.count >= depth else {
-                throw GeyserError.badRoute(route: route, message: "Can flow only at depth \(depth)")
+                throw "Can flow only at depth \(depth)"
             }
-            return depth
+            return Route(route.prefix(depth))
         }
     }
 }
