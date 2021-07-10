@@ -15,3 +15,17 @@ public enum GeyserError<Route>: Error {
     case badRoute(route: Route, message: String)
 }
 
+
+public protocol SimplerGeyser {
+
+    associatedtype Path
+    associatedtype Key: Hashable
+
+    func gush(of: Path) -> Flow<Shrub<Key>>
+    func source(of: Path) throws -> Path // TODO:❗️-> AnyPublisher<Path, Error>
+}
+
+
+struct SimplerPond<Source: SimplerGeyser> {
+
+}
