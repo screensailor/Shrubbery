@@ -1,6 +1,6 @@
 @_exported import Hope
 @_exported import Peek
-@_exported import Shrub
+@_exported import Shrubbery
 @_exported import Combine
 
 extension String: Error {}

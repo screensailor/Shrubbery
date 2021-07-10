@@ -3,13 +3,13 @@
 import PackageDescription
 
 let package = Package(
-    name: "Shrub",
+    name: "Shrubbery",
     platforms: [
         .macOS(.v11),
         .iOS(.v13)
     ],
     products: [
-        .library(name: "Shrub", targets: ["Shrub"]),
+        .library(name: "Shrubbery", targets: ["Shrubbery"]),
     ],
     dependencies: [
         .package(url: "https://github.com/screensailor/Peek.git", .branch("trunk")),
@@ -17,12 +17,12 @@ let package = Package(
     ],
     targets: [
         .target(
-            name: "Shrub",
+            name: "Shrubbery",
             dependencies: ["Peek"]
         ),
         .testTarget(
-            name: "ShrubTests",
-            dependencies: ["Shrub", "Hope", "Peek"]
+            name: "ShrubberyTests",
+            dependencies: ["Shrubbery", "Hope", "Peek"]
         ),
     ]
 )
