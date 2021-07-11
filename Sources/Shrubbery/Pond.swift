@@ -17,12 +17,7 @@ public class Pond<Source>: Delta where Source: Geyser {
     
     public private(set) var basin: Basin
     public private(set) var subscriptions: Tree<Fork, Subscription>
-    
-    private let q: DispatchQueue = .init(
-        label: "\(Pond<Source>.self).q_\(#file)_\(#line)",
-        qos: .userInteractive
-    )
-    
+
     public init(
         geyser: Source,
         basin: Basin = .init(),
@@ -43,49 +38,42 @@ public class Pond<Source>: Delta where Source: Geyser {
     }
 
     private func flow<A>(of route: Route, from source: Route, as: A.Type) -> Flow<A> {
-        q.sync {
+
+        let o: (didSink: Subject, cancel: (Int) -> ()) = basin.sync {
+
             if let subscription = subscriptions[value: source] {
-                return subscription.didSink.flow(of: route, in: basin, cancel: subscription.cancel)
+                return (subscription.didSink, subscription.cancel)
             }
-            var count = 0
-            let cancel = { [weak self] (x: Int) in
-                guard let self = self else { return }
-                self.q.sync {
+            else {
+                var count = 0
+                let cancel = { [weak self] (x: Int) in
                     count += x
                     if count < 1 {
                         assert(count == 0)
-                        self.subscriptions[value: source] = nil
+                        self?.subscriptions[value: source] = nil
                     }
                 }
+                let didSink = Subject(false)
+                subscriptions[value: source] = Subscription(
+                    cancel: cancel,
+                    didSink: didSink,
+                    cancellable: geyser.gush(of: source).sink{ [weak didSink] result in
+                        self.basin.set(source, to: result)
+                        didSink?.send(true)
+                    }
+                )
+                return (didSink, cancel)
             }
-            let didSink = Subject(false)
-            subscriptions[value: source] = Subscription(
-                cancel: cancel,
-                didSink: didSink,
-                cancellable: geyser.gush(of: source).sink{ [weak didSink] result in
-                    didSink?.send(true)
-                    self.basin.set(source, to: result)
-                }
-            )
-            return didSink.flow(of: route, in: basin, cancel: cancel)
         }
-    }
-}
 
-private extension CurrentValueSubject where Output == Bool, Failure == Never {
-    
-    func flow<A, Key>(
-        of route: DeltaShrub<Key>.Route,
-        in basin: DeltaShrub<Key>,
-        cancel: @escaping (Int) -> ()
-    ) -> Flow<A> {
-        first(where: { $0 })
+        return o.didSink
+            .first{ $0 }
             .flatMap{ _ in
-                basin.flow(of: route)
+                self.basin.flow(of: route)
             }
             .handleEvents(
-                receiveSubscription: { _ in cancel(+1) },
-                receiveCancel: { cancel(-1) }
+                receiveSubscription: { _ in self.basin.sync{ o.cancel(+1) } },
+                receiveCancel: { self.basin.sync{ o.cancel(-1) } }
             )
             .eraseToAnyPublisher()
     }
