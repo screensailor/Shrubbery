@@ -114,7 +114,7 @@ public class DeltaShrub<Key>: Delta /* TODO:❗️, Shrubbery */ where Key: Hash
             for route in route.lineage.reversed() {
                 subscriptions[route]?.value?.send(Result{ try shrub.get(route) })
             }
-            let error: Result<Shrub<Key>, Error> = .failure(error ?? "Route '\(route)' has been deleted".error())
+            let error: Result<Shrub<Key>, Error> = .failure(error ?? "Route '\(route)' has been deleted")
             subscriptions[route]?.traverse{ subroute, subject in
                 subject?.send(error)
             }

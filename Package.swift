@@ -6,7 +6,7 @@ let package = Package(
     name: "Shrubbery",
     platforms: [
         .macOS(.v11),
-        .iOS(.v13)
+        .iOS(.v14)
     ],
     products: [
         .library(name: "Shrubbery", targets: ["Shrubbery"]),
@@ -17,12 +17,11 @@ let package = Package(
     ],
     targets: [
         .target(
-            name: "Shrubbery",
-            dependencies: ["Peek"]
+            name: "Shrubbery"
         ),
         .testTarget(
             name: "ShrubberyTests",
-            dependencies: ["Shrubbery", "Hope", "Peek"]
+            dependencies: ["Shrubbery", "Peek", "Hope"]
         ),
     ]
 )

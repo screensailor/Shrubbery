@@ -41,25 +41,25 @@ extension Shrub {
             return ºany
         }
         guard let any = ºany else {
-            throw "Expected \(route) but found nil".error()
+            throw "Expected \(route) but found nil"
         }
         switch index.value
         {
         case .a(let int):
             guard let array = any as? [Any] else {
-                throw "Expected [Any] but found \(type(of: any)) at '\(index)' in \(route)".error()
+                throw "Expected [Any] but found \(type(of: any)) at '\(index)' in \(route)"
             }
             guard array.indices.contains(int) else {
-                throw "Index \(int) in \(route) is out of bounds - found only \(array.count) elements".error()
+                throw "Index \(int) in \(route) is out of bounds - found only \(array.count) elements"
             }
             return try get(route.dropFirst(), in: array[int])
             
         case .b(let key):
             guard let dictionary = any as? [Key: Any] else {
-                throw "Expected [\(Key.self): Any] but found \(type(of: any)) at '\(key)' in \(route)".error()
+                throw "Expected [\(Key.self): Any] but found \(type(of: any)) at '\(key)' in \(route)"
             }
             guard let any = dictionary[key] else {
-                throw "No value found at \(key) in \(route)".error()
+                throw "No value found at \(key) in \(route)"
             }
             return try get(route.dropFirst(), in: any)
         }
@@ -92,7 +92,7 @@ extension Shrub {
         {
         case .a(let int):
             guard int >= 0 else { // TODO: allow relative indexing
-                throw "Fork in route \(route) is negative".error()
+                throw "Fork in route \(route) is negative"
             }
             var array = any as? [Any] ?? []
             array.append(contentsOf: repeatElement(none, count: max(0, int - array.endIndex + 1)))

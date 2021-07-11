@@ -1,4 +1,4 @@
-import Peek
+extension String: Error {}
 
 public protocol Shrubbery:
     AnyWrapper,
@@ -44,7 +44,7 @@ extension Shrubbery {
         
     public func `as`<A>(_: A.Type) throws -> A {
         guard let a = unwrapped as? A ?? self as? A else {
-            throw "Expected \(A.self) but got \(type(of: unwrapped))".error()
+            throw "Expected \(A.self) but got \(type(of: unwrapped))"
         }
         return a
     }
@@ -78,26 +78,12 @@ extension Shrubbery {
         Route: Collection,
         Route.Element == Fork
     {
+        // TODO: rethink error handling here
         get {
-            do {
-                return try get(route)
-            }
-            catch {
-                if #available(iOS 14.0, *) {
-                    "\(error)".peek(as: .debug)
-                }
-            }
-            return nil
+            (try? get(route)) ?? nil
         }
         set {
-            do {
-                try set(route.array, to: newValue.unwrapped)
-            }
-            catch {
-                if #available(iOS 14.0, *) {
-                    "\(error)".peek(as: .debug)
-                }
-            }
+            _ = try? set(route.array, to: newValue.unwrapped)
         }
     }
 }
@@ -161,22 +147,12 @@ extension Shrubbery {
         Route: Collection,
         Route.Element == Fork
     {
+        // TODO: rethink error handling here
         get {
-            do {
-                return try get(route.array, as: A.self)
-            }
-            catch {
-                "\(error)".peek(as: .debug)
-            }
-            return nil
+            try? get(route.array, as: A.self)
         }
         set {
-            do {
-                try set(route.array, to: newValue)
-            }
-            catch {
-                "\(error)".peek(as: .debug)
-            }
+        _ = try? set(route.array, to: newValue)
         }
     }
 }

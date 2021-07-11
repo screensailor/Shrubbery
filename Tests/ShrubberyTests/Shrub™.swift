@@ -3,8 +3,6 @@
 @_exported import Shrubbery
 @_exported import Combine
 
-extension String: Error {}
-
 private extension Forks where Key == String {
     var a: Forks { __("a") }
     var b: Forks { __("b") }
