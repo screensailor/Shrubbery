@@ -103,13 +103,13 @@ extension Tree {
 }
 
 extension Tree {
-    
+
     // TODO:❗️breadth vs. depth first
     /// Depth first traversal
     public func traverse(yield: ((route: [Key], value: Value?)) -> ()) {
         Self.traverse(route: [], tree: self, yield: yield)
     }
-    
+
     private static func traverse(route: [Key], tree: Tree, yield: ((route: [Key], value: Value?)) -> ()) {
         yield((route, tree.value))
         for (key, tree) in tree.branches {
@@ -118,18 +118,40 @@ extension Tree {
     }
 }
 
-extension Tree: CustomStringConvertible {
-    
-    public var description: String {
-        "\(Self.self)(value: \(String(describing: value)) branches: \(branches))"
+extension Tree where Key: Comparable {
+
+    // TODO:❗️breadth vs. depth first
+    /// Depth first traversal
+    public func traverse(sorted: Bool = false, yield: ((route: [Key], value: Value?)) -> ()) {
+        Self.traverse(sorted: sorted, route: [], tree: self, yield: yield)
+    }
+
+    private static func traverse(sorted: Bool = false, route: [Key], tree: Tree, yield: ((route: [Key], value: Value?)) -> ()) {
+        yield((route, tree.value))
+        if sorted {
+            for (key, tree) in tree.branches.sorted(by: { $0.key < $1.key }) {
+                traverse(sorted: sorted, route: route + [key], tree: tree, yield: yield)
+            }
+        } else {
+            for (key, tree) in tree.branches {
+                traverse(sorted: sorted, route: route + [key], tree: tree, yield: yield)
+            }
+        }
     }
 }
 
-extension Tree: CustomDebugStringConvertible {
+extension Tree: CustomStringConvertible {
     
+    public var description: String {
+        "\(Self.self)(value: \(String(describing: value)) branches count: \(branches.count))"
+    }
+}
+
+extension Tree: CustomDebugStringConvertible where Key: Comparable {
+
     public var debugDescription: String {
         var o = "\(Self.self)"
-        traverse { route, value in
+        traverse(sorted: true) { route, value in
             let t = repeatElement("\t|", count: route.count + 1).joined()
             o += "\n\(t)\(route):\n\(t)\(value.map(String.init(describing:)) ?? "nil")"
         }
