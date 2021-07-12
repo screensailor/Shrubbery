@@ -7,7 +7,7 @@ public class Pond<Source>: Delta where Source: Geyser {
     public typealias Basin = DeltaShrub<Source.Key>
     public typealias Subject = CurrentValueSubject<Bool, Never>
     
-    public struct Subscription {
+    public struct Gush {
         public let cancel: (Int) -> ()
         public let didSink: Subject
         public let cancellable: AnyCancellable
@@ -16,12 +16,12 @@ public class Pond<Source>: Delta where Source: Geyser {
     public let geyser: Source
     
     public private(set) var basin: Basin
-    public private(set) var subscriptions: Tree<Fork, Subscription>
+    public private(set) var subscriptions: Tree<Fork, Gush>
 
     public init(
         geyser: Source,
         basin: Basin = .init(),
-        subscriptions: Tree<Fork, Subscription> = .init()
+        subscriptions: Tree<Fork, Gush> = .init()
     ) {
         self.geyser = geyser
         self.basin = basin
@@ -54,7 +54,7 @@ public class Pond<Source>: Delta where Source: Geyser {
                     }
                 }
                 let didSink = Subject(false)
-                subscriptions[value: source] = Subscription(
+                subscriptions[value: source] = Gush(
                     cancel: cancel,
                     didSink: didSink,
                     cancellable: geyser.gush(of: source).sink{ [weak didSink] result in
@@ -76,5 +76,12 @@ public class Pond<Source>: Delta where Source: Geyser {
                 receiveCancel: { self.basin.sync{ o.cancel(-1) } }
             )
             .eraseToAnyPublisher()
+    }
+}
+
+extension Pond.Gush: CustomStringConvertible {
+
+    public var description: String {
+        "Gush(didSink: \(didSink.value))"
     }
 }
