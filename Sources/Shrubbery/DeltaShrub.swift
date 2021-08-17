@@ -1,4 +1,4 @@
-import Dispatch
+import Foundation
 
 public class DeltaShrub<Key>: Delta /* TODO:❗️, Shrubbery */ where Key: Hashable {
     
@@ -7,12 +7,7 @@ public class DeltaShrub<Key>: Delta /* TODO:❗️, Shrubbery */ where Key: Hash
     
     public private(set) var shrub: Shrub<Key>
     private var subscriptions: Tree<Fork, Subject>
-
-    private let k: DispatchSpecificKey<Void>
-    private let q: DispatchQueue = .init(
-        label: "\(DeltaShrub<Key>.self).q_\(#file)_\(#line)",
-        qos: .userInteractive
-    )
+    private let lock = NSRecursiveLock()
 
     public init(
         drop: Shrub<Key> = nil,
@@ -20,7 +15,6 @@ public class DeltaShrub<Key>: Delta /* TODO:❗️, Shrubbery */ where Key: Hash
     ) {
         self.shrub = drop
         self.subscriptions = subscriptions
-        self.k = q.setSpecificKey()
     }
 
     public convenience init(_ unwrapped: Any) {
@@ -28,9 +22,9 @@ public class DeltaShrub<Key>: Delta /* TODO:❗️, Shrubbery */ where Key: Hash
     }
 
     func sync<A>(_ work: () throws -> A) rethrows -> A {
-        DispatchQueue.getSpecific(key: k) == nil
-            ? try q.sync(execute: work)
-            : try work()
+        lock.lock()
+        defer{ lock.unlock() }
+        return try work()
     }
 
     // MARK: delta flow

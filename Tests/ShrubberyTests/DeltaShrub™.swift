@@ -281,5 +281,12 @@ class DeltaShrub™: Hopes {
 
         hope(json2.debugDescription) == json1.debugDescription
     }
+    
+    func test_performance() throws {
+        
+        measure {
+            _ = try? test_thousand_subscriptions_and_concurrent_updates()
+        }
+    }
 }
 
