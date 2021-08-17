@@ -15,11 +15,14 @@ public class DeltaShrub<Key>: Delta /* TODO:❗️, Shrubbery */ where Key: Hash
     ) {
         self.shrub = drop
         self.subscriptions = subscriptions
+        self.lock.name = "Shrubbery.DeltaShrub.lock"
     }
 
     public convenience init(_ unwrapped: Any) {
         self.init(drop: Shrub<Key>(unwrapped))
     }
+    
+    // MARK: sync
 
     func sync<A>(_ work: () throws -> A) rethrows -> A {
         lock.lock()

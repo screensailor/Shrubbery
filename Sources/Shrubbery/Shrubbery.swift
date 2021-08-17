@@ -237,7 +237,7 @@ extension Shrubbery {
         {
         case let other as [Any]:
             guard self.unwrapped is [Any] else {
-                try! self.set(to: other) // TODO: improve the api for setting `self`
+                self = .init(other)
                 return
             }
             for (i, other) in other.enumerated() {
@@ -253,7 +253,7 @@ extension Shrubbery {
 
         case let other as [Key: Any]:
             guard self.unwrapped is [Key: Any] else {
-                try! self.set(to: other) // TODO: improve the api for setting `self`
+                self = .init(other)
                 return
             }
             for (key, other) in other {

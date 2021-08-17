@@ -50,8 +50,16 @@ where
     Output.Value: Equatable,
     Failure == Never
 {
-    public func removeDuplicates() -> Flow<Output.Value> {
-        unflow().removeDuplicates().flow()
+    public func removeDuplicates() -> AnyPublisher<Output, Never> {
+        self.removeDuplicates{ a, b in
+            do {
+                return try a.get() == b.get()
+            }
+            catch {
+                return false
+            }
+        }
+        .eraseToAnyPublisher()
     }
 }
 

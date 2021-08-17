@@ -63,7 +63,7 @@ class DeltaShrub™: Hopes {
         hope(a) == 4
         hope(b) == 4
         
-        hope(count.a) == 2
+        hope(count.a) == 1
         hope(count.b) == 3
 
         delta.set(1, to: Result<Int, Error>.failure("👌".error()))
@@ -71,7 +71,7 @@ class DeltaShrub™: Hopes {
         hope.throws(try a.get())
         hope.throws(try b.get())
         
-        hope(count.a) == 3
+        hope(count.a) == 2
         hope(count.b) == 4
     }
 
@@ -117,6 +117,29 @@ class DeltaShrub™: Hopes {
         hope(b) == 3
         hope(count.a) == 4
         hope(count.b) == 2
+    }
+    
+    func test_counts_with_un_Equatable() throws {
+        
+        struct UnEq {
+            let x: Int
+        }
+        
+        var count = 0
+        
+        var a: Result<UnEq, Error> = .failure("😱") { didSet { count += 1 } }
+
+        let delta = DeltaJSON()
+        
+        try delta.set(1, "two", 3, to: ["four": UnEq(x: 4)])
+
+        delta.flow(of: 1, "two", 3, "four").sink{ a = $0 }.store(in: &bag)
+        
+        try delta.set(1, "two", 3, to: ["four": UnEq(x: 4)])
+
+        hope(try a.get().x) == 4
+        
+        hope(count) == 2
     }
 
     func test_transaction() throws {

@@ -63,11 +63,8 @@ class Pond™: Hopes {
 
         try pond.geyser.store.set(1, "two", 3, to: ["a": 0, "b": 0])
 
-        // TODO: pass all the hopes without the removeDuplicates operator.
-        // These ↓ reflect the fact that `store.set` is causing the geyser to gush,
-        // which in turn causes subscribers of all the fields within the gush to be called.
-        pond.flow(of: 1, "two", 3, "a").removeDuplicates().sink{ a = $0 }.store(in: &bag)
-        pond.flow(of: 1, "two", 3, "b").removeDuplicates().sink{ b = $0 }.store(in: &bag)
+        pond.flow(of: 1, "two", 3, "a").sink{ a = $0 }.store(in: &bag)
+        pond.flow(of: 1, "two", 3, "b").sink{ b = $0 }.store(in: &bag)
 
         hope(a) == 0
         hope(b) == 0
@@ -114,11 +111,8 @@ class Pond™: Hopes {
 
         try pond.geyser.store.set(1, "two", 3, to: ["a": 0, "b": 0])
 
-        // TODO: pass all the hopes without the removeDuplicates operator.
-        // These ↓ reflect the fact that `store.set` is causing the geyser to gush,
-        // which in turn causes subscribers of all the fields within the gush to be called.
-        pond.flow(of: 1, "two", 3, "a").removeDuplicates().sink{ a = $0 }.store(in: &bag)
-        pond.flow(of: 1, "two", 3, "b").removeDuplicates().sink{ b = $0 }.store(in: &bag)
+        pond.flow(of: 1, "two", 3, "a").sink{ a = $0 }.store(in: &bag)
+        pond.flow(of: 1, "two", 3, "b").sink{ b = $0 }.store(in: &bag)
 
         hope(a) == 0
         hope(b) == 0
