@@ -17,7 +17,6 @@ typealias State = SwiftUI.State
 struct ExampleApp: App {
 
     @State private var json: JSON = [
-        "count": 1,
         "sources": [
             "Source No 1": ["message": "Yay"]
         ]
