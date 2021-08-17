@@ -1,0 +1,16 @@
+{
+  "object": {
+    "pins": [
+      {
+        "package": "Shrubbery",
+        "repositoryURL": "git@github.com:screensailor/Shrub.git",
+        "state": {
+          "branch": "trunk",
+          "revision": "719ac47dded57389b3befc0139707cefc0a830ad",
+          "version": null
+        }
+      }
+    ]
+  },
+  "version": 1
+}

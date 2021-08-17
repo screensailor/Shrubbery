@@ -7,7 +7,11 @@
 
 @_exported import CoreData
 @_exported import SwiftUI
-@_exported import Shrub
+@_exported import Peek
+@_exported import Shrubbery
+
+typealias JSON = Shrub<String>
+typealias State = SwiftUI.State
 
 @main
 struct ExampleApp: App {
@@ -21,32 +25,11 @@ struct ExampleApp: App {
     
     var body: some Scene {
         return WindowGroup {
-            Sources(count: $json["count", default: 1], json: $json["sources"])
+            Sources(
+                count: $json["count", default: 1],
+                json: $json["sources"]
+            )
         }
-    }
-}
-
-extension View {
-    
-    public func eraseToAnyView() -> AnyView {
-        AnyView(erasing: self)
-    }
-}
-
-public protocol TryView: View where Body == AnyView {
-    
-    associatedtype DoBody: View
-    associatedtype CatchBody: View
-    
-    func doBody() throws -> DoBody
-    func catchBody(_ error: Error) -> CatchBody
-}
-
-extension TryView {
-    
-    public var body: Body {
-        do { return try doBody().eraseToAnyView() }
-        catch { return catchBody(error).eraseToAnyView() }
     }
 }
 

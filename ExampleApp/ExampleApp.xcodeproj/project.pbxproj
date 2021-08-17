@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0741C75226CC73EA0046023A /* Shrubbery in Frameworks */ = {isa = PBXBuildFile; productRef = 0741C75126CC73EA0046023A /* Shrubbery */; };
+		0741C75426CC74420046023A /* Peek in Frameworks */ = {isa = PBXBuildFile; productRef = 0741C75326CC74420046023A /* Peek */; };
 		077071C82607397D00370086 /* ExampleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 077071C72607397D00370086 /* ExampleApp.swift */; };
 		077071CA2607397D00370086 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 077071C92607397D00370086 /* ContentView.swift */; };
 		077071CC2607398100370086 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 077071CB2607398100370086 /* Assets.xcassets */; };
@@ -15,7 +17,6 @@
 		077071D42607398100370086 /* ExampleApp.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 077071D22607398100370086 /* ExampleApp.xcdatamodeld */; };
 		077071DF2607398100370086 /* ExampleAppTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 077071DE2607398100370086 /* ExampleAppTests.swift */; };
 		077071EA2607398100370086 /* ExampleAppUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 077071E92607398100370086 /* ExampleAppUITests.swift */; };
-		077071FF26076DB700370086 /* Shrub in Frameworks */ = {isa = PBXBuildFile; productRef = 077071FE26076DB700370086 /* Shrub */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -57,7 +58,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				077071FF26076DB700370086 /* Shrub in Frameworks */,
+				0741C75226CC73EA0046023A /* Shrubbery in Frameworks */,
+				0741C75426CC74420046023A /* Peek in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -78,6 +80,13 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		0741C75026CC73EA0046023A /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		077071BB2607397D00370086 = {
 			isa = PBXGroup;
 			children = (
@@ -85,6 +94,7 @@
 				077071DD2607398100370086 /* ExampleAppTests */,
 				077071E82607398100370086 /* ExampleAppUITests */,
 				077071C52607397D00370086 /* Products */,
+				0741C75026CC73EA0046023A /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -155,7 +165,8 @@
 			);
 			name = ExampleApp;
 			packageProductDependencies = (
-				077071FE26076DB700370086 /* Shrub */,
+				0741C75126CC73EA0046023A /* Shrubbery */,
+				0741C75326CC74420046023A /* Peek */,
 			);
 			productName = ExampleApp;
 			productReference = 077071C42607397D00370086 /* ExampleApp.app */;
@@ -609,10 +620,13 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		077071FE26076DB700370086 /* Shrub */ = {
+		0741C75126CC73EA0046023A /* Shrubbery */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 077071FD26076DB700370086 /* XCRemoteSwiftPackageReference "Shrub" */;
-			productName = Shrub;
+			productName = Shrubbery;
+		};
+		0741C75326CC74420046023A /* Peek */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Peek;
 		};
 /* End XCSwiftPackageProductDependency section */
 
