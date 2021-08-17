@@ -44,7 +44,7 @@ struct Sources: View {
                     ForEach(json.branches.sorted()) { branch in
                         VStack {
                             Text(branch.stringValue).font(.headline)
-                            Text(json[branch, "message", default: "😱"] as String).font(.subheadline)
+                            Text(json[branch, "message", default: "😱"]).font(.subheadline)
                         }
                     }
                     .onDelete{ indices in
