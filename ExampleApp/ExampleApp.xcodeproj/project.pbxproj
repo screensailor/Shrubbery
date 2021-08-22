@@ -9,11 +9,10 @@
 /* Begin PBXBuildFile section */
 		0741C75226CC73EA0046023A /* Shrubbery in Frameworks */ = {isa = PBXBuildFile; productRef = 0741C75126CC73EA0046023A /* Shrubbery */; };
 		0741C75426CC74420046023A /* Peek in Frameworks */ = {isa = PBXBuildFile; productRef = 0741C75326CC74420046023A /* Peek */; };
+		0741C75726D13C9A0046023A /* Shrubbery in Frameworks */ = {isa = PBXBuildFile; productRef = 0741C75626D13C9A0046023A /* Shrubbery */; };
 		077071C82607397D00370086 /* ExampleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 077071C72607397D00370086 /* ExampleApp.swift */; };
-		077071CA2607397D00370086 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 077071C92607397D00370086 /* ContentView.swift */; };
 		077071CC2607398100370086 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 077071CB2607398100370086 /* Assets.xcassets */; };
 		077071CF2607398100370086 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 077071CE2607398100370086 /* Preview Assets.xcassets */; };
-		077071D12607398100370086 /* Persistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 077071D02607398100370086 /* Persistence.swift */; };
 		077071D42607398100370086 /* ExampleApp.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 077071D22607398100370086 /* ExampleApp.xcdatamodeld */; };
 		077071DF2607398100370086 /* ExampleAppTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 077071DE2607398100370086 /* ExampleAppTests.swift */; };
 		077071EA2607398100370086 /* ExampleAppUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 077071E92607398100370086 /* ExampleAppUITests.swift */; };
@@ -39,10 +38,8 @@
 /* Begin PBXFileReference section */
 		077071C42607397D00370086 /* ExampleApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ExampleApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		077071C72607397D00370086 /* ExampleApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExampleApp.swift; sourceTree = "<group>"; };
-		077071C92607397D00370086 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		077071CB2607398100370086 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		077071CE2607398100370086 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
-		077071D02607398100370086 /* Persistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Persistence.swift; sourceTree = "<group>"; };
 		077071D32607398100370086 /* ExampleApp.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = ExampleApp.xcdatamodel; sourceTree = "<group>"; };
 		077071D52607398100370086 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		077071DA2607398100370086 /* ExampleAppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ExampleAppTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -60,6 +57,7 @@
 			files = (
 				0741C75226CC73EA0046023A /* Shrubbery in Frameworks */,
 				0741C75426CC74420046023A /* Peek in Frameworks */,
+				0741C75726D13C9A0046023A /* Shrubbery in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -112,9 +110,7 @@
 			isa = PBXGroup;
 			children = (
 				077071D52607398100370086 /* Info.plist */,
-				077071C92607397D00370086 /* ContentView.swift */,
 				077071C72607397D00370086 /* ExampleApp.swift */,
-				077071D02607398100370086 /* Persistence.swift */,
 				077071CB2607398100370086 /* Assets.xcassets */,
 				077071D22607398100370086 /* ExampleApp.xcdatamodeld */,
 				077071CD2607398100370086 /* Preview Content */,
@@ -167,6 +163,7 @@
 			packageProductDependencies = (
 				0741C75126CC73EA0046023A /* Shrubbery */,
 				0741C75326CC74420046023A /* Peek */,
+				0741C75626D13C9A0046023A /* Shrubbery */,
 			);
 			productName = ExampleApp;
 			productReference = 077071C42607397D00370086 /* ExampleApp.app */;
@@ -240,7 +237,7 @@
 			);
 			mainGroup = 077071BB2607397D00370086;
 			packageReferences = (
-				077071FD26076DB700370086 /* XCRemoteSwiftPackageReference "Shrub" */,
+				0741C75526D13C9A0046023A /* XCRemoteSwiftPackageReference "Shrubbery" */,
 			);
 			productRefGroup = 077071C52607397D00370086 /* Products */;
 			projectDirPath = "";
@@ -285,8 +282,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				077071D42607398100370086 /* ExampleApp.xcdatamodeld in Sources */,
-				077071D12607398100370086 /* Persistence.swift in Sources */,
-				077071CA2607397D00370086 /* ContentView.swift in Sources */,
 				077071C82607397D00370086 /* ExampleApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -609,9 +604,9 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		077071FD26076DB700370086 /* XCRemoteSwiftPackageReference "Shrub" */ = {
+		0741C75526D13C9A0046023A /* XCRemoteSwiftPackageReference "Shrubbery" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "git@github.com:screensailor/Shrub.git";
+			repositoryURL = "git@github.com:screensailor/Shrubbery.git";
 			requirement = {
 				branch = trunk;
 				kind = branch;
@@ -627,6 +622,11 @@
 		0741C75326CC74420046023A /* Peek */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Peek;
+		};
+		0741C75626D13C9A0046023A /* Shrubbery */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 0741C75526D13C9A0046023A /* XCRemoteSwiftPackageReference "Shrubbery" */;
+			productName = Shrubbery;
 		};
 /* End XCSwiftPackageProductDependency section */
 

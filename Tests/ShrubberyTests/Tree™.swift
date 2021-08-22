@@ -28,10 +28,14 @@ class Tree™: Hopes {
         tree[1, 2] = Tree(
             value: nil,
             branches: [
+                1: Tree(value: 1),
+                2: Tree(value: 2),
                 "a": Tree(value: 3),
-                "b": Tree(value: 4)
+                "b": Tree(value: 4),
             ]
         )
+        hope(tree[value: 1, 2, 1]) == 1
+        hope(tree[value: 1, 2, 2]) == 2
         hope(tree[value: 1, 2, "a"]) == 3
         hope(tree[value: 1, 2, "b"]) == 4
 

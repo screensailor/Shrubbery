@@ -38,6 +38,9 @@ extension EitherType {
     @inlinable public subscript(type: A.Type = A.self) -> A? { a }
     @inlinable public subscript(type: B.Type = B.self) -> B? { b }
     
+    @inlinable public func `is`(_: A.Type) -> Bool { a != nil }
+    @inlinable public func `is`(_: B.Type) -> Bool { b != nil }
+
     @inlinable public func cast<T>(to: T.Type = T.self) -> T? { a as? T ?? b as? T }
 }
 
