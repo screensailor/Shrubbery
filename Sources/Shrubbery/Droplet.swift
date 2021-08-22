@@ -76,10 +76,10 @@ public prefix func ^ <Key, Value>(v: Value) -> Result<Shrub<Key>, Error> { .succ
 
 extension Result: Droplet, CustomStringConvertible where Failure == Error {
     
-    public static func value(_ value: Success) -> Self { .success(value) }
-    public static func error<E: Error>(_ error: E) -> Self { .failure(error) }
-    
-    public var isError: Bool { if case .failure = self { return true } else { return false } }
+    @inlinable public static func value(_ value: Success) -> Self { .success(value) }
+    @inlinable public static func error<E: Error>(_ error: E) -> Self { .failure(error) }
+
+    @inlinable public var isError: Bool { if case .failure = self { return true } else { return false } }
 }
 
 extension Result:

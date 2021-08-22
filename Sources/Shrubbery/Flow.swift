@@ -2,6 +2,8 @@
 
 public typealias Flow<A> = AnyPublisher<Result<A, Error>, Never>
 
+public typealias AnyFlow = Flow<Any?>
+
 extension Publisher {
     
     public func flow() -> Flow<Output> {
