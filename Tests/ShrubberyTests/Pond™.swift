@@ -11,7 +11,7 @@ class Pond™: Hopes {
         
         var a: Result<Int, Error> = .failure("😱")
         
-        pond.flow(of: "a", 2, "c").map().sink{ a = $0 }.store(in: &bag)
+        pond.flow(of: "a", 2, "c").sink{ a = $0 }.store(in: &bag)
         
         hope(db.count.subscriptions) == 1
         hope.throws(try a.get())
@@ -37,13 +37,13 @@ class Pond™: Hopes {
         
         class Database: Geyser {
             
-            typealias Fork = JSON.Fork
+            typealias Key = JSON.Key
 
             @Published var store: JSON = .init()
             let depth = 1
             
             func gush(of route: JSON.Route) -> AnyFlow {
-                $store.flow(of: route)
+                $store.flow(of: route).eraseToAnyPublisher()
             }
             
             func source(of route: JSON.Route) throws -> JSON.Route {
@@ -192,7 +192,7 @@ extension Pond™ {
 
     class Database: Geyser {
         
-        typealias Fork = JSON.Fork
+        typealias Key = JSON.Key
 
         let store: DeltaJSON = .init()
         
@@ -207,12 +207,10 @@ extension Pond™ {
         }
         
         func gush(of route: JSON.Route) -> AnyFlow {
-            store.flow(of: route)
-                .handleEvents(
-                    receiveSubscription: { _ in self.count.subscriptions += 1 },
-                    receiveCancel: { self.count.subscriptions -= 1 }
-                )
-                .eraseToAnyPublisher()
+            store.flow(of: route).handleEvents(
+                receiveSubscription: { _ in self.count.subscriptions += 1 },
+                receiveCancel: { self.count.subscriptions -= 1 }
+            ).eraseToAnyPublisher()
         }
         
         func source(of route: JSON.Route) throws -> JSON.Route {

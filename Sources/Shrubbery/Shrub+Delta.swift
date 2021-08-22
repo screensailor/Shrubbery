@@ -1,4 +1,5 @@
 extension Publisher where Output: Shrubbery {
+    public typealias Key = Output.Key
     /**
      Convenience. Not as performant as `DeltaShrub`.
      */
@@ -7,7 +8,7 @@ extension Publisher where Output: Shrubbery {
     }
 }
 
-extension Published.Publisher: Delta where Output: Shrubbery {}
-extension CurrentValueSubject: Delta where Output: Shrubbery, Failure == Never {}
-extension PassthroughSubject: Delta where Output: Shrubbery, Failure == Never {}
+extension Published.Publisher: Routed, Delta where Output: Shrubbery {}
+extension CurrentValueSubject: Routed, Delta where Output: Shrubbery, Failure == Never {}
+extension PassthroughSubject: Routed, Delta where Output: Shrubbery, Failure == Never {}
 

@@ -1,17 +1,16 @@
+@_exported import Combine
+
 extension String: Error {}
 
 public protocol Shrubbery:
+    Routed,
     AnyWrapper,
     ExpressibleByArrayLiteral,
     ExpressibleByDictionaryLiteral,
     CustomDebugStringConvertible
 where
-    Key: Hashable,
     Value == Any?
 {
-    typealias Fork = EitherType<Int, Key>
-    typealias Route = [Fork]
-
     func get(_ route: Route) throws -> Self
     
     mutating

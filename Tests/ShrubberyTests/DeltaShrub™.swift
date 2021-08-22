@@ -312,4 +312,3 @@ class DeltaShrub™: Hopes {
         }
     }
 }
-

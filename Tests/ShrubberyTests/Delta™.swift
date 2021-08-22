@@ -27,21 +27,4 @@ class Delta™: Hopes {
         
         hope(result) == 4
     }
-    
-    func test_flowFlatMap() throws {
-        
-        let json = CurrentValueSubject<JSON.Result, Never>(^0)
-        
-        var result: JSON.Result = .failure("😱")
-
-        json.flowFlatMap{ o in Just(o).flow() }.sink{ result = $0 }.store(in: &bag)
-
-        json.value = ^4.0
-        hope(try result.get().cast()) == 4.0
-
-        json.value = .failure("😱")
-
-        json.value = ^5.0
-        hope(try result.get().cast()) == 5.0
-    }
 }

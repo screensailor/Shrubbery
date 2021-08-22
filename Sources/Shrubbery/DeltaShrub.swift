@@ -2,7 +2,6 @@ import Foundation
 
 public class DeltaShrub<Key>: Delta /* TODO:❗️, Shrubbery */ where Key: Hashable {
     
-    public typealias Fork = Shrub<Key>.Fork
     public typealias Subject = PassthroughSubject<Result<Any?, Error>, Never>
     
     public private(set) var shrub: Shrub<Key>
@@ -33,7 +32,7 @@ public class DeltaShrub<Key>: Delta /* TODO:❗️, Shrubbery */ where Key: Hash
     // MARK: delta flow
 
     public func flow(of route: Route) -> AnyFlow {
-        sync{
+        sync {
             Just(Result{ try shrub.get(route) }).merge(
                 with: subscriptions[value: route, inserting: Subject()]
             )

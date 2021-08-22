@@ -2,9 +2,8 @@ import Dispatch
 
 public class Pond<Source>: Delta where Source: Geyser {
 
-    public typealias Fork = Source.Fork
-    public typealias Route = Source.Route
-    public typealias Basin = DeltaShrub<Source.Key>
+    public typealias Key = Source.Key
+    public typealias Basin = DeltaShrub<Key>
     public typealias Subject = CurrentValueSubject<Bool, Never>
     
     public struct Gush {
@@ -33,7 +32,7 @@ public class Pond<Source>: Delta where Source: Geyser {
             let source = try geyser.source(of: route)
             return flow(of: route, from: source)
         } catch {
-            return error.flow()
+            return error.flow().eraseToAnyPublisher()
         }
     }
 
@@ -58,8 +57,12 @@ public class Pond<Source>: Delta where Source: Geyser {
                     cancel: cancel,
                     didSink: didSink,
                     cancellable: geyser.gush(of: source).sink{ [weak didSink] result in
-                        self.basin.set(source, to: result)
-                        didSink?.send(true)
+                        do {
+                            try self.basin.set(source, to: result)
+                            didSink?.send(true)
+                        } catch {
+                            // TODO:❗️
+                        }
                     }
                 )
                 return (didSink, cancel)

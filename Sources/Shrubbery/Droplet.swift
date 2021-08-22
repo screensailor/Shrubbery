@@ -69,10 +69,40 @@ extension Shrubbery where Self: Droplet, Self.Key == String {
     }
 }
 
+extension Publisher where Output: Droplet, Failure == Never {
+    
+    public func cast<A>(to: A.Type = A.self) -> Publishers.Map<Self, Result<A, Error>> {
+        map{ o in
+            Result { () throws -> A in
+                guard let r = try o.get() as? A else {
+                    throw "\(o) of type \(type(of: o)) is not an \(A.self)" // TODO:❗️trace
+                }
+                return r
+            }
+        }
+    }
+    
+    public func decode<A, D>(type: A.Type = A.self, decoder: D) -> Publishers.Map<Self, Result<A, Error>> where
+        A: Decodable,
+        D: TopLevelDecoder,
+        D.Input == Any?
+    {
+        map{ o in
+            Result {
+                let o = try o.get()
+                if let o = o as? A {
+                    return o
+                }
+                return try decoder.decode(A.self, from: o)
+            }
+        }
+    }
+}
+
 // MARK: Result
 
-public prefix func ^ <Value>(v: Value) -> Result<Value, Error> { .success(v) }
-public prefix func ^ <Key, Value>(v: Value) -> Result<Shrub<Key>, Error> { .success(.init(v)) }
+//public prefix func ^ <Value>(v: Value) -> Result<Value, Error> { .success(v) }
+//public prefix func ^ <Key, Value>(v: Value) -> Result<Shrub<Key>, Error> { .success(.init(v)) }
 
 extension Result: Droplet, CustomStringConvertible where Failure == Error {
     
@@ -83,6 +113,7 @@ extension Result: Droplet, CustomStringConvertible where Failure == Error {
 }
 
 extension Result:
+    Routed,
     Shrubbery,
     AnyWrapper,
     ExpressibleByNilLiteral,
@@ -90,12 +121,6 @@ extension Result:
     ExpressibleByDictionaryLiteral,
     CustomDebugStringConvertible
 where Success == Any?, Failure == Error {
-
-    public init(arrayLiteral elements: Any?...) { // TODO: inherit
-        self.init(elements)
-    }
     
-    public init(dictionaryLiteral elements: (String, Any?)...) { // TODO: inherit
-        self.init(Dictionary(elements){ _, last in last })
-    }
+    public typealias Key = String
 }
