@@ -6,5 +6,5 @@ public protocol Geyser {
     typealias Route = [Fork]
 
     func source(of: Route) throws -> Route // TODO:❗️-> AnyPublisher<Route, Error>
-    func gush(of: Route) -> Flow<Shrub<Key>>
+    func gush(of: Route) -> AnyFlow
 }

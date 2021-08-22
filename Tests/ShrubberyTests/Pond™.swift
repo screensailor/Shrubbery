@@ -11,7 +11,7 @@ class Pond™: Hopes {
         
         var a: Result<Int, Error> = .failure("😱")
         
-        pond.flow(of: "a", 2, "c").sink{ a = $0 }.store(in: &bag)
+        pond.flow(of: "a", 2, "c").map().sink{ a = $0 }.store(in: &bag)
         
         hope(db.count.subscriptions) == 1
         hope.throws(try a.get())
@@ -42,7 +42,7 @@ class Pond™: Hopes {
             @Published var store: JSON = .init()
             let depth = 1
             
-            func gush(of route: JSON.Route) -> Flow<JSON> {
+            func gush(of route: JSON.Route) -> AnyFlow {
                 $store.flow(of: route)
             }
             
@@ -109,7 +109,7 @@ class Pond™: Hopes {
         
         let pond = Pond(geyser: Database())
 
-        try pond.geyser.store.set(1, "two", 3, to: ["a": 0, "b": 0])
+        pond.geyser.store.set(1, "two", 3, to: ["a": 0, "b": 0])
 
         pond.flow(of: 1, "two", 3, "a").sink{ a = $0 }.store(in: &bag)
         pond.flow(of: 1, "two", 3, "b").sink{ b = $0 }.store(in: &bag)
@@ -163,7 +163,7 @@ class Pond™: Hopes {
         let json: DeltaJSON = .init()
         
         for route in Set(routes.compactMap(\.first)) {
-            pond.flow(of: route, as: JSON.self).sink{ result in
+            pond.flow(of: route).sink{ result in
                 try? json.set(route, to: result.get())
             }.store(in: &bag)
         }
@@ -199,16 +199,15 @@ extension Pond™ {
         let depth: Int
         
         private(set) var count = (
-            subscriptions: 0,
-            ()
+            subscriptions: 0, ()
         )
         
         public init(depth: Int = 1) {
             self.depth = depth
         }
         
-        func gush(of route: JSON.Route) -> Flow<JSON> {
-            store.flow(of: route, as: JSON.self)
+        func gush(of route: JSON.Route) -> AnyFlow {
+            store.flow(of: route)
                 .handleEvents(
                     receiveSubscription: { _ in self.count.subscriptions += 1 },
                     receiveCancel: { self.count.subscriptions -= 1 }

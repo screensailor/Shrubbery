@@ -28,16 +28,16 @@ public class Pond<Source>: Delta where Source: Geyser {
         self.subscriptions = subscriptions
     }
     
-    public func flow<A>(of route: Route, as: A.Type) -> Flow<A> {
+    public func flow(of route: Route) -> AnyFlow {
         do {
             let source = try geyser.source(of: route)
-            return flow(of: route, from: source, as: A.self)
+            return flow(of: route, from: source)
         } catch {
             return error.flow()
         }
     }
 
-    private func flow<A>(of route: Route, from source: Route, as: A.Type) -> Flow<A> {
+    private func flow(of route: Route, from source: Route) -> AnyFlow {
 
         let o: (didSink: Subject, cancel: (Int) -> ()) = basin.sync {
 

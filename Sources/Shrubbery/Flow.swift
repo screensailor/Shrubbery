@@ -4,6 +4,21 @@ public typealias Flow<A> = AnyPublisher<Result<A, Error>, Never>
 
 public typealias AnyFlow = Flow<Any?>
 
+extension AnyFlow {
+    
+    public func map<A>(_: A.Type = A.self) -> Flow<A> {
+        map{ o in
+            Result { () throws -> A in
+                guard let r = try o.get() as? A else {
+                    throw "\(type(of: o)) is not an \(A.self)"
+                }
+                return r
+            }
+        }
+        .eraseToAnyPublisher()
+    }
+}
+
 extension Publisher {
     
     public func flow() -> Flow<Output> {

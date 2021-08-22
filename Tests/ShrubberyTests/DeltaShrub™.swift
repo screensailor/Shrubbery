@@ -39,7 +39,7 @@ class DeltaShrub™: Hopes {
 
         let delta = DeltaJSON()
         
-        try delta.set(1, "two", 3, to: ["a": 4, "b": 4])
+        delta.set(1, "two", 3, to: ["a": 4, "b": 4])
 
         delta.flow(of: 1, "two", 3, "a").sink{ a = $0 }.store(in: &bag)
         delta.flow(of: 1, "two", 3, "b").sink{ b = $0 }.store(in: &bag)
@@ -58,7 +58,7 @@ class DeltaShrub™: Hopes {
         hope(count.a) == 1
         hope(count.b) == 2
 
-        try delta.set(1, "two", 3, to: ["a": 4, "b": 4])
+        delta.set(1, "two", 3, to: ["a": 4, "b": 4])
 
         hope(a) == 4
         hope(b) == 4
@@ -84,7 +84,7 @@ class DeltaShrub™: Hopes {
 
         let delta = DeltaJSON()
         
-        try delta.set(1, "two", 3, to: ["a": 0, "b": 0])
+        delta.set(1, "two", 3, to: ["a": 0, "b": 0])
 
         delta.flow(of: 1, "two", 3, "a").sink{ a = $0 }.store(in: &bag)
         delta.flow(of: 1, "two", 3, "b").sink{ b = $0 }.store(in: &bag)
@@ -131,11 +131,11 @@ class DeltaShrub™: Hopes {
 
         let delta = DeltaJSON()
         
-        try delta.set(1, "two", 3, to: ["four": UnEq(x: 4)])
+        delta.set(1, "two", 3, to: ["four": UnEq(x: 4)])
 
         delta.flow(of: 1, "two", 3, "four").sink{ a = $0 }.store(in: &bag)
         
-        try delta.set(1, "two", 3, to: ["four": UnEq(x: 4)])
+        delta.set(1, "two", 3, to: ["four": UnEq(x: 4)])
 
         hope(try a.get().x) == 4
         
@@ -151,7 +151,7 @@ class DeltaShrub™: Hopes {
 
         let delta = DeltaJSON()
 
-        try delta.set(1, "two", 3, to: ["a": 0, "b": 0])
+        delta.set(1, "two", 3, to: ["a": 0, "b": 0])
 
         delta.flow(of: 1, "two", 3, "a").sink{ a = $0 }.store(in: &bag)
         delta.flow(of: 1, "two", 3, "b").sink{ b = $0 }.store(in: &bag)
@@ -217,8 +217,8 @@ class DeltaShrub™: Hopes {
         
         let json: DeltaJSON = .init()
         
-        var result_a: Result<JSON, Error> = .failure("😱".error())
-        var result_b: Result<JSON, Error> = .failure("😱".error())
+        var result_a: Result<Any?, Error> = .failure("😱".error())
+        var result_b: Result<Any?, Error> = .failure("😱".error())
 
         json.flow(of: "a").sink{ result_a = $0 }.store(in: &bag)
         json.flow(of: "a", "b").sink{ result_b = $0 }.store(in: &bag)
@@ -226,16 +226,16 @@ class DeltaShrub™: Hopes {
         
         try json.set("a", "b", "c", to: 1)
         try json.set("a", "B", "C", to: 2)
-        hope(try result_a.get().get()) == ["b": ["c": 1], "B": ["C": 2]]
-        hope(try result_b.get().get()) == ["c": 1]
+        hope(try result_a.get()) == ["b": ["c": 1], "B": ["C": 2]]
+        hope(try result_b.get()) == ["c": 1]
 
         json.delete("a", "b")
-        hope(try result_a.get().get()) == ["B": ["C": 2]]
+        hope(try result_a.get()) == ["B": ["C": 2]]
         hope.throws(try result_b.get())
 
         try json.set("a", to: ["b": ["c": 2]])
-        hope(try result_a.get().get()) ==  ["b": ["c": 2]]
-        hope(try result_b.get().get()) ==  ["c": 2]
+        hope(try result_a.get()) ==  ["b": ["c": 2]]
+        hope(try result_b.get()) ==  ["c": 2]
     }
 
     func test_thousand_subscriptions() throws {

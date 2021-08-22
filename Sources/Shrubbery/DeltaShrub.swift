@@ -3,7 +3,7 @@ import Foundation
 public class DeltaShrub<Key>: Delta /* TODO:❗️, Shrubbery */ where Key: Hashable {
     
     public typealias Fork = Shrub<Key>.Fork
-    public typealias Subject = PassthroughSubject<Result<Shrub<Key>, Error>, Never>
+    public typealias Subject = PassthroughSubject<Result<Any?, Error>, Never>
     
     public private(set) var shrub: Shrub<Key>
     private var subscriptions: Tree<Fork, Subject>
@@ -32,12 +32,10 @@ public class DeltaShrub<Key>: Delta /* TODO:❗️, Shrubbery */ where Key: Hash
 
     // MARK: delta flow
 
-    public func flow<A>(of route: Route, as: A.Type = A.self) -> Flow<A> {
+    public func flow(of route: Route) -> AnyFlow {
         sync{
             Just(Result{ try shrub.get(route) }).merge(
-                with: subscriptions[value: route, inserting: Subject()].map{ o in
-                    Result{ try o.get().as(A.self) }
-                }
+                with: subscriptions[value: route, inserting: Subject()]
             )
             .eraseToAnyPublisher()
         }
@@ -117,7 +115,7 @@ public class DeltaShrub<Key>: Delta /* TODO:❗️, Shrubbery */ where Key: Hash
             for route in route.lineage.reversed() {
                 subscriptions[route]?.value?.send(Result{ try shrub.get(route) })
             }
-            let error: Result<Shrub<Key>, Error> = .failure(error ?? "Route '\(route)' has been deleted")
+            let error: Result<Any?, Error> = .failure(error ?? "Route '\(route)' has been deleted")
             subscriptions[route]?.traverse{ subroute, subject in
                 subject?.send(error)
             }
