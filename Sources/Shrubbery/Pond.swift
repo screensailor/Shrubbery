@@ -57,12 +57,8 @@ public class Pond<Source>: Delta where Source: Geyser {
                     cancel: cancel,
                     didSink: didSink,
                     cancellable: geyser.gush(of: source).sink{ [weak didSink] result in
-                        do {
-                            try self.basin.set(source, to: result)
-                            didSink?.send(true)
-                        } catch {
-                            // TODO:❗️
-                        }
+                        self.basin.set(source, to: result)
+                        didSink?.send(true)
                     }
                 )
                 return (didSink, cancel)

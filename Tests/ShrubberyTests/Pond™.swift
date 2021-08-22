@@ -16,7 +16,7 @@ class Pond™: Hopes {
         hope(db.count.subscriptions) == 1
         hope.throws(try a.get())
         
-        try db.store.set("a", 2, "c", to: 2)
+        db.store.set("a", 2, "c", to: 2)
         hope(db.count.subscriptions) == 1
         hope(a) == 2
         
@@ -61,7 +61,7 @@ class Pond™: Hopes {
         
         let pond = Pond(geyser: Database())
 
-        try pond.geyser.store.set(1, "two", 3, to: ["a": 0, "b": 0])
+        pond.geyser.store.set(1, "two", 3, to: ["a": 0, "b": 0])
 
         pond.flow(of: 1, "two", 3, "a").sink{ a = $0 }.store(in: &bag)
         pond.flow(of: 1, "two", 3, "b").sink{ b = $0 }.store(in: &bag)
@@ -71,28 +71,28 @@ class Pond™: Hopes {
         hope(count.a) == 1
         hope(count.b) == 1
 
-        try pond.geyser.store.set(1, "two", 3, "a", to: 1)
+        pond.geyser.store.set(1, "two", 3, "a", to: 1)
 
         hope(a) == 1
         hope(b) == 0
         hope(count.a) == 2
         hope(count.b) == 1
 
-        try pond.geyser.store.set(1, "two", 3, "a", to: 2)
+        pond.geyser.store.set(1, "two", 3, "a", to: 2)
 
         hope(a) == 2
         hope(b) == 0
         hope(count.a) == 3
         hope(count.b) == 1
 
-        try pond.geyser.store.set(1, "two", 3, "a", to: 3)
+        pond.geyser.store.set(1, "two", 3, "a", to: 3)
 
         hope(a) == 3
         hope(b) == 0
         hope(count.a) == 4
         hope(count.b) == 1
 
-        try pond.geyser.store.set(1, "two", 3, "b", to: 3)
+        pond.geyser.store.set(1, "two", 3, "b", to: 3)
 
         hope(a) == 3
         hope(b) == 3
@@ -119,28 +119,28 @@ class Pond™: Hopes {
         hope(count.a) == 1
         hope(count.b) == 1
 
-        try pond.geyser.store.set(1, "two", 3, "a", to: 1)
+        pond.geyser.store.set(1, "two", 3, "a", to: 1)
 
         hope(a) == 1
         hope(b) == 0
         hope(count.a) == 2
         hope(count.b) == 1
 
-        try pond.geyser.store.set(1, "two", 3, "a", to: 2)
+        pond.geyser.store.set(1, "two", 3, "a", to: 2)
 
         hope(a) == 2
         hope(b) == 0
         hope(count.a) == 3
         hope(count.b) == 1
 
-        try pond.geyser.store.set(1, "two", 3, "a", to: 3)
+        pond.geyser.store.set(1, "two", 3, "a", to: 3)
 
         hope(a) == 3
         hope(b) == 0
         hope(count.a) == 4
         hope(count.b) == 1
 
-        try pond.geyser.store.set(1, "two", 3, "b", to: 3)
+        pond.geyser.store.set(1, "two", 3, "b", to: 3)
 
         hope(a) == 3
         hope(b) == 3
@@ -177,7 +177,7 @@ class Pond™: Hopes {
         for (i, route) in routes.enumerated() {
             g.enter()
             q[i % q.count].asyncAfter(deadline: .now() + .random(in: 0...0.01)) {
-                try! pond.geyser.store.set(route, to: i)
+                pond.geyser.store.set(route, to: i)
                 g.leave()
             }
         }

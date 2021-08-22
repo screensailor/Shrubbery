@@ -43,14 +43,14 @@ extension Shrubbery where Self: Droplet, Self.Key == String {
         try map(route)
     }
     
-    @inlinable public mutating func set(_ route: Route, to: Any?) throws {
+    @inlinable public mutating func set(_ route: Route, to: Any?) {
         var o = try? get()
-        try Shrub<String>.set(route, in: &o, to: to)
+        Shrub<String>.set(route, in: &o, to: to)
         self = Self(o)
     }
     
     @inlinable public mutating func delete(_ route: Route) {
-        _ = try? set(route, to: nil)
+        set(route, to: nil)
     }
 }
 

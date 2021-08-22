@@ -17,6 +17,19 @@
 				</dict>
 			</dict>
 		</dict>
+		<key>Shrub™</key>
+		<dict>
+			<key>test_traverse_and_debugDescription()</key>
+			<dict>
+				<key>com.apple.XCTPerformanceMetric_WallClockTime</key>
+				<dict>
+					<key>baselineAverage</key>
+					<real>0.0021404</real>
+					<key>baselineIntegrationDisplayName</key>
+					<string>Local Baseline</string>
+				</dict>
+			</dict>
+		</dict>
 	</dict>
 </dict>
 </plist>

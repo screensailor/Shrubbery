@@ -7,8 +7,6 @@ public protocol Delta: Routed {
     func flow(of: Route) -> DeltaFlow
 }
 
-public protocol Flows: Publisher where Output: Droplet, Failure == Never {}
-
 extension Delta {
 
     @inlinable public func flow(of route: Fork...) -> DeltaFlow {
@@ -46,22 +44,20 @@ extension Delta {
 }
 
 extension Delta { // TODO: should these ↓ really be default where A: Equatable
-    
-    public typealias WithoutDuplicatesFlowOf<A> = Publishers.RemoveDuplicates<Publishers.Map<DeltaFlow, Result<A, Error>>>
 
-    @inlinable func flow<A: Equatable>(of  route: Route, as: A.Type) -> WithoutDuplicatesFlowOf<A> {
+    @inlinable func flow<A: Equatable>(of  route: Route, as: A.Type) -> Publishers.RemoveDuplicates<FlowOf<A>> {
         flow(of: route).cast(to: A.self).removeDuplicates()
     }
 
-    @inlinable public func flow<A: Equatable>(of route: Fork..., as: A.Type = A.self) -> WithoutDuplicatesFlowOf<A> {
+    @inlinable public func flow<A: Equatable>(of route: Fork..., as: A.Type = A.self) -> Publishers.RemoveDuplicates<FlowOf<A>> {
         flow(of: Route(route)).cast(to: A.self).removeDuplicates()
     }
 
-    @inlinable public subscript<A: Equatable>(route: Fork..., as _: A.Type = A.self) -> WithoutDuplicatesFlowOf<A> {
+    @inlinable public subscript<A: Equatable>(route: Fork..., as _: A.Type = A.self) -> Publishers.RemoveDuplicates<FlowOf<A>> {
         flow(of: Route(route)).cast(to: A.self).removeDuplicates()
     }
 
-    @inlinable public subscript<A: Equatable>(route: Route, as _: A.Type = A.self) -> WithoutDuplicatesFlowOf<A> {
+    @inlinable public subscript<A: Equatable>(route: Route, as _: A.Type = A.self) -> Publishers.RemoveDuplicates<FlowOf<A>> {
         flow(of: route).cast(to: A.self).removeDuplicates()
     }
 }

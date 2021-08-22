@@ -13,11 +13,9 @@ where
 {
     func get(_ route: Route) throws -> Self
     
-    mutating
-    func set(_ route: Route, to: Any?) throws
+    mutating func set(_ route: Route, to: Any?)
 
-    mutating
-    func delete(_ route: Route)
+    mutating func delete(_ route: Route)
 }
 
 // MARK: views
@@ -82,7 +80,7 @@ extension Shrubbery {
             (try? get(route)) ?? nil
         }
         set {
-            _ = try? set(route.array, to: newValue.unwrapped)
+            set(route.array, to: newValue.unwrapped)
         }
     }
 }
@@ -151,7 +149,7 @@ extension Shrubbery {
             try? get(route.array, as: A.self)
         }
         set {
-        _ = try? set(route.array, to: newValue)
+            set(route.array, to: newValue)
         }
     }
 }
@@ -189,36 +187,33 @@ extension Shrubbery {
 
 extension Shrubbery {
 
-    public mutating func set<A>(_ route: Key, rest: Key..., to value: A) throws {
-        try set([route] + rest, to: value as Any?)
+    public mutating func set<A>(_ route: Key, rest: Key..., to value: A) {
+        set([route] + rest, to: value as Any?)
     }
     
-    public mutating func set<A, Route>(_ route: Route, to value: A) throws
-    where
+    public mutating func set<A, Route>(_ route: Route, to value: A) where
         Route: Collection,
         Route.Element == Key
     {
-        try set(route.array, to: value)
+        set(route.map{ ^$0 }, to: value)
     }
 
-    public mutating func set<A>(_ route: Fork..., to value: A) throws {
-        try set(route, to: value as Any?)
+    public mutating func set<A>(_ route: Fork..., to value: A) {
+        set(route, to: value as Any?)
     }
     
-    public mutating func set<A, Route>(_ route: Route, to value: A) throws
-    where
+    public mutating func set<A, Route>(_ route: Route, to value: A) where
         Route: Collection,
         Route.Element == Fork
     {
-        try set(route.array, to: value as Any?)
+        set(route.array, to: value as Any?)
     }
 
     @inlinable public mutating func delete() {
         delete([])
     }
 
-    public mutating func delete<Route>(_ route: Route)
-    where
+    public mutating func delete<Route>(_ route: Route) where
         Route: Collection,
         Route.Element == Fork
     {
@@ -247,7 +242,7 @@ extension Shrubbery {
                 }
                 var o = Self(try? get(i))
                 o.merge(Self(other))
-                try! set(i, to: o)
+                set(i, to: o)
             }
 
         case let other as [Key: Any]:
@@ -263,11 +258,11 @@ extension Shrubbery {
                 }
                 var o = Self(try? get(key))
                 o.merge(Self(other))
-                try! set(key, to: o)
+                set(key, to: o)
             }
 
         case let other?:
-            try! self.set(to: other)
+            self.set(to: other)
 
         case nil:
             self.delete()

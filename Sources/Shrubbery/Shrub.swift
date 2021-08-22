@@ -2,22 +2,22 @@ public struct Shrub<Key>: Shrubbery where Key: Hashable {
 
     public private(set) var unwrapped: Any?
     
-    public init(_ unwrapped: Any? = nil) { try! set([], to: unwrapped) }
+    public init(_ unwrapped: Any? = nil) { set([], to: unwrapped) }
 
     @inlinable public func get(_ route: Route) throws -> Self {
         try Self(Self.get(route, in: self.unwrapped))
     }
 
-    public mutating func set(_ route: Route, to value: Any?) throws {
-        try Self.set(route, in: &unwrapped, to: value)
+    public mutating func set(_ route: Route, to value: Any?) {
+        Self.set(route, in: &unwrapped, to: value)
     }
 
     public mutating func delete(_ route: Route) {
-        try! Self.set(route, in: &unwrapped, to: nil)
+        Self.set(route, in: &unwrapped, to: nil)
     }
 
     public mutating func delete() {
-        try! Self.set(in: &unwrapped, to: nil)
+        Self.set(in: &unwrapped, to: nil)
     }
 }
 
@@ -72,12 +72,11 @@ extension Shrub {
     
     public static var none: Any { Optional<Value>.none as Any }
 
-    public static func set(_ route: Fork..., in any: inout Any?, to value: Any?) throws {
-        try set(route, in: &any, to: value)
+    public static func set(_ route: Fork..., in any: inout Any?, to value: Any?) {
+        set(route, in: &any, to: value)
     }
 
-    public static func set<Route>(_ route: Route, in any: inout Any?, to value: Any?) throws
-    where
+    public static func set<Route>(_ route: Route, in any: inout Any?, to value: Any?) where
         Route: Collection,
         Route.Element == Fork
     {
@@ -91,13 +90,14 @@ extension Shrub {
         switch index.value
         {
         case .a(let int):
-            guard int >= 0 else { // TODO: allow relative indexing
-                throw "Fork in route \(route) is negative"
+            guard int >= 0 else {
+                // TODO: allow relative indexing
+                return
             }
             var array = any as? [Any] ?? []
             array.append(contentsOf: repeatElement(none, count: max(0, int - array.endIndex + 1)))
             var o: Any? = array[int]
-            try Self.set(route.dropFirst(), in: &o, to: value)
+            Self.set(route.dropFirst(), in: &o, to: value)
             array[int] = o as Any
             for e in array.reversed() {
                 guard isNilAfterFlattening(e) else { break }
@@ -108,7 +108,7 @@ extension Shrub {
         case .b(let key):
             var dictionary = any as? [Key: Any] ?? [:]
             var o: Any? = dictionary[key] ?? []
-            try Self.set(route.dropFirst(), in: &o, to: value)
+            Self.set(route.dropFirst(), in: &o, to: value)
             dictionary[key] = o
             any = dictionary.isEmpty ? none : dictionary
         }

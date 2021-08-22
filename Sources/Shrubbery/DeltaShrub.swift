@@ -1,6 +1,6 @@
 import Foundation
 
-public class DeltaShrub<Key>: Delta /* TODO:❗️, Shrubbery */ where Key: Hashable {
+public class DeltaShrub<Key>: Delta where Key: Hashable {
     
     public typealias Subject = PassthroughSubject<Result<Any?, Error>, Never>
     
@@ -60,17 +60,17 @@ public class DeltaShrub<Key>: Delta /* TODO:❗️, Shrubbery */ where Key: Hash
         set([], to: .success(unwrapped))
     }
 
-    public func set<A>(_ route: Fork..., to value: A) throws {
-        try set(route, to: value)
+    public func set<A>(_ route: Fork..., to value: A) {
+        set(route, to: value)
     }
 
-    public func set<A, Route>(_ route: Route, to value: A) throws
+    public func set<A, Route>(_ route: Route, to value: A)
     where
         Route: Collection,
         Route.Element == Fork
     {
-        try sync{
-            try shrub.set(route, to: value)
+        sync{
+            shrub.set(route, to: value)
             for route in route.lineage.reversed() {
                 subscriptions[route]?.value?.send(Result{ try shrub.get(route) })
             }
@@ -152,27 +152,23 @@ extension DeltaShrub {
 
         fileprivate init() {}
 
-        public override func set<A, Route>(_ route: Route, to value: A) throws
-        where
-            Route: Collection,
-            Route.Element == Fork
-        {
-            try sync{
-                try super.set(route, to: value)
-                routes.insert(route.array)
-            }
-        }
-
-        public override func delete<Route>(_ route: Route, because error: Error? = nil)
-        where
+        public override func set<A, Route>(_ route: Route, to value: A) where
             Route: Collection,
             Route.Element == Fork
         {
             sync{
-                do {
-                    try super.set(route, to: Sentinel.deletion)
-                    routes.insert(route.array)
-                } catch {}
+                super.set(route, to: value)
+                routes.insert(route.array)
+            }
+        }
+
+        public override func delete<Route>(_ route: Route, because error: Error? = nil)  where
+            Route: Collection,
+            Route.Element == Fork
+        {
+            sync{
+                super.set(route, to: Sentinel.deletion)
+                routes.insert(route.array)
             }
         }
     }

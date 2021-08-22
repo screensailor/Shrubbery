@@ -8,7 +8,7 @@ class DeltaShrub™: Hopes {
         
         var delta = DeltaJSON()
         
-        try delta.set(1, "two", 3, to: 4)
+        delta.set(1, "two", 3, to: 4)
         
         hope(try delta.get(1, "two", 3)) == 4
 
@@ -18,11 +18,11 @@ class DeltaShrub™: Hopes {
 
         hope(try result.map{ try $0.get() }) == Array(repeating: 4, count: result.count)
 
-        try delta.set(1, "two", 3, to: 5)
+        delta.set(1, "two", 3, to: 5)
 
         hope(try result.map{ try $0.get() }) == Array(repeating: 5, count: result.count)
 
-        try delta.set(1, "two", 3, to: 6)
+        delta.set(1, "two", 3, to: 6)
 
         hope(try result.map{ try $0.get() }) == Array(repeating: 6, count: result.count)
 
@@ -50,7 +50,7 @@ class DeltaShrub™: Hopes {
         hope(count.a) == 1
         hope(count.b) == 1
 
-        try delta.set(1, "two", 3, "b", to: 5)
+        delta.set(1, "two", 3, "b", to: 5)
 
         hope(a) == 4
         hope(b) == 5
@@ -94,25 +94,25 @@ class DeltaShrub™: Hopes {
         hope(count.a) == 1
         hope(count.b) == 1
 
-        try delta.set(1, "two", 3, "a", to: 1)
+        delta.set(1, "two", 3, "a", to: 1)
         hope(a) == 1
         hope(b) == 0
         hope(count.a) == 2
         hope(count.b) == 1
 
-        try delta.set(1, "two", 3, "a", to: 2)
+        delta.set(1, "two", 3, "a", to: 2)
         hope(a) == 2
         hope(b) == 0
         hope(count.a) == 3
         hope(count.b) == 1
 
-        try delta.set(1, "two", 3, "a", to: 3)
+        delta.set(1, "two", 3, "a", to: 3)
         hope(a) == 3
         hope(b) == 0
         hope(count.a) == 4
         hope(count.b) == 1
 
-        try delta.set(1, "two", 3, "b", to: 3)
+        delta.set(1, "two", 3, "b", to: 3)
         hope(a) == 3
         hope(b) == 3
         hope(count.a) == 4
@@ -163,10 +163,10 @@ class DeltaShrub™: Hopes {
         hope(count.a) == 1
         hope(count.b) == 1
 
-        try transaction.set(1, "two", 3, "a", to: 1)
-        try transaction.set(1, "two", 3, "a", to: 2)
-        try transaction.set(1, "two", 3, "a", to: 3)
-        try transaction.set(1, "two", 3, "b", to: 3)
+        transaction.set(1, "two", 3, "a", to: 1)
+        transaction.set(1, "two", 3, "a", to: 2)
+        transaction.set(1, "two", 3, "a", to: 3)
+        transaction.set(1, "two", 3, "b", to: 3)
 
         hope(a) == 0
         hope(b) == 0
@@ -203,13 +203,13 @@ class DeltaShrub™: Hopes {
         json.flow(of: "a", "b", "c").sink{ result = $0 }.store(in: &bag)
         hope.throws(try result.get())
         
-        try json.set("a", "b", "c", to: 1)
+        json.set("a", "b", "c", to: 1)
         hope(result) == 1
         
         json.delete("a", "b")
         hope.throws(try result.get())
 
-        try json.set("a", to: ["b": ["c": 2]])
+        json.set("a", to: ["b": ["c": 2]])
         hope(result) == 2
     }
     
@@ -224,8 +224,8 @@ class DeltaShrub™: Hopes {
         json.flow(of: "a", "b").sink{ result_b = $0 }.store(in: &bag)
         hope.throws(try result_a.get())
         
-        try json.set("a", "b", "c", to: 1)
-        try json.set("a", "B", "C", to: 2)
+        json.set("a", "b", "c", to: 1)
+        json.set("a", "B", "C", to: 2)
         hope(try result_a.get()) == ["b": ["c": 1], "B": ["C": 2]]
         hope(try result_b.get()) == ["c": 1]
 
@@ -233,7 +233,7 @@ class DeltaShrub™: Hopes {
         hope(try result_a.get()) == ["B": ["C": 2]]
         hope.throws(try result_b.get())
 
-        try json.set("a", to: ["b": ["c": 2]])
+        json.set("a", to: ["b": ["c": 2]])
         hope(try result_a.get()) ==  ["b": ["c": 2]]
         hope(try result_b.get()) ==  ["c": 2]
     }
@@ -259,7 +259,7 @@ class DeltaShrub™: Hopes {
         }
         
         for (i, route) in routes.enumerated() {
-            try json1.set(route, to: i)
+            json1.set(route, to: i)
         }
 
         hope(json2.debugDescription) == json1.debugDescription
@@ -295,7 +295,7 @@ class DeltaShrub™: Hopes {
         for (i, route) in routes.enumerated() {
             g.enter()
             q[i % q.count].asyncAfter(deadline: .now() + .random(in: 0...0.01)) {
-                try? json1.set(route, to: i)
+                json1.set(route, to: i)
                 g.leave()
             }
         }

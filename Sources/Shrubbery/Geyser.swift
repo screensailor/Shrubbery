@@ -1,9 +1,9 @@
 public protocol Geyser: Routed {
     
-    associatedtype Gush: Publisher where
-        Gush.Output: Droplet,
-        Gush.Failure == Never
+    associatedtype GeyserFlow: Publisher where
+        GeyserFlow.Output: Droplet,
+        GeyserFlow.Failure == Never
 
-    func source(of: Route) throws -> Route // TODO:❗️-> AnyPublisher<Route, Error>
-    func gush(of: Route) -> Gush
+    func source(of: Route) throws -> Route // TODO:❗️Publisher
+    func gush(of: Route) -> GeyserFlow
 }
