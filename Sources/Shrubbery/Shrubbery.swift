@@ -7,7 +7,7 @@ public protocol Shrubbery:
     CustomDebugStringConvertible
 where
     Key: Hashable,
-    Value == Any
+    Value == Any?
 {
     typealias Fork = EitherType<Int, Key>
     typealias Route = [Fork]
@@ -280,11 +280,11 @@ extension Shrubbery {
 
 extension Shrubbery {
 
-    public init(arrayLiteral elements: Any...) {
+    public init(arrayLiteral elements: Any?...) {
         self.init(elements)
     }
     
-    public init(dictionaryLiteral elements: (Key, Any)...) {
+    public init(dictionaryLiteral elements: (Key, Any?)...) {
         self.init(Dictionary(elements){ _, last in last })
     }
 }
