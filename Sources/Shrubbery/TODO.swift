@@ -8,7 +8,7 @@
  *      - Hedge<Key, Value>
  *      - Pond
  * - unflow everything?, keep .flow() as just an operator?
- * - - Result<Any?, Error>: Shrubbery
+ * - Droplet: Shrubbery where Value == Any?
  * - Datum<Key, Value, Context> instead of Result<Value, Error>
  * - events vs? streams - i.e. events as streams of () or of Event value?
  * - subscribing vs observing
