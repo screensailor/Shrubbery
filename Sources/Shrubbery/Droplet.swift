@@ -109,7 +109,9 @@ extension Result: Droplet, CustomStringConvertible where Failure == Error {
     @inlinable public var isError: Bool { if case .failure = self { return true } else { return false } }
 }
 
-extension Result:
+public typealias AnyResult = Result<Any?, Error>
+
+extension AnyResult:
     Routed,
     Shrubbery,
     AnyWrapper,
@@ -117,7 +119,6 @@ extension Result:
     ExpressibleByArrayLiteral,
     ExpressibleByDictionaryLiteral,
     CustomDebugStringConvertible
-where Success == Any?, Failure == Error {
-    
+{
     public typealias Key = String
 }
