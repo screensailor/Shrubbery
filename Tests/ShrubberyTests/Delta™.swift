@@ -8,7 +8,7 @@ class Delta™: Hopes {
         
         var result: Result<Int, Error> = .failure("😱")
 
-        $json["one", 2, "three"].sink{ result = $0 }.store(in: &bag)
+        $json.flow("one", 2, "three").sink{ result = $0 }.store(in: &bag)
 
         json["one", 2, "three"] = 4
 
@@ -21,7 +21,7 @@ class Delta™: Hopes {
         
         var result: Result<Int, Error> = .failure("😱")
         
-        json["one", 2, "three"].sink{ result = $0 }.store(in: &bag)
+        json.flow("one", 2, "three").sink{ result = $0 }.store(in: &bag)
         
         json.value["one", 2, "three"] = 4
         
