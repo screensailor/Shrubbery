@@ -6,7 +6,7 @@ public class DeltaShrub<Key>: Delta where Key: Hashable {
     
     public private(set) var shrub: Shrub<Key>
     private var subscriptions: Tree<Fork, Subject>
-    private let lock = NSRecursiveLock()
+    private let lock = Lock()
 
     public init(
         drop: Shrub<Key> = nil,
@@ -14,7 +14,6 @@ public class DeltaShrub<Key>: Delta where Key: Hashable {
     ) {
         self.shrub = drop
         self.subscriptions = subscriptions
-        self.lock.name = "Shrubbery.DeltaShrub.lock"
     }
 
     public convenience init(_ unwrapped: Any) {
@@ -124,15 +123,15 @@ public class DeltaShrub<Key>: Delta where Key: Hashable {
 
 extension DeltaShrub {
 
-    public func transaction() -> Transaction {
-        Transaction()
+    public func batch() -> Batch {
+        Batch()
     }
 
-    public func apply(_ transaction: Transaction) {
+    public func apply(_ batch: Batch) {
         sync {
-            shrub.merge(transaction.shrub)
+            shrub.merge(batch.shrub)
             var routes: [[Fork]: Subject] = [:]
-            for route in transaction.routes {
+            for route in batch.routes {
                 for route in route.lineage.reversed() {
                     routes[route.array] = subscriptions[route]?.value
                 }
@@ -146,7 +145,7 @@ extension DeltaShrub {
         }
     }
 
-    public class Transaction: DeltaShrub {
+    public class Batch: DeltaShrub {
 
         fileprivate var routes: Set<[Fork]> = []
 

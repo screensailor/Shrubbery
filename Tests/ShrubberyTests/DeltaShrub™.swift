@@ -142,7 +142,7 @@ class DeltaShrub™: Hopes {
         hope(count) == 2
     }
 
-    func test_transaction() throws {
+    func test_batch() throws {
 
         var count = (a: 0, b: 0)
 
@@ -156,35 +156,35 @@ class DeltaShrub™: Hopes {
         delta.flow(1, "two", 3, "a").sink{ a = $0 }.store(in: &bag)
         delta.flow(1, "two", 3, "b").sink{ b = $0 }.store(in: &bag)
 
-        var transaction = delta.transaction()
+        var batch = delta.batch()
 
         hope(a) == 0
         hope(b) == 0
         hope(count.a) == 1
         hope(count.b) == 1
 
-        transaction.set(1, "two", 3, "a", to: 1)
-        transaction.set(1, "two", 3, "a", to: 2)
-        transaction.set(1, "two", 3, "a", to: 3)
-        transaction.set(1, "two", 3, "b", to: 3)
+        batch.set(1, "two", 3, "a", to: 1)
+        batch.set(1, "two", 3, "a", to: 2)
+        batch.set(1, "two", 3, "a", to: 3)
+        batch.set(1, "two", 3, "b", to: 3)
 
         hope(a) == 0
         hope(b) == 0
         hope(count.a) == 1
         hope(count.b) == 1
 
-        delta.apply(transaction)
+        delta.apply(batch)
 
         hope(a) == 3
         hope(b) == 3
         hope(count.a) == 2
         hope(count.b) == 2
 
-        transaction = delta.transaction()
+        batch = delta.batch()
 
-        transaction.delete(1, "two", 3, "a")
+        batch.delete(1, "two", 3, "a")
 
-        delta.apply(transaction)
+        delta.apply(batch)
 
         hope.throws(try a.get())
         hope(b) == 3
