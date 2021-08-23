@@ -144,7 +144,6 @@ extension Shrubbery {
         Route: Collection,
         Route.Element == Fork
     {
-        // TODO: rethink error handling here
         get {
             try? get(route.array, as: A.self)
         }
@@ -279,7 +278,11 @@ extension Shrubbery {
     }
     
     public init(dictionaryLiteral elements: (Key, Any?)...) {
-        self.init(Dictionary(elements){ _, last in last })
+        var o: [Key: Any] = [:]
+        for (k, v) in elements {
+            o[k] = v
+        }
+        self.init(o)
     }
 }
 
@@ -379,7 +382,7 @@ extension Shrubbery where Key: Comparable {
 extension Shrubbery {
     
     public var debugDescription: String {
-        sortedDescription{ $0.sorted{ "\($0.key)" < "\($1.key)" } }
+        sortedDescription{ $0.sorted{ String(describing: $0.key) < String(describing: $1.key) } }
     }
     
     public func sortedDescription(_ sort: ([Key: Any]) -> [(Key, Any)]) -> String {

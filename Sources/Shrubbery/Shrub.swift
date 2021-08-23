@@ -98,7 +98,7 @@ extension Shrub {
             array.append(contentsOf: repeatElement(none, count: max(0, int - array.endIndex + 1)))
             var o: Any? = array[int]
             Self.set(route.dropFirst(), in: &o, to: value)
-            array[int] = o as Any
+            array[int] = o ?? none
             for e in array.reversed() {
                 guard isNilAfterFlattening(e) else { break }
                 array.removeLast()
