@@ -11,7 +11,7 @@ class Pond™: Hopes {
         
         var a: Result<Int, Error> = .failure("😱")
         
-        pond.flow(of: "a", 2, "c").sink{ a = $0 }.store(in: &bag)
+        pond.flow("a", 2, "c").sink{ a = $0 }.store(in: &bag)
         
         hope(db.count.subscriptions) == 1
         hope.throws(try a.get())
@@ -20,13 +20,13 @@ class Pond™: Hopes {
         hope(db.count.subscriptions) == 1
         hope(a) == 2
         
-        pond.flow(of: "a", 2, "c").sink{ a = $0 }.store(in: &bag)
+        pond.flow("a", 2, "c").sink{ a = $0 }.store(in: &bag)
         hope(db.count.subscriptions) == 1
         
-        pond.flow(of: "a", 2, "d").sink{ a = $0 }.store(in: &bag)
+        pond.flow("a", 2, "d").sink{ a = $0 }.store(in: &bag)
         hope(db.count.subscriptions) == 1
         
-        pond.flow(of: "b", 2, "c").sink{ a = $0 }.store(in: &bag)
+        pond.flow("b", 2, "c").sink{ a = $0 }.store(in: &bag)
         hope(db.count.subscriptions) == 2
 
         bag.removeAll()
@@ -42,8 +42,8 @@ class Pond™: Hopes {
             @Published var store: JSON = .init()
             let depth = 1
             
-            func gush(of route: JSON.Route) -> AnyFlow {
-                $store.flow(of: route).eraseToAnyPublisher()
+            func gush(_ route: JSON.Route) -> AnyFlow {
+                $store.flow(route).eraseToAnyPublisher()
             }
             
             func source(of route: JSON.Route) throws -> JSON.Route {
@@ -63,8 +63,8 @@ class Pond™: Hopes {
 
         pond.geyser.store.set(1, "two", 3, to: ["a": 0, "b": 0])
 
-        pond.flow(of: 1, "two", 3, "a").sink{ a = $0 }.store(in: &bag)
-        pond.flow(of: 1, "two", 3, "b").sink{ b = $0 }.store(in: &bag)
+        pond.flow(1, "two", 3, "a").sink{ a = $0 }.store(in: &bag)
+        pond.flow(1, "two", 3, "b").sink{ b = $0 }.store(in: &bag)
 
         hope(a) == 0
         hope(b) == 0
@@ -111,8 +111,8 @@ class Pond™: Hopes {
 
         pond.geyser.store.set(1, "two", 3, to: ["a": 0, "b": 0])
 
-        pond.flow(of: 1, "two", 3, "a").sink{ a = $0 }.store(in: &bag)
-        pond.flow(of: 1, "two", 3, "b").sink{ b = $0 }.store(in: &bag)
+        pond.flow(1, "two", 3, "a").sink{ a = $0 }.store(in: &bag)
+        pond.flow(1, "two", 3, "b").sink{ b = $0 }.store(in: &bag)
 
         hope(a) == 0
         hope(b) == 0
@@ -163,7 +163,7 @@ class Pond™: Hopes {
         let json: DeltaJSON = .init()
         
         for route in Set(routes.compactMap(\.first)) {
-            pond.flow(of: route).sink{ result in
+            pond.flow(route).sink{ result in
                 try? json.set(route, to: result.get())
             }.store(in: &bag)
         }
@@ -206,8 +206,8 @@ extension Pond™ {
             self.depth = depth
         }
         
-        func gush(of route: JSON.Route) -> AnyFlow {
-            store.flow(of: route).handleEvents(
+        func gush(_ route: JSON.Route) -> AnyFlow {
+            store.flow(route).handleEvents(
                 receiveSubscription: { _ in self.count.subscriptions += 1 },
                 receiveCancel: { self.count.subscriptions -= 1 }
             ).eraseToAnyPublisher()

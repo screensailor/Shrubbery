@@ -4,7 +4,7 @@ public typealias AnyFlow = Flow<Any?>
 
 extension Error {
     
-    public func flow<A>(of: A.Type = A.self) -> Just<Result<A, Error>> {
+    public func flow<A>(_: A.Type = A.self) -> Just<Result<A, Error>> {
         Just(Result<A, Error>.failure(self))
     }
 }

@@ -1,5 +1,3 @@
-import Dispatch
-
 public class Pond<Source>: Delta where Source: Geyser {
 
     public typealias Key = Source.Key
@@ -27,16 +25,16 @@ public class Pond<Source>: Delta where Source: Geyser {
         self.subscriptions = subscriptions
     }
     
-    public func flow(of route: Route) -> AnyFlow {
+    public func flow(_ route: Route) -> AnyFlow {
         do {
             let source = try geyser.source(of: route)
-            return flow(of: route, from: source)
+            return flow(route, from: source)
         } catch {
             return error.flow().eraseToAnyPublisher()
         }
     }
 
-    private func flow(of route: Route, from source: Route) -> AnyFlow {
+    private func flow(_ route: Route, from source: Route) -> AnyFlow {
 
         let o: (didSink: Subject, cancel: (Int) -> ()) = basin.sync {
 
@@ -56,7 +54,7 @@ public class Pond<Source>: Delta where Source: Geyser {
                 subscriptions[value: source] = Gush(
                     cancel: cancel,
                     didSink: didSink,
-                    cancellable: geyser.gush(of: source).sink{ [weak didSink] result in
+                    cancellable: geyser.gush(source).sink{ [weak didSink] result in
                         self.basin.set(source, to: result)
                         didSink?.send(true)
                     }
@@ -68,7 +66,7 @@ public class Pond<Source>: Delta where Source: Geyser {
         return o.didSink
             .first{ $0 }
             .flatMap{ _ in
-                self.basin.flow(of: route)
+                self.basin.flow(route)
             }
             .handleEvents(
                 receiveSubscription: { _ in self.basin.sync{ o.cancel(+1) } },

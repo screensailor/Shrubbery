@@ -13,7 +13,7 @@ class DeltaShrub™: Hopes {
         hope(try delta.get(1, "two", 3)) == 4
 
         for i in result.indices {
-            delta.flow(of: 1, "two", 3).sink{ result[i] = $0 }.store(in: &bag)
+            delta.flow(1, "two", 3).sink{ result[i] = $0 }.store(in: &bag)
         }
 
         hope(try result.map{ try $0.get() }) == Array(repeating: 4, count: result.count)
@@ -41,8 +41,8 @@ class DeltaShrub™: Hopes {
         
         delta.set(1, "two", 3, to: ["a": 4, "b": 4])
 
-        delta.flow(of: 1, "two", 3, "a").sink{ a = $0 }.store(in: &bag)
-        delta.flow(of: 1, "two", 3, "b").sink{ b = $0 }.store(in: &bag)
+        delta.flow(1, "two", 3, "a").sink{ a = $0 }.store(in: &bag)
+        delta.flow(1, "two", 3, "b").sink{ b = $0 }.store(in: &bag)
 
         hope(a) == 4
         hope(b) == 4
@@ -86,8 +86,8 @@ class DeltaShrub™: Hopes {
         
         delta.set(1, "two", 3, to: ["a": 0, "b": 0])
 
-        delta.flow(of: 1, "two", 3, "a").sink{ a = $0 }.store(in: &bag)
-        delta.flow(of: 1, "two", 3, "b").sink{ b = $0 }.store(in: &bag)
+        delta.flow(1, "two", 3, "a").sink{ a = $0 }.store(in: &bag)
+        delta.flow(1, "two", 3, "b").sink{ b = $0 }.store(in: &bag)
 
         hope(a) == 0
         hope(b) == 0
@@ -133,7 +133,7 @@ class DeltaShrub™: Hopes {
         
         delta.set(1, "two", 3, to: ["four": UnEq(x: 4)])
 
-        delta.flow(of: 1, "two", 3, "four").sink{ a = $0 }.store(in: &bag)
+        delta.flow(1, "two", 3, "four").sink{ a = $0 }.store(in: &bag)
         
         delta.set(1, "two", 3, to: ["four": UnEq(x: 4)])
 
@@ -153,8 +153,8 @@ class DeltaShrub™: Hopes {
 
         delta.set(1, "two", 3, to: ["a": 0, "b": 0])
 
-        delta.flow(of: 1, "two", 3, "a").sink{ a = $0 }.store(in: &bag)
-        delta.flow(of: 1, "two", 3, "b").sink{ b = $0 }.store(in: &bag)
+        delta.flow(1, "two", 3, "a").sink{ a = $0 }.store(in: &bag)
+        delta.flow(1, "two", 3, "b").sink{ b = $0 }.store(in: &bag)
 
         var transaction = delta.transaction()
 
@@ -200,7 +200,7 @@ class DeltaShrub™: Hopes {
         
         var result: Result<Int, Error> = .failure("😱".error())
         
-        json.flow(of: "a", "b", "c").sink{ result = $0 }.store(in: &bag)
+        json.flow("a", "b", "c").sink{ result = $0 }.store(in: &bag)
         hope.throws(try result.get())
         
         json.set("a", "b", "c", to: 1)
@@ -220,8 +220,8 @@ class DeltaShrub™: Hopes {
         var result_a: Result<Any?, Error> = .failure("😱".error())
         var result_b: Result<Any?, Error> = .failure("😱".error())
 
-        json.flow(of: "a").sink{ result_a = $0 }.store(in: &bag)
-        json.flow(of: "a", "b").sink{ result_b = $0 }.store(in: &bag)
+        json.flow("a").sink{ result_a = $0 }.store(in: &bag)
+        json.flow("a", "b").sink{ result_b = $0 }.store(in: &bag)
         hope.throws(try result_a.get())
         
         json.set("a", "b", "c", to: 1)
@@ -253,7 +253,7 @@ class DeltaShrub™: Hopes {
         let json2: DeltaJSON = .init()
         
         for route in routes {
-            json1.flow(of: route, as: Int.self).sink{ result in
+            json1.flow(route, as: Int.self).sink{ result in
                 try? json2.set(route, to: result.get())
             }.store(in: &bag)
         }
@@ -281,7 +281,7 @@ class DeltaShrub™: Hopes {
         let json2: DeltaJSON = .init()
         
         for route in routes {
-            json1.flow(of: route, as: Int.self).sink{ result in
+            json1.flow(route, as: Int.self).sink{ result in
                 try? json2.set(route, to: result.get())
             }.store(in: &bag)
         }

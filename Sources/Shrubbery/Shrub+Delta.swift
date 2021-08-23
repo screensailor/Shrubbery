@@ -3,7 +3,7 @@ extension Publisher where Output: Shrubbery {
     /**
      Convenience. Not as performant as `DeltaShrub`.
      */
-    public func flow(of route: Output.Route) -> Publishers.Map<Self, Result<Any?, Error>> {
+    public func flow(_ route: Output.Route) -> Publishers.Map<Self, Result<Any?, Error>> {
         map{ o in Result{ try o.get(route).unwrapped } }
     }
 }

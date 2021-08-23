@@ -31,7 +31,7 @@ public class DeltaShrub<Key>: Delta where Key: Hashable {
 
     // MARK: delta flow
 
-    public func flow(of route: Route) -> AnyFlow {
+    public func flow(_ route: Route) -> AnyFlow {
         sync {
             Just(Result{ try shrub.get(route) }).merge(
                 with: subscriptions[value: route, inserting: Subject()]
