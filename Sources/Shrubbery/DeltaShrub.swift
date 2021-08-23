@@ -145,30 +145,35 @@ extension DeltaShrub {
         }
     }
 
-    public class Batch: DeltaShrub {
+    public struct Batch: Shrubbery {
 
-        fileprivate var routes: Set<[Fork]> = []
-
-        fileprivate init() {}
-
-        public override func set<A, Route>(_ route: Route, to value: A) where
-            Route: Collection,
-            Route.Element == Fork
-        {
-            sync{
-                super.set(route, to: value)
-                routes.insert(route.array)
-            }
+        public private(set) var routes: Set<[Fork]> = []
+        public private(set) var shrub: Shrub<Key>
+        
+        public var unwrapped: Any? {
+            shrub.unwrapped
         }
 
-        public override func delete<Route>(_ route: Route, because error: Error? = nil)  where
-            Route: Collection,
-            Route.Element == Fork
-        {
-            sync{
-                super.set(route, to: Sentinel.deletion)
-                routes.insert(route.array)
-            }
+        public init(_ unwrapped: Any?) {
+            shrub = Shrub(unwrapped)
+        }
+
+        public init(_ shrub: Shrub<Key>) {
+            self.shrub = shrub
+        }
+
+        public func get(_ route: Route) throws -> Batch {
+            try Batch(shrub.get(route))
+        }
+
+        public mutating func set(_ route: Route, to value: Any?) {
+            shrub.set(route, to: value)
+            routes.insert(route)
+        }
+
+        public mutating func delete(_ route: Route) {
+            shrub.set(route, to: Sentinel.deletion)
+            routes.insert(route)
         }
     }
 }

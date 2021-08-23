@@ -185,6 +185,10 @@ extension Shrubbery {
 // MARK: set
 
 extension Shrubbery {
+    
+    public init(_ o: Self) {
+        self.init(o.unwrapped)
+    }
 
     public mutating func set<A>(_ route: Key, rest: Key..., to value: A) {
         set([route] + rest, to: value as Any?)
@@ -207,9 +211,18 @@ extension Shrubbery {
     {
         set(route.array, to: value as Any?)
     }
+}
 
+// MARK: delete
+
+extension Shrubbery {
+    
     @inlinable public mutating func delete() {
         delete([])
+    }
+    
+    @inlinable public mutating func delete(_ route: Fork...) {
+        delete(route)
     }
 
     public mutating func delete<Route>(_ route: Route) where
