@@ -11,7 +11,7 @@ extension Error {
 
 extension Publisher where
     Output: Droplet,
-    Output.Value: Equatable,
+    Output.Success: Equatable,
     Failure == Never
 {
     public func removeDuplicates() -> Publishers.RemoveDuplicates<Self> {
@@ -26,7 +26,7 @@ extension Publisher where
     Output: Droplet,
     Failure == Never
 {
-    public func map<A>(_ ƒ: @escaping (Output.Value) throws -> A) -> Publishers.Map<Self, Result<A, Error>> {
+    public func map<A>(_ ƒ: @escaping (Output.Success) throws -> A) -> Publishers.Map<Self, Result<A, Error>> {
         map { o in
             Result {
                 try ƒ(o.get())
@@ -34,7 +34,7 @@ extension Publisher where
         }
     }
     
-    public func flatMap<A, E: Error>(_ ƒ: @escaping (Output.Value)   -> Result<A, E>) -> Publishers.Map<Self, Result<A, Error>> {
+    public func flatMap<A, E: Error>(_ ƒ: @escaping (Output.Success)   -> Result<A, E>) -> Publishers.Map<Self, Result<A, Error>> {
         map { o in
             Result {
                 try ƒ(o.get()).get()

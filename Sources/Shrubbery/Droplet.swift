@@ -1,43 +1,54 @@
+public typealias ResultProtocol = Droplet
+
 public protocol Droplet: CustomStringConvertible {
     
-    associatedtype Value
+    associatedtype Success
+    associatedtype Failure: Error
     
-    static func value(_: Value) -> Self
-    static func error(_: Error) -> Self
+    static func success(_: Success) -> Self
+    static func failure(_: Failure) -> Self
     
-    var isError: Bool { get }
-    
-    func get() throws -> Value
+    var isSuccess: Bool { get }
+    var isFailure: Bool { get }
+
+    func map<NewSuccess>(_ transform: (Success) -> NewSuccess) -> Result<NewSuccess, Failure>
+    func mapError<NewFailure>(_ transform: (Failure) -> NewFailure) -> Result<Success, NewFailure> where NewFailure : Error
+    func flatMap<NewSuccess>(_ transform: (Success) -> Result<NewSuccess, Failure>) -> Result<NewSuccess, Failure>
+    func flatMapError<NewFailure>(_ transform: (Failure) -> Result<Success, NewFailure>) -> Result<Success, NewFailure> where NewFailure : Error
+    func get() throws -> Success
 }
 
 extension Droplet {
-    
+
     public var description: String {
         do { return try "\(get())" }
         catch { return "⚠️ \(error)" }
     }
+}
+
+extension Droplet where Failure == Error {
     
-    @inlinable public init(_ ƒ: @autoclosure () throws -> Value) {
-        self.init(ƒ)
+    public init(catching body: () throws -> Success) {
+        do { self = try .success(body()) }
+        catch { self = .failure(error) }
     }
-    
-    @inlinable public init(_ ƒ: () throws -> Value) {
-        do { self = try .value(ƒ()) }
-        catch { self = .error(error) }
+
+    @inlinable public init(_ ƒ: @autoclosure () throws -> Success) {
+        self.init(catching: ƒ)
     }
 }
 
-extension Shrubbery where Self: Droplet { // AnyWrapper
+extension Shrubbery where Self: Droplet, Success == Any?, Failure == Error { // AnyWrapper
     
     public var unwrapped: Any? { try? get() }
     
     public init(_ unwrapped: Any?) {
-        if let o = unwrapped { self = .value(o) }
-        else { self = .error("nil") }
+        if let o = unwrapped { self = .success(o) }
+        else { self = .failure("nil") }
     }
 }
 
-extension Shrubbery where Self: Droplet, Self.Key == String {
+extension Shrubbery where Self.Key == String, Self: Droplet, Success == Any?, Failure == Error {
 
     @inlinable public func get(_ route: Route) throws -> Self {
         try map(route)
@@ -54,10 +65,10 @@ extension Shrubbery where Self: Droplet, Self.Key == String {
     }
 }
 
-extension Shrubbery where Self: Droplet, Self.Key == String {
+extension Shrubbery where Self.Key == String, Self: Droplet, Success == Any?, Failure == Error {
 
     public func map(_ route: Route) throws -> Self {
-        try .value(
+        try .success(
             Shrub.get(route, in: get())
         )
     }
@@ -71,12 +82,21 @@ extension Shrubbery where Self: Droplet, Self.Key == String {
 
 // MARK: Result
 
-extension Result: Droplet, CustomStringConvertible where Failure == Error {
+extension Result: Droplet, CustomStringConvertible {
     
-    @inlinable public static func value(_ value: Success) -> Self { .success(value) }
-    @inlinable public static func error<E: Error>(_ error: E) -> Self { .failure(error) }
-
-    @inlinable public var isError: Bool { if case .failure = self { return true } else { return false } }
+    @inlinable public var isSuccess: Bool {
+        switch self {
+        case .failure: return false
+        case .success: return true
+        }
+    }
+    
+    @inlinable public var isFailure: Bool {
+        switch self {
+        case .failure: return true
+        case .success: return false
+        }
+    }
 }
 
 public typealias AnyResult = Result<Any?, Error>
@@ -91,4 +111,5 @@ extension AnyResult:
     CustomDebugStringConvertible
 {
     public typealias Key = String
+    public typealias ArrayLiteralElement = Any?
 }
