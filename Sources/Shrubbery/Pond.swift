@@ -25,7 +25,7 @@ public class Pond<Source>: Delta where Source: Geyser {
         self.subscriptions = subscriptions
     }
     
-    public func flow(_ route: Route) -> AnyPublisher<AnyResult, Never> {
+    public func flow(_ route: Route) -> AnyPublisher<Result<Any?, Error>, Never> {
         do {
             let source = try geyser.source(of: route)
             return flow(route, from: source)
@@ -34,7 +34,7 @@ public class Pond<Source>: Delta where Source: Geyser {
         }
     }
 
-    private func flow(_ route: Route, from source: Route) -> AnyPublisher<AnyResult, Never> {
+    private func flow(_ route: Route, from source: Route) -> AnyPublisher<Result<Any?, Error>, Never> {
 
         let o: (didSink: Subject, cancel: (Int) -> ()) = basin.sync {
 

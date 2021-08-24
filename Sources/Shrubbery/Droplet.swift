@@ -99,9 +99,7 @@ extension Result: Droplet, CustomStringConvertible {
     }
 }
 
-public typealias AnyResult = Result<Any?, Error>
-
-extension AnyResult:
+extension Result:
     Routed,
     Shrubbery,
     AnyWrapper,
@@ -109,6 +107,9 @@ extension AnyResult:
     ExpressibleByArrayLiteral,
     ExpressibleByDictionaryLiteral,
     CustomDebugStringConvertible
+where
+    Success == Any?,
+    Failure == Error
 {
     public typealias Key = String
     public typealias ArrayLiteralElement = Any?
