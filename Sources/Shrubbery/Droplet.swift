@@ -24,6 +24,10 @@ extension Droplet {
         do { return try "\(get())" }
         catch { return "⚠️ \(error)" }
     }
+    
+    public func get(default o: Success) -> Success {
+        (try? get()) ?? o
+    }
 }
 
 extension Droplet where Failure == Error {
