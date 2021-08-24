@@ -1,9 +1,5 @@
-public typealias Flow<A> = AnyPublisher<Result<A, Error>, Never>
-
-public typealias AnyFlow = Flow<Any?>
-
 extension Error {
-    
+
     public func flow<A>(_: A.Type = A.self) -> Just<Result<A, Error>> {
         Just(Result<A, Error>.failure(self))
     }
@@ -33,15 +29,15 @@ extension Publisher where
             }
         }
     }
-    
-    public func flatMap<A, E: Error>(_ ƒ: @escaping (Output.Success)   -> Result<A, E>) -> Publishers.Map<Self, Result<A, Error>> {
+
+    public func flatMap<A, E: Error>(_ ƒ: @escaping (Output.Success) -> Result<A, E>) -> Publishers.Map<Self, Result<A, Error>> {
         map { o in
             Result {
                 try ƒ(o.get()).get()
             }
         }
     }
-    
+
     public func cast<A>(to: A.Type = A.self) -> Publishers.Map<Self, Result<A, Error>> {
         map{ o in
             Result {
@@ -52,7 +48,7 @@ extension Publisher where
             }
         }
     }
-    
+
     public func decode<A, D>(type: A.Type = A.self, decoder: D) -> Publishers.Map<Self, Result<A, Error>> where
         A: Decodable,
         D: TopLevelDecoder,

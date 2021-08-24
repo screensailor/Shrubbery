@@ -42,7 +42,7 @@ class Pond™: Hopes {
             @Published var store: JSON = .init()
             let depth = 1
             
-            func gush(_ route: JSON.Route) -> AnyFlow {
+            func gush(_ route: JSON.Route) -> AnyPublisher<AnyResult, Never> {
                 $store.flow(route).eraseToAnyPublisher()
             }
             
@@ -206,7 +206,7 @@ extension Pond™ {
             self.depth = depth
         }
         
-        func gush(_ route: JSON.Route) -> AnyFlow {
+        func gush(_ route: JSON.Route) -> AnyPublisher<AnyResult, Never> {
             store.flow(route).handleEvents(
                 receiveSubscription: { _ in self.count.subscriptions += 1 },
                 receiveCancel: { self.count.subscriptions -= 1 }

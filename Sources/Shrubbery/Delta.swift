@@ -1,22 +1,22 @@
 public protocol Delta: Routed {
     
-    associatedtype DeltaFlow: Publisher where
-        DeltaFlow.Output: Droplet,
-        DeltaFlow.Failure == Never
+    associatedtype Flow: Publisher where
+        Flow.Output: Droplet,
+        Flow.Failure == Never
     
-    func flow(_ route: Route) -> DeltaFlow
+    func flow(_ route: Route) -> Flow
 }
 
 extension Delta {
 
-    @inlinable public func flow(_ route: Fork...) -> DeltaFlow {
+    @inlinable public func flow(_ route: Fork...) -> Flow {
         flow(route)
     }
 }
 
 extension Delta {
     
-    public typealias FlowAs<A> = Publishers.Map<DeltaFlow, Result<A, Error>>
+    public typealias FlowAs<A> = Publishers.Map<Flow, Result<A, Error>>
 
     @inlinable public func flow<A>(_ route: Fork..., as: A.Type = A.self) -> FlowAs<A> {
         flow(route).cast()
