@@ -56,7 +56,7 @@ public class DeltaShrub<Key>: Delta where Key: Hashable {
     // MARK: set
 
     public func reset(to unwrapped: Any? = nil) {
-        set([], to: .success(unwrapped))
+        set([], to: unwrapped)
     }
 
     public func set<A>(_ route: Fork..., to value: A) {
@@ -68,6 +68,12 @@ public class DeltaShrub<Key>: Delta where Key: Hashable {
         Route: Collection,
         Route.Element == Fork
     {
+        if let value = value as? Result<Any?, Error> { // TODO:❗️ think deeper
+            switch value {
+            case let .success(value): return set(route, to: value)
+            case let .failure(error): return delete(route, because: error)
+            }
+        }
         sync{
             shrub.set(route, to: value)
             for route in route.lineage.reversed() {
@@ -75,24 +81,6 @@ public class DeltaShrub<Key>: Delta where Key: Hashable {
             }
             subscriptions[route]?.traverse{ subroute, subject in
                 subject?.send(Result{ try shrub.get(route + subroute) })
-            }
-        }
-    }
-
-    public func set<A>(_ route: Fork..., to value: Result<A, Error>) {
-        set(route, to: value)
-    }
-
-    public func set<A, Route>(_ route: Route, to value: Result<A, Error>)
-    where
-        Route: Collection,
-        Route.Element == Fork
-    {
-        sync{
-            do {
-                try set(route, to: value.get())
-            } catch {
-                delete(route, because: error)
             }
         }
     }

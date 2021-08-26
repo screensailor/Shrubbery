@@ -21,11 +21,11 @@ public protocol Droplet: CustomStringConvertible {
 extension Droplet {
 
     public var description: String {
-        do { return try "\(get())" }
-        catch { return "⚠️ \(error)" }
+        do { return try "\(Self.self).success(\(get()))" }
+        catch { return "\(Self.self).failure(\(error))" }
     }
     
-    public func get(default o: Success) -> Success {
+    @inlinable public func get(default o: Success) -> Success {
         (try? get()) ?? o
     }
 }
