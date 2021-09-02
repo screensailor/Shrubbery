@@ -112,14 +112,19 @@ public class DeltaShrub<Key>: Delta where Key: Hashable {
 extension DeltaShrub {
 
     public func batch() -> Batch {
-        Batch()
+        nil
     }
 
     public func apply(_ batch: Batch) {
         sync {
-            shrub.merge(batch.shrub)
             var routes: [[Fork]: Subject] = [:]
-            for route in batch.routes {
+            batch.routes.traverse { route, isNewValue in
+                guard isNewValue == true else { return }
+                if let value = batch[route, as: Any?.self] {
+                    shrub[route] = value
+                } else {
+                    shrub.delete(route)
+                }
                 for route in route.lineage.reversed() {
                     routes[route.array] = subscriptions[route]?.value
                 }
@@ -133,35 +138,58 @@ extension DeltaShrub {
         }
     }
 
-    public struct Batch: Shrubbery {
+    public struct Batch {
+        
+        public typealias IsNewValue = Bool
 
-        public private(set) var routes: Set<[Fork]> = []
+        public private(set) var routes: Tree<Fork, IsNewValue>
         public private(set) var shrub: Shrub<Key>
         
-        public var unwrapped: Any? {
-            shrub.unwrapped
+        public func edits() -> [Route: Any?] {
+            var o: [Route: Any?] = [:]
+            routes.traverse { route, isNewValue in
+                guard isNewValue == true else { return }
+                o[route] = shrub[route, as: Any.self]
+            }
+            return o
         }
+    }
+}
 
-        public init(_ unwrapped: Any?) {
-            shrub = Shrub(unwrapped)
-        }
-
-        public init(_ shrub: Shrub<Key>) {
-            self.shrub = shrub
-        }
-
-        public func get(_ route: Route) throws -> Batch {
-            try Batch(shrub.get(route))
-        }
-
-        public mutating func set(_ route: Route, to value: Any?) {
+extension DeltaShrub.Batch: Shrubbery {
+    
+    public var unwrapped: Any? {
+        shrub.unwrapped
+    }
+    
+    public init(_ unwrapped: Any?) {
+        self.init(Shrub(unwrapped))
+    }
+    
+    public init(_ shrub: Shrub<Key>) {
+        self.shrub = shrub
+        routes = .init()
+    }
+    
+    public func get(_ route: Route) throws -> Self {
+        try Self(shrub.get(route))
+    }
+    
+    public mutating func set(_ route: Route, to value: Any?) {
+        if let sentinel = value as? Sentinel, sentinel == .deletion {
+            delete(route)
+        } else {
             shrub.set(route, to: value)
-            routes.insert(route)
+            if (0..<route.count).allSatisfy({ routes[route.dropFirst($0)] == nil }) {
+                routes[route] = .init(value: true, branches: [:])
+            }
         }
-
-        public mutating func delete(_ route: Route) {
-            shrub.set(route, to: Sentinel.deletion)
-            routes.insert(route)
+    }
+    
+    public mutating func delete(_ route: Route) {
+        shrub.delete(route)
+        if (0..<route.count).allSatisfy({ routes[route.dropFirst($0)] == nil }) {
+            routes[route] = .init(value: true, branches: [:])
         }
     }
 }

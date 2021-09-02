@@ -106,14 +106,14 @@ extension Tree {
 
     // TODO:❗️breadth vs. depth first
     /// Depth first traversal
-    public func traverse(yield: ((route: [Key], value: Value?)) -> ()) {
-        Self.traverse(route: [], tree: self, yield: yield)
+    public func traverse(yield: ((route: [Key], value: Value?)) throws -> ()) rethrows {
+        try Self.traverse(route: [], tree: self, yield: yield)
     }
 
-    private static func traverse(route: [Key], tree: Tree, yield: ((route: [Key], value: Value?)) -> ()) {
-        yield((route, tree.value))
+    private static func traverse(route: [Key], tree: Tree, yield: ((route: [Key], value: Value?)) throws -> ()) rethrows {
+        try yield((route, tree.value))
         for (key, tree) in tree.branches {
-            traverse(route: route + [key], tree: tree, yield: yield)
+            try traverse(route: route + [key], tree: tree, yield: yield)
         }
     }
 }
@@ -122,19 +122,19 @@ extension Tree where Key: Comparable {
 
     // TODO:❗️breadth vs. depth first
     /// Depth first traversal
-    public func traverse(sorted: Bool = false, yield: ((route: [Key], value: Value?)) -> ()) {
-        Self.traverse(sorted: sorted, route: [], tree: self, yield: yield)
+    public func traverse(sorted: Bool = false, yield: ((route: [Key], value: Value?)) throws -> ()) rethrows {
+        try Self.traverse(sorted: sorted, route: [], tree: self, yield: yield)
     }
 
-    private static func traverse(sorted: Bool = false, route: [Key], tree: Tree, yield: ((route: [Key], value: Value?)) -> ()) {
-        yield((route, tree.value))
+    private static func traverse(sorted: Bool = false, route: [Key], tree: Tree, yield: ((route: [Key], value: Value?)) throws -> ()) rethrows {
+        try yield((route, tree.value))
         if sorted {
             for (key, tree) in tree.branches.sorted(by: { $0.key < $1.key }) {
-                traverse(sorted: sorted, route: route + [key], tree: tree, yield: yield)
+                try traverse(sorted: sorted, route: route + [key], tree: tree, yield: yield)
             }
         } else {
             for (key, tree) in tree.branches {
-                traverse(sorted: sorted, route: route + [key], tree: tree, yield: yield)
+                try traverse(sorted: sorted, route: route + [key], tree: tree, yield: yield)
             }
         }
     }
