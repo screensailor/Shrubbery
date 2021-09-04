@@ -11,14 +11,6 @@ public struct Shrub<Key>: Shrubbery where Key: Hashable {
     public mutating func set(_ route: Route, to value: Any?) {
         Self.set(route, in: &unwrapped, to: value)
     }
-
-    public mutating func delete(_ route: Route) {
-        Self.set(route, in: &unwrapped, to: nil)
-    }
-
-    public mutating func delete() {
-        Self.set(in: &unwrapped, to: nil)
-    }
 }
 
 // MARK: static get

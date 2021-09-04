@@ -1,12 +1,19 @@
 import Foundation
 
-public class DeltaShrub<Key>: Delta where Key: Hashable {
+public class DeltaShrub<Key: Hashable>: AnyWrapper {
     
     public typealias Subject = PassthroughSubject<Result<Any?, Error>, Never>
     
     public private(set) var shrub: Shrub<Key>
     private var subscriptions: Tree<Fork, Subject>
     private let lock = Lock()
+    
+    public var unwrapped: Any? { shrub.unwrapped }
+    
+    public required init(_ unwrapped: Any?) {
+        self.shrub = .init(unwrapped)
+        self.subscriptions = .init()
+    }
 
     public init(
         drop: Shrub<Key> = nil,
@@ -16,19 +23,14 @@ public class DeltaShrub<Key>: Delta where Key: Hashable {
         self.subscriptions = subscriptions
     }
 
-    public convenience init(_ unwrapped: Any) {
-        self.init(drop: Shrub<Key>(unwrapped))
-    }
-    
-    // MARK: sync
-
     func sync<A>(_ work: () throws -> A) rethrows -> A {
         lock.lock()
         defer{ lock.unlock() }
         return try work()
     }
+}
 
-    // MARK: delta flow
+extension DeltaShrub: Delta {
 
     public func flow(_ route: Route) -> AnyPublisher<Result<Any?, Error>, Never> {
         sync {
@@ -38,36 +40,15 @@ public class DeltaShrub<Key>: Delta where Key: Hashable {
             .eraseToAnyPublisher()
         }
     }
+}
 
-    // MARK: get
+extension DeltaShrub: ShrubberyObject {
 
-    public func get<A>(_ route: Fork...) throws -> A {
-        try get(route)
+    public func get(_ route: Route) throws -> Self {
+        try sync{ try Self(shrub.get(route)) }
     }
 
-    public func get<A, Route>(_ route: Route) throws -> A
-    where
-        Route: Collection,
-        Route.Element == Fork
-    {
-        try sync{ try shrub.get(route) }
-    }
-
-    // MARK: set
-
-    public func reset(to unwrapped: Any? = nil) {
-        set([], to: unwrapped)
-    }
-
-    public func set<A>(_ route: Fork..., to value: A) {
-        set(route, to: value)
-    }
-
-    public func set<A, Route>(_ route: Route, to value: A)
-    where
-        Route: Collection,
-        Route.Element == Fork
-    {
+    public func set(_ route: Route, to value: Any?) {
         if let value = value as? Result<Any?, Error> { // TODO:❗️ think deeper
             switch value {
             case let .success(value): return set(route, to: value)

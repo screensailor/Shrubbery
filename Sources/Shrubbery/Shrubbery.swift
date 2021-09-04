@@ -12,10 +12,13 @@ where
     Value == Any?
 {
     func get(_ route: Route) throws -> Self
-    
-    mutating func set(_ route: Route, to: Any?)
-
+    mutating func set(_ route: Route, to value: Any?)
     mutating func delete(_ route: Route)
+}
+
+public protocol ShrubberyObject: Shrubbery {
+    func set(_ route: Route, to value: Any?)
+    func delete(_ route: Route)
 }
 
 // MARK: views
@@ -44,6 +47,15 @@ extension Shrubbery {
             throw "Expected \(A.self) but got \(type(of: unwrapped))"
         }
         return a
+    }
+}
+
+// MARK: init
+
+extension Shrubbery {
+    
+    public init(_ o: Self) {
+        self.init(o.unwrapped)
     }
 }
 
@@ -185,31 +197,38 @@ extension Shrubbery {
 // MARK: set
 
 extension Shrubbery {
-    
-    public init(_ o: Self) {
-        self.init(o.unwrapped)
-    }
 
-    public mutating func set<A>(_ route: Key, rest: Key..., to value: A) {
+    @inlinable public mutating func set<A>(_ route: Key, rest: Key..., to value: A) {
         set([route] + rest, to: value as Any?)
     }
     
-    public mutating func set<A, Route>(_ route: Route, to value: A) where
+    @inlinable public mutating func set<A, Route>(_ route: Route, to value: A) where
         Route: Collection,
         Route.Element == Key
     {
         set(route.map{ ^$0 }, to: value)
     }
 
-    public mutating func set<A>(_ route: Fork..., to value: A) {
+    @inlinable public mutating func set<A>(_ route: Fork..., to value: A) {
         set(route, to: value as Any?)
     }
+}
+
+extension ShrubberyObject {
+
+    @inlinable public func set<A>(_ route: Key, rest: Key..., to value: A) {
+        set([route] + rest, to: value as Any?)
+    }
     
-    public mutating func set<A, Route>(_ route: Route, to value: A) where
+    @inlinable public func set<A, Route>(_ route: Route, to value: A) where
         Route: Collection,
-        Route.Element == Fork
+        Route.Element == Key
     {
-        set(route.array, to: value as Any?)
+        set(route.map{ ^$0 }, to: value)
+    }
+
+    @inlinable public func set<A>(_ route: Fork..., to value: A) {
+        set(route, to: value as Any?)
     }
 }
 
@@ -217,19 +236,41 @@ extension Shrubbery {
 
 extension Shrubbery {
     
-    @inlinable public mutating func delete() {
+    @inlinable mutating public func delete() {
         delete([])
     }
     
-    @inlinable public mutating func delete(_ route: Fork...) {
+    @inlinable mutating public func delete(_ route: Fork...) {
         delete(route)
     }
 
-    public mutating func delete<Route>(_ route: Route) where
+    @inlinable mutating public func delete<Route>(_ route: Route) where
         Route: Collection,
         Route.Element == Fork
     {
-        delete(route.array)
+        set(Array(route), to: nil)
+    }
+}
+
+extension ShrubberyObject {
+    
+    @inlinable public func delete() {
+        delete([])
+    }
+    
+    @inlinable public func delete(_ route: Fork...) {
+        delete(route)
+    }
+
+    @inlinable public func delete<Route>(_ route: Route) where
+        Route: Collection,
+        Route.Element == Fork
+    {
+        set(Array(route), to: nil)
+    }
+    
+    public func delete(_ route: [EitherType<Int, Key>]) {
+        set(Array(route), to: nil)
     }
 }
 
