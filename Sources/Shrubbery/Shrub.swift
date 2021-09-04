@@ -69,8 +69,6 @@ extension Shrub {
 // MARK: static set
 
 extension Shrub {
-    
-    public static var none: Any { Optional<Value>.none as Any }
 
     public static func set(_ route: Fork..., in any: inout Any?, to value: Any?) {
         set(route, in: &any, to: value)
@@ -94,23 +92,23 @@ extension Shrub {
                 // TODO: allow relative indexing
                 return
             }
-            var array = any as? [Any] ?? []
-            array.append(contentsOf: repeatElement(none, count: max(0, int - array.endIndex + 1)))
+            var array = any as? [Any?] ?? []
+            array.append(contentsOf: repeatElement(nil, count: max(0, int - array.endIndex + 1)))
             var o: Any? = array[int]
             Self.set(route.dropFirst(), in: &o, to: value)
-            array[int] = o ?? none
+            array[int] = o as Any
             for e in array.reversed() {
                 guard isNilAfterFlattening(e) else { break }
                 array.removeLast()
             }
-            any = array.isEmpty ? none : array
+            any = array.isEmpty ? nil : array
             
         case .b(let key):
             var dictionary = any as? [Key: Any] ?? [:]
-            var o: Any? = dictionary[key] ?? []
+            var o: Any? = dictionary[key]
             Self.set(route.dropFirst(), in: &o, to: value)
             dictionary[key] = o
-            any = dictionary.isEmpty ? none : dictionary
+            any = dictionary.isEmpty ? nil : dictionary
         }
     }
 }

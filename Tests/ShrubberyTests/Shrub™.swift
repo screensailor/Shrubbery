@@ -80,6 +80,21 @@ class Shrub™: Hopes {
 
         hope(o["and", 2]) == "..."
     }
+    
+    func test_delete() throws {
+        
+        var o: JSON = [
+            "one": [
+                "two": [
+                    nil, nil, nil, 3
+                ]
+            ]
+        ]
+        
+        o.delete("one", "two", 3)
+        
+        hope.true(o.unwrapped == nil)
+    }
 }
 
 extension Shrub™ {
